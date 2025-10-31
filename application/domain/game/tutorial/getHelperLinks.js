@@ -1,0 +1,3 @@
+() => ({
+  ...lib.game.tutorial.getHelperLinks(),
+});
