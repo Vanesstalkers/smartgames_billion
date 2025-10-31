@@ -1,6 +1,6 @@
 export default {
-  path: '/game/TO_CHANGE/:type/:id',
-  name: 'TO_CHANGE Game',
+  path: '/game/billion/:type/:id',
+  name: 'Billion Game',
   component: function () {
     return import('./Game.vue');
   },

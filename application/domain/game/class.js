@@ -6,11 +6,12 @@
       ...lib.game.decorators['@hasDeck'].decorate(),
     });
 
-    this.defaultClasses({
-      Player: domain.game._objects.Player,
-      Deck: domain.game._objects.Deck,
-      Card: domain.game._objects.Card,
-    });
+    // TO_CHANGE - uncomment if needed
+    // this.defaultClasses({
+    //   Player: domain.game._objects.Player,
+    //   Deck: domain.game._objects.Deck,
+    //   Card: domain.game._objects.Card,
+    // });
   }
 
   getFullPrice() {

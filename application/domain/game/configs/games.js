@@ -1,18 +1,10 @@
 () => ({
-  TO_CHANGE: {
-    ...{ title: 'TO_CHANGE', icon: ['fas', 'user'] },
+  billion: {
+    ...{ title: 'Тренажёр', icon: ['fa', 'money'] },
     items: {
-      blitz: {
-        title: 'Блиц',
+      default: {
+        title: 'Ручной',
         timer: 60,
-      },
-      standart: {
-        title: 'Стандарт',
-        timer: 45,
-      },
-      hardcore: {
-        title: 'Хардкор',
-        timer: 30,
       },
     },
     itemsDefault: {

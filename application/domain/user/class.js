@@ -1,5 +1,5 @@
 () =>
-  class TO_CHANGE extends lib.game.userClass() {
+  class BillionGameUser extends lib.game.userClass() {
     async gameFinished({ gameId, gameType, playerEndGameStatus, fullPrice, roundCount }) {
       const {
         helper: { getTutorial },
