@@ -1,10 +1,11 @@
 <template>
-  <game :defaultScaleMinVisibleWidth="1000" :planeScaleMin="1" :planeScaleMax="5">
+  <game :defaultScaleMinVisibleWidth="2000" :planeScaleMin="1" :planeScaleMax="5">
     <template #helper-guru="{ menuWrapper, menuButtonsMap } = {}" />
 
     <template #gameplane="{
       /* game = {}, gamePlaneScale */
     } = {}">
+      <billion-game-plane />
     </template>
 
     <template #gameinfo="{ } = {}">
@@ -55,16 +56,22 @@ import card from '~/lib/game/front/components/card.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
 
+import billionGamePlane from './components/plane.vue';
+
 export default {
   components: {
     Game,
     player,
     card,
     tutorial,
+    billionGamePlane,
   },
   props: {},
   setup() {
-    const gameGlobals = prepareGameGlobals();
+    const gameGlobals = prepareGameGlobals({
+      defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
+    });
+
     provide('gameGlobals', gameGlobals);
     return gameGlobals;
   },

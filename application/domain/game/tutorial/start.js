@@ -1,14 +1,15 @@
+/* eslint-disable max-len */
 ({
   steps: {
     hello: {
       initialStep: true,
       superPos: true,
       text: `
-        Поздравляю, ты начал многопользовательскую партию "Игра на миллиард". Пока ты ждешь подключения других игроков, я готов рассказать об интерфейсе игры.
+        Поздравляю, ты начал многопользовательскую партию "Игра на миллиард"! Пока ты ждешь подключения других игроков, я готов рассказать об интерфейсе игры.
       `,
       actions: {
         before: ({ $root }) => {
-          const skipStep = $root.querySelector('.players .player') ? false : true;
+          const skipStep = !$root.querySelector('.players .player');
           return { skipStep };
         },
       },
@@ -24,7 +25,7 @@
       superPos: true,
       actions: {
         before: ({ $root }) => {
-          const skipStep = $root.querySelector('.players .player') ? true : false;
+          const skipStep = !!$root.querySelector('.players .player');
           return { skipStep };
         },
       },
@@ -37,7 +38,7 @@
       text: 'Это твой противник. Ты можешь увидеть сколько карт у него в руке.',
       actions: {
         before: ({ $root }) => {
-          const skipStep = $root.querySelector('.players .player') ? false : true;
+          const skipStep = !$root.querySelector('.players .player');
           return { skipStep };
         },
       },
