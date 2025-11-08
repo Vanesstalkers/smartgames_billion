@@ -1,19 +1,31 @@
 #gameInfo {
+  .deck-list {
+    scale: 0.3;
+    transform-origin: right top;
+  }
+
   .deck {
     position: absolute;
     top: 35px;
     cursor: default;
 
     .card-event {
-      width: 60px;
-      height: 90px;
+      width: 152px;
+      height: 296px;
+
+      background-color: transparent;
+      background-image: url(../assets/cards.png);
+      background-size: 720px auto;
+      background-repeat: no-repeat;
+      position: relative;
+
       border: none;
-      font-size: 36px;
+      font-size: 108px;
       display: flex;
       justify-content: center;
       align-content: center;
       color: #ff5900;
-      text-shadow: 1px 1px 0 #fff;
+      text-shadow: 4px 4px 0 #fff;
     }
 
     &.drop {
@@ -24,6 +36,75 @@
       cursor: default;
       .card-event {
         color: #ccc;
+      }
+    }
+
+    &[code="Deck[card_construction]"] {
+      right: 0px;
+      .card-event {
+        background-position: -188px 0px;
+      }
+    }
+    
+    &[code="Deck[card_mining]"] {
+      display: block !important;
+      right: 160px;
+      .card-event {
+        background-position: 0px -654px;
+      }
+    }
+    &[code="Deck[card_finance]"] {
+      right: 325px;
+      .card-event {
+        background-position: -378px -654px;
+      }
+    }
+    &[code="Deck[card_electronic]"] {
+      right: 490px;
+      .card-event {
+        background-position: 0px -326px;
+      }
+    }
+    &[code="Deck[card_media]"] {
+      right: 655px;
+      .card-event {
+        background-position: -188px -654px;
+      }
+    }
+    &[code="Deck[card_distribution]"] {
+      right: 810px;
+      .card-event {
+        background-position: -569px -654px;
+      }
+    }
+    &[code="Deck[card_art]"] {
+      right: 975px;
+      .card-event {
+        background-position: 0px 0px;
+      }
+    }
+    &[code="Deck[card_it]"] {
+      right: 1140px;
+      .card-event {
+        background-position: -378px 0px;
+      }
+    }
+    &[code="Deck[card_engineering]"] {
+      right: 1305px;
+      .card-event {
+        background-position: -378px -326px;
+      }
+    }
+    &[code="Deck[card_chemistry]"] {
+      right: 1470px;
+      .card-event {
+        background-position: -569px -326px;
+      }
+    }
+    &[code="Deck[card_light]"] {
+      right: 1635px;
+      .card-event {
+        background-position: -188px -326px;
       }
     }
   }

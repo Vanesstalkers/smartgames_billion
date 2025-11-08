@@ -53,7 +53,8 @@ export default {
       return { id: this.state.currentUser, ...(currentUserData || {}) };
     },
     viewLoaded() {
-      return this.$root.state.viewLoaded;
+      return true;
+      // return this.$root.state.viewLoaded;
     },
   },
   methods: {

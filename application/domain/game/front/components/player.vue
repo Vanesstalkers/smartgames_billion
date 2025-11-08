@@ -17,17 +17,6 @@
               :imgExt="'png'"
             />
           </div>
-          <div class="hand-cards at-table" :cardCount="tableCards.length">
-            <card
-              v-for="card in tableCards"
-              :key="card.id"
-              :cardId="card.id"
-              :cardGroup="card.group"
-              :canPlay="canPlay(card)"
-              :myCard="iam"
-              :imgExt="'png'"
-            />
-          </div>
         </div>
       </div>
       <div class="workers">

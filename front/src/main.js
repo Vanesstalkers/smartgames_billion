@@ -25,9 +25,9 @@ const init = async () => {
   const port = new URLSearchParams(location.search).get('port') || serverFrontConfig.port;
 
   const serverHost =
-    process.env.NODE_ENV === 'development' || new URLSearchParams(document.location.search).get('dev')
-      ? `${location.hostname}:${port}`
-      : `${location.hostname + location.pathname}api/`;
+    process.env.NODE_ENV === 'development' || new URLSearchParams(document.location.search).get('dev') ?
+      `${location.hostname}:${port}` :
+      `${location.hostname + location.pathname}api/`;
 
   const metacom = Metacom.create(`${protocol}://${serverHost}`);
   metacom.on('error', (err) => {
@@ -56,12 +56,12 @@ const init = async () => {
         mergeDeep({ target: state.store, source: data });
       },
       alert(data, config) {
-        prettyAlert(data, config);
+        window.prettyAlert(data, config);
       },
       logout() {
         window.app.$set(window.app.$root.state, 'currentUser', '');
         localStorage.removeItem(window.tokenName);
-        router.push({ path: `/` }).catch((err) => {
+        router.push({ path: '/' }).catch((err) => {
           console.log(err);
         });
       },
@@ -74,16 +74,15 @@ const init = async () => {
     event(data, config);
   });
 
-  window.addEventListener('message', async function (e) {
+  window.addEventListener('message', async (e) => {
     const { path, args, routeTo, emit } = e.data;
     if (path && args) {
-      const result = await api.action.call({ path, args }).catch((err) => prettyAlert(err));
+      const result = await api.action.call({ path, args }).catch((err) => window.prettyAlert(err));
 
       if (result?.logout === true) {
-        return await api.action.call({ path: 'lobby.api.logout' }).catch(prettyAlert);
+        return await api.action.call({ path: 'lobby.api.logout' }).catch(window.prettyAlert);
       }
       return result;
-
     }
 
     if (routeTo) {
@@ -174,7 +173,7 @@ const init = async () => {
     router,
     mixins: [mixin],
     data: { state },
-    render: function (h) {
+    render(h) {
       return h(App);
     },
   });
@@ -196,11 +195,11 @@ const init = async () => {
     const height = window.innerHeight;
     state.innerWidth = screen.width;
     state.innerHeight = screen.height;
-    state.isMobile = isMobile() ? true : false;
+    state.isMobile = !!isMobile();
     state.isLandscape = height < width;
     state.isPortrait = !state.isLandscape;
     state.guiScale = width < 1000 ? 1 : width < 1500 ? 2 : width < 2000 ? 3 : width < 3000 ? 4 : 5;
-    state.isFullscreen = document.fullscreenElement ? true : false;
+    state.isFullscreen = !!document.fullscreenElement;
   };
 
   // window.addEventListener('orientationchange', async () => {
@@ -210,7 +209,7 @@ const init = async () => {
   window.addEventListener('resize', checkDevice);
   checkDevice();
 
-  document.addEventListener('contextmenu', function (event) {
+  document.addEventListener('contextmenu', (event) => {
     event.preventDefault();
   });
 };

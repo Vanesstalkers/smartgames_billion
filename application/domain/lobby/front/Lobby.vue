@@ -1,14 +1,18 @@
 <template>
-  <lobby :customInitSession="customInitSession" />
+  <lobby :customInitSession="insideIframe ? customInitSession : null" />
 </template>
 
 <script>
 import Lobby from '~/lib/lobby/front/Lobby.vue';
 export default {
+  name: 'BillionLobby',
   components: { Lobby },
   computed: {
     state() {
       return this.$root.state || {};
+    },
+    insideIframe() {
+      return new URLSearchParams(document.location.search).get('userId');
     },
   },
   methods: {
@@ -17,9 +21,9 @@ export default {
     },
   },
   created() {
-    this.state.emit.logout = async () => {
-      window.parent.postMessage({ emit: { name: 'hideGameIframe' } }, '*');
-    };
+    // this.state.emit.logout = async () => {
+    //   window.parent.postMessage({ emit: { name: 'hideGameIframe' } }, '*');
+    // };
   },
   async beforeDestroy() {},
 };
