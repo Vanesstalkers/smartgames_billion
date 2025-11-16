@@ -127,6 +127,7 @@ const init = async () => {
             })) || {};
 
         const { token: sessionToken, userId, reconnect } = session;
+        console.log('mixin initSession', { token, sessionToken, userId, reconnect });
         if (reconnect) {
           const { workerId, ports } = reconnect;
           const port = ports[workerId.substring(1) * 1 - 1];

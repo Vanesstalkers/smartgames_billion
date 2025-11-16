@@ -25,12 +25,11 @@ export default {
     //   window.parent.postMessage({ emit: { name: 'hideGameIframe' } }, '*');
     // };
   },
+  mounted() {
+    console.log("domain.lobby mounted() {");
+  },
   async beforeDestroy() {},
 };
 </script>
 <style lang="scss">
-#lobby {
-  // чтобы не мельтешил при загрузке игры
-  display: none !important;
-}
 </style>

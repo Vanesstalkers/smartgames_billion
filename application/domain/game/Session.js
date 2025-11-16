@@ -1,4 +1,4 @@
-(class BillionSession extends domain.game.Session {
+(class BillionGameSession extends lib.game.Session() {
   getUserClass() {
     return domain.user.Class;
   }

@@ -41,6 +41,8 @@
           throw transportError;
         }
       }
+
+      return err;
     }
   },
 });
