@@ -2,7 +2,7 @@
   billion: {
     ...{ title: 'Тренажёр', icon: ['fa', 'money'] },
     items: {
-      default: {
+      playtable: {
         title: 'Ручной',
         timer: 60,
       },

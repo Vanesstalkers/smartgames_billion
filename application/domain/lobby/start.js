@@ -15,7 +15,7 @@ async () => {
   if (application.worker.id === 'W1') {
     db.redis.handlers.afterStart({ workerStarted: async () => {
       async function connectToLobby() {
-        const smartgamesLobby = await db.redis.get('smartgamesLobby', { json: true });
+        const smartgamesLobby = await db.redis.get('smartgamesPortalLobby', { json: true });
         if (smartgamesLobby) {
           const { channelName } = smartgamesLobby;
           const url = 'https://smartgames.studio/billion';
@@ -25,7 +25,7 @@ async () => {
             icon: ['fas', 'microchip'],
             active: true,
             url: lib.lobby.__devMode ? 'http://localhost:8085' : url,
-            serverUrl: lib.lobby.__devMode ? `http://localhost:${config.server.balancer}` : `${url}/api`,
+            serverUrl: lib.lobby.__devMode ? `http://localhost:${config.server.ports[0]}` : `${url}/api`,
             games: lib.lobby.__games,
           });
           return;
