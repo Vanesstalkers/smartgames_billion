@@ -4,7 +4,7 @@
       <games
         class="menu-item-content"
         :games="gamesMap"
-        :deckType="'billion'"
+        :deckType="lobby.defaultGameType"
       >
         <!-- <template
           #new-game-controls="{
@@ -239,6 +239,12 @@ export default {
   computed: {
     state() {
       return this.$root.state || {};
+    },
+    store() {
+      return this.state.store || {};
+    },
+    lobby() {
+      return this.store.lobby?.[this.state.currentLobby] || {};
     },
     insideIframe() {
       return new URLSearchParams(document.location.search).get("userId");
