@@ -1,4 +1,3 @@
 ({
   appCode: 'billionGame',
-  defaultGameType: 'billion',
 });

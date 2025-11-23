@@ -1,5 +1,17 @@
 async () => {
-  lib.lobby.__tutorialImgPrefix = lib.lobby.__devMode ? '' : '/billion';
+  const code = 'billion';
+  const smartgamesURL = `https://smartgames.studio/${code}`;
+
+  lib.lobby.__gameServerConfig = {
+    code,
+    title: 'Игра на миллиард',
+    icon: ['fa', 'rub'],
+    active: true,
+    url: lib.lobby.__devMode ? 'http://localhost:8085' : smartgamesURL,
+    serverUrl: lib.lobby.__devMode ? `http://localhost:${config.server.ports[0]}` : `${smartgamesURL}/api`,
+    games: {}, // будет заполнено в lib.lobby.start.fillingLobbyGamesList
+  };
+  lib.lobby.__tutorialImgPrefix = lib.lobby.__devMode ? '' : `/${code}`;
 
   {
     // TO_CHANGE - uncomment if needed
@@ -18,16 +30,7 @@ async () => {
         const smartgamesLobby = await db.redis.get('smartgamesPortalLobby', { json: true });
         if (smartgamesLobby) {
           const { channelName } = smartgamesLobby;
-          const url = 'https://smartgames.studio/billion';
-          lib.store.broadcaster.publishAction(channelName, 'gameServerConnected', {
-            code: 'billion',
-            title: 'Игра на миллиард',
-            icon: ['fas', 'microchip'],
-            active: true,
-            url: lib.lobby.__devMode ? 'http://localhost:8085' : url,
-            serverUrl: lib.lobby.__devMode ? `http://localhost:${config.server.ports[0]}` : `${url}/api`,
-            games: lib.lobby.__games,
-          });
+          lib.store.broadcaster.publishAction(channelName, 'gameServerConnected', lib.lobby.__gameServerConfig);
           return;
         }
         setTimeout(async () => await connectToLobby(), 1000);

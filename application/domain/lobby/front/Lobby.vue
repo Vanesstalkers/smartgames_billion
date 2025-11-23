@@ -1,10 +1,10 @@
 <template>
   <lobby :customInitSession="insideIframe ? customInitSession : null">
-    <template #menu-item-game>
+    <template v-if="lobby.__gameServerConfig" #menu-item-game>
       <games
         class="menu-item-content"
-        :games="gamesMap"
-        :deckType="lobby.defaultGameType"
+        :deckMap="deckMap"
+        :defaultDeckType="defaultDeckType"
       >
         <!-- <template
           #new-game-controls="{
@@ -216,25 +216,7 @@ export default {
   name: "BillionLobby",
   components: { Lobby, games },
   data() {
-    return {
-      gamesMap: {
-        billion: {
-          selected: true,
-          title: "Игра на миллиард",
-          icon: ["fa", "money"],
-          items: {
-            playtable: {
-              timer: 60,
-              title: "Игровой стол",
-            },
-            trainer: {
-              disabled: true,
-              title: "Тренажёр",
-            },
-          },
-        },
-      },
-    };
+    return {};
   },
   computed: {
     state() {
@@ -248,6 +230,14 @@ export default {
     },
     insideIframe() {
       return new URLSearchParams(document.location.search).get("userId");
+    },
+    defaultDeckType() {
+      return this.lobby.__gameServerConfig?.code;
+    },
+    deckMap() {
+      return {
+        [this.defaultDeckType]: this.lobby.__gameServerConfig,
+      };
     },
   },
   methods: {
