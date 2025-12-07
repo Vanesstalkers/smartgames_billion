@@ -18,15 +18,15 @@ Vue.config.productionTip = false;
 
 const init = async () => {
   if (!window.name) window.name = Date.now() + Math.random();
-  window.tokenName = 'smartgames.session.token';
+
+  window.tokenName = 'smartgames.session.token-' + location.host + location.pathname;
+  if (window.tokenName.endsWith('/')) window.tokenName = window.tokenName.slice(0, -1);
 
   const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
-  // направление на конкретный port нужно для reconnect (см. initSession) + для отладки
-  const port = new URLSearchParams(location.search).get('port') || serverFrontConfig.port;
 
   const serverHost =
     process.env.NODE_ENV === 'development' || new URLSearchParams(document.location.search).get('dev') ?
-      `${location.hostname}:${port}` : `${location.hostname + location.pathname}api/`;
+      `${location.hostname}:${serverFrontConfig.port}` : `${location.hostname + location.pathname}api/`;
 
   const metacom = Metacom.create(`${protocol}://${serverHost}`);
   metacom.on('error', (err) => {
@@ -35,7 +35,6 @@ const init = async () => {
   const { api } = metacom;
   window.metacom = metacom;
   window.api = api;
-  window.iframeEvents = [];
 
   await metacom.load('action');
 
@@ -125,14 +124,7 @@ const init = async () => {
               if (typeof onError === 'function') await onError(err);
             })) || {};
 
-        const { token: sessionToken, userId, reconnect } = session;
-        console.log('mixin initSession', { token, sessionToken, userId, reconnect });
-        if (reconnect) {
-          const { workerId, ports } = reconnect;
-          const port = ports[workerId.substring(1) * 1 - 1];
-          location.href = `${location.origin}?port=${port}`;
-          return;
-        }
+        const { token: sessionToken, userId } = session;
 
         this.$set(this.$root.state, 'currentToken', sessionToken);
         if (sessionToken && sessionToken !== token) localStorage.setItem(window.tokenName, sessionToken);
@@ -140,31 +132,8 @@ const init = async () => {
           this.$set(this.$root.state, 'currentUser', userId);
           if (typeof onSuccess === 'function') await onSuccess(session);
         }
-      },
-      async initSessionIframe() {
-        const searchParams = new URLSearchParams(document.location.search);
-        const userId = searchParams.get('userId');
-        const lobbyId = searchParams.get('lobbyId');
-        const token = searchParams.get('token');
 
-        await api.action.public({
-          path: 'user.api.initSession',
-          args: [
-            {
-              ...{ token, userId, lobbyId },
-              windowTabId: window.name,
-            },
-          ],
-        });
-
-        this.$set(this.$root.state, 'currentUser', userId);
-        this.$set(this.$root.state, 'currentLobby', lobbyId);
-        this.$set(this.$root.state, 'lobbyOrigin', searchParams.get('lobbyOrigin'));
-
-        if (window !== window.parent) {
-          const iframeCode = searchParams.get('iframeCode');
-          window.parent.postMessage({ emit: { name: 'iframeAlive', data: { iframeCode } } }, '*');
-        }
+        return session;
       },
     },
   };

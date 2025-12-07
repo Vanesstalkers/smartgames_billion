@@ -1,5 +1,5 @@
 <template>
-  <lobby :customInitSession="insideIframe ? customInitSession : null">
+  <lobby :gameServerTitle="gameServerTitle">
     <template v-if="lobby.__gameServerConfig" #menu-item-game>
       <games
         class="menu-item-content"
@@ -228,8 +228,8 @@ export default {
     lobby() {
       return this.store.lobby?.[this.state.currentLobby] || {};
     },
-    insideIframe() {
-      return new URLSearchParams(document.location.search).get("userId");
+    gameServerTitle() {
+      return this.lobby.__gameServerConfig?.title;
     },
     defaultDeckType() {
       return this.lobby.__gameServerConfig?.code;
@@ -240,19 +240,13 @@ export default {
       };
     },
   },
-  methods: {
-    async customInitSession() {
-      await this.$root.initSessionIframe();
-    },
-  },
+  methods: {},
   created() {
     // this.state.emit.logout = async () => {
     //   window.parent.postMessage({ emit: { name: 'hideGameIframe' } }, '*');
     // };
   },
-  mounted() {
-    console.log("domain.lobby mounted() {");
-  },
+  mounted() {},
   async beforeDestroy() {},
 };
 </script>
