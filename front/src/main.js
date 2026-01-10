@@ -25,8 +25,9 @@ const init = async () => {
   const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
 
   const serverHost =
-    process.env.NODE_ENV === 'development' || new URLSearchParams(document.location.search).get('dev') ?
-      `${location.hostname}:${serverFrontConfig.port}` : `${location.hostname + location.pathname}api/`;
+    process.env.NODE_ENV === 'development' || new URLSearchParams(document.location.search).get('dev')
+      ? `${location.hostname}:${serverFrontConfig.port}`
+      : `${location.hostname + location.pathname}api/`;
 
   const metacom = Metacom.create(`${protocol}://${serverHost}`);
   metacom.on('error', (err) => {
@@ -45,6 +46,7 @@ const init = async () => {
     isMobile: false,
     isLandscape: true,
     isPortrait: false,
+    iframeMode: window !== window.parent,
     isFullscreen: false,
     gamePlaneNeedUpdate: false,
     guiScale: 1,
