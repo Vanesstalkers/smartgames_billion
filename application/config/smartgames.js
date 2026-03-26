@@ -1,5 +1,5 @@
 ({
-  appCode: 'TO_CHANGE',
-  appTitle: 'TO_CHANGE',
-  appIcon: ['fas', 'TO_CHANGE'],
+  appCode: 'billion',
+  appTitle: 'Игра на миллиард',
+  appIcon: ['fas', 'money'],
 });

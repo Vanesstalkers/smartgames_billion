@@ -16,7 +16,6 @@ import games from '~/lib/lobby/front/components/games.vue';
 import tutorialGames from './components/tutorial-games.vue';
 
 export default {
-  name: 'TO_CHANGE',
   components: { Lobby, games, tutorialGames },
   data() {
     return {};
