@@ -4,13 +4,14 @@
     :gamePlaneFillWidth="[0.4, 0.4, 0.4, 0.4, 0.4][state.guiScale - 1]"
     :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]"
   >
-    <template #helper-guru="{ menuWrapper, menuButtonsMap } = {}">
+    <!-- <template #helper-guru="{ menuWrapper, menuButtonsMap } = {}">
       <tutorial :game="game" class="scroll-off" :customMenu="customMenu({ menuWrapper, menuButtonsMap })" />
-    </template>
+    </template> -->
 
     <template #gameplane="{
       /* game = {}, gamePlaneScale */
     } = {}">
+      <billion-game-plane />
     </template>
 
     <template #gameinfo="{} = {}">
@@ -64,16 +65,22 @@ import card from '~/lib/game/front/components/card.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
 
+import billionGamePlane from './components/plane.vue';
+
 export default {
   components: {
     Game,
     player,
     card,
     tutorial,
+    billionGamePlane,
   },
   props: {},
   setup() {
-    const gameGlobals = prepareGameGlobals({ defaultDeviceOffset: 500 });
+    const gameGlobals = prepareGameGlobals({
+      defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
+    });
+
     provide('gameGlobals', gameGlobals);
     return gameGlobals;
   },
@@ -127,21 +134,22 @@ export default {
     },
   },
   methods: {
-    customMenu({ menuWrapper, menuButtonsMap } = {}) {
-      if (!menuButtonsMap) return [];
+    // ??? попробовать убрать
+    // customMenu({ menuWrapper, menuButtonsMap } = {}) {
+    //   if (!menuButtonsMap) return [];
 
-      const { cancel, restore, tutorials, helperLinks, leave } = menuButtonsMap();
-      const fillTutorials = tutorials({
-        showList: [
-          { title: 'Стартовое приветствие игры', action: { tutorial: 'game-tutorial-start' } },
-          { title: 'Управление игровым полем', action: { tutorial: 'game-tutorial-gamePlane' } },
-        ],
-      });
+    //   const { cancel, restore, tutorials, helperLinks, leave } = menuButtonsMap();
+    //   const fillTutorials = tutorials({
+    //     showList: [
+    //       { title: 'Стартовое приветствие игры', action: { tutorial: 'game-tutorial-start' } },
+    //       { title: 'Управление игровым полем', action: { tutorial: 'game-tutorial-gamePlane' } },
+    //     ],
+    //   });
 
-      return menuWrapper({
-        buttons: [cancel(), restore(), fillTutorials, helperLinks({ inGame: true }), leave()],
-      });
-    },
+    //   return menuWrapper({
+    //     buttons: [cancel(), restore(), fillTutorials, helperLinks({ inGame: true }), leave()],
+    //   });
+    // },
   },
 };
 </script>
