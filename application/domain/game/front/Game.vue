@@ -1,9 +1,5 @@
 <template>
   <game :debug="false" :gamePlaneFillWidth="0.2" :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]">
-    <!-- <template #helper-guru="{ menuWrapper, menuButtonsMap } = {}">
-      <tutorial :game="game" class="scroll-off" :customMenu="customMenu({ menuWrapper, menuButtonsMap })" />
-    </template> -->
-
     <template
       #gameplane="{
         /* game = {}, gamePlaneScale */
@@ -86,7 +82,7 @@ export default {
       ...prepareGameGlobals({
         defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
       }),
-      getCardCustomStyle: ()=>({
+      getCardCustomStyle: () => ({
         backgroundImage: `url(${state.serverOrigin}/img/cards/default/industry/cards.png)`,
       }),
     };
@@ -143,22 +139,7 @@ export default {
       return Object.keys(this.game.deckMap).map((id) => this.store.deck?.[id]) || [];
     },
   },
-  methods: {
-    // ??? попробовать убрать
-    // customMenu({ menuWrapper, menuButtonsMap } = {}) {
-    //   if (!menuButtonsMap) return [];
-    //   const { cancel, restore, tutorials, helperLinks, leave } = menuButtonsMap();
-    //   const fillTutorials = tutorials({
-    //     showList: [
-    //       { title: 'Стартовое приветствие игры', action: { tutorial: 'game-tutorial-start' } },
-    //       { title: 'Управление игровым полем', action: { tutorial: 'game-tutorial-gamePlane' } },
-    //     ],
-    //   });
-    //   return menuWrapper({
-    //     buttons: [cancel(), restore(), fillTutorials, helperLinks({ inGame: true }), leave()],
-    //   });
-    // },
-  },
+  methods: {},
 };
 </script>
 <style lang="scss">
