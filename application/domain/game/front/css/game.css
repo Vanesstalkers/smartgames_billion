@@ -19,38 +19,44 @@
 }
 
 .custom-card-background {
-  &[name="construction"] {
+  &[name='construction'] {
     background-position: -188px 0px;
   }
-  &[name="mining"] {
+  &[name='mining'] {
     background-position: 0px -654px;
   }
-  &[name="finance"] {
+  &[name='finance'] {
     background-position: -378px -654px;
   }
-  &[name="electronic"] {
+  &[name='electronic'] {
     background-position: 0px -326px;
   }
-  &[name="media"] {
+  &[name='media'] {
     background-position: -188px -654px;
   }
-  &[name="distribution"] {
+  &[name='distribution'] {
     background-position: -569px -654px;
   }
-  &[name="art"] {
+  &[name='art'] {
     background-position: 0px 0px;
   }
-  &[name="it"] {
+  &[name='it'] {
     background-position: -378px 0px;
   }
-  &[name="engineering"] {
+  &[name='engineering'] {
     background-position: -378px -326px;
   }
-  &[name="chemistry"] {
+  &[name='chemistry'] {
     background-position: -569px -326px;
   }
-  &[name="light"] {
+  &[name='light'] {
     background-position: -188px -326px;
+  }
+  &[name='buster'] {
+    background-position: -563px 24px;
+    width: 131px;
+    padding-top: 52px;
+    font-size: 80px;
   }
 }
 
@@ -70,40 +76,43 @@
     }
   }
 
-  &[code="Deck[card_construction]"] {
+  &[code='Deck[card_construction]'] {
     right: 0px;
   }
-  
-  &[code="Deck[card_mining]"] {
+
+  &[code='Deck[card_mining]'] {
     display: block !important;
     right: 160px;
   }
-  &[code="Deck[card_finance]"] {
+  &[code='Deck[card_finance]'] {
     right: 325px;
   }
-  &[code="Deck[card_electronic]"] {
+  &[code='Deck[card_electronic]'] {
     right: 490px;
   }
-  &[code="Deck[card_media]"] {
+  &[code='Deck[card_media]'] {
     right: 655px;
   }
-  &[code="Deck[card_distribution]"] {
+  &[code='Deck[card_distribution]'] {
     right: 810px;
   }
-  &[code="Deck[card_art]"] {
+  &[code='Deck[card_art]'] {
     right: 975px;
   }
-  &[code="Deck[card_it]"] {
+  &[code='Deck[card_it]'] {
     right: 1140px;
   }
-  &[code="Deck[card_engineering]"] {
+  &[code='Deck[card_engineering]'] {
     right: 1305px;
   }
-  &[code="Deck[card_chemistry]"] {
+  &[code='Deck[card_chemistry]'] {
     right: 1470px;
   }
-  &[code="Deck[card_light]"] {
+  &[code='Deck[card_light]'] {
     right: 1635px;
+  }
+  &[code='Deck[card_buster]'] {
+    right: 1800px;
   }
 }
 

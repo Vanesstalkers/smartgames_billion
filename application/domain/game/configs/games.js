@@ -35,6 +35,7 @@
         { type: 'card', subtype: 'engineering' },
         { type: 'card', subtype: 'chemistry' },
         { type: 'card', subtype: 'construction' },
+        { type: 'card', subtype: 'buster' },
       ],
     },
   },

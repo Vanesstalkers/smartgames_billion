@@ -5,6 +5,7 @@ export interface DomainGameActionsModule extends GameActionsModule {
   fillGameData(this: DomainGameInstance, data: Record<string, any> & { newGame?: boolean }): DomainGameInstance;
   startGame(this: DomainGameInstance): void;
   roundEnd(this: DomainGameInstance, opts?: { timerOverdue?: boolean }, initPlayer?: any): void;
+  initPrepareGameEvents(this: DomainGameInstance): any;
   endGame(
     this: DomainGameInstance,
     opts?: { winningPlayer?: any; canceledByUser?: string | boolean; message?: string }
