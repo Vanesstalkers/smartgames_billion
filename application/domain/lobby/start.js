@@ -14,6 +14,16 @@ async () => {
   };
   lib.lobby.__tutorialImgPrefix = lib.lobby.__devMode ? '' : `/${code}`;
 
+  {
+    const files = await node.fsp.readdir('./application/static/img/cards', { withFileTypes: true });
+    const cardTemplates = Object.values(files).map((_) => _.name);
+    domain.game.configs.cardTemplates = cardTemplates;
+    domain.game.configs.cardTemplates.random = ({ exclude = [] } = {}) => {
+      const templates = cardTemplates.filter((_) => !exclude.includes(_));
+      return templates[Math.floor(Math.random() * templates.length)];
+    };
+  }
+
   if (application.worker.id === 'W1') {
     db.redis.handlers.afterStart({
       workerStarted: async () => {

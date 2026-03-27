@@ -1,116 +1,117 @@
+.card-event {
+  width: 152px;
+  height: 296px;
+
+  background-color: transparent;
+  background-image: url(../assets/cards.png);
+  background-size: 720px auto;
+  background-repeat: no-repeat;
+  position: relative;
+
+  border: none;
+  border-radius: 10px;
+  font-size: 108px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  color: #ff5900;
+  text-shadow: 4px 4px 0 #fff;
+}
+
+.custom-card-background {
+  &[name="construction"] {
+    background-position: -188px 0px;
+  }
+  &[name="mining"] {
+    background-position: 0px -654px;
+  }
+  &[name="finance"] {
+    background-position: -378px -654px;
+  }
+  &[name="electronic"] {
+    background-position: 0px -326px;
+  }
+  &[name="media"] {
+    background-position: -188px -654px;
+  }
+  &[name="distribution"] {
+    background-position: -569px -654px;
+  }
+  &[name="art"] {
+    background-position: 0px 0px;
+  }
+  &[name="it"] {
+    background-position: -378px 0px;
+  }
+  &[name="engineering"] {
+    background-position: -378px -326px;
+  }
+  &[name="chemistry"] {
+    background-position: -569px -326px;
+  }
+  &[name="light"] {
+    background-position: -188px -326px;
+  }
+}
+
+.deck {
+  position: absolute;
+  top: 35px;
+  cursor: default;
+
+  &.drop {
+    filter: grayscale(0.7);
+    transform: scale(0.5);
+    margin-right: -24px;
+    margin-top: 40px;
+    cursor: default;
+    .card-event {
+      color: #ccc;
+    }
+  }
+
+  &[code="Deck[card_construction]"] {
+    right: 0px;
+  }
+  
+  &[code="Deck[card_mining]"] {
+    display: block !important;
+    right: 160px;
+  }
+  &[code="Deck[card_finance]"] {
+    right: 325px;
+  }
+  &[code="Deck[card_electronic]"] {
+    right: 490px;
+  }
+  &[code="Deck[card_media]"] {
+    right: 655px;
+  }
+  &[code="Deck[card_distribution]"] {
+    right: 810px;
+  }
+  &[code="Deck[card_art]"] {
+    right: 975px;
+  }
+  &[code="Deck[card_it]"] {
+    right: 1140px;
+  }
+  &[code="Deck[card_engineering]"] {
+    right: 1305px;
+  }
+  &[code="Deck[card_chemistry]"] {
+    right: 1470px;
+  }
+  &[code="Deck[card_light]"] {
+    right: 1635px;
+  }
+}
+
 #gameInfo {
   .deck-list {
     scale: 0.3;
     transform-origin: right top;
   }
-
-  .deck {
-    position: absolute;
-    top: 35px;
-    cursor: default;
-
-    .card-event {
-      width: 152px;
-      height: 296px;
-
-      background-color: transparent;
-      background-image: url(../assets/cards.png);
-      background-size: 720px auto;
-      background-repeat: no-repeat;
-      position: relative;
-
-      border: none;
-      font-size: 108px;
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      color: #ff5900;
-      text-shadow: 4px 4px 0 #fff;
-    }
-
-    &.drop {
-      filter: grayscale(0.7);
-      transform: scale(0.5);
-      margin-right: -24px;
-      margin-top: 40px;
-      cursor: default;
-      .card-event {
-        color: #ccc;
-      }
-    }
-
-    &[code="Deck[card_construction]"] {
-      right: 0px;
-      .card-event {
-        background-position: -188px 0px;
-      }
-    }
-    
-    &[code="Deck[card_mining]"] {
-      display: block !important;
-      right: 160px;
-      .card-event {
-        background-position: 0px -654px;
-      }
-    }
-    &[code="Deck[card_finance]"] {
-      right: 325px;
-      .card-event {
-        background-position: -378px -654px;
-      }
-    }
-    &[code="Deck[card_electronic]"] {
-      right: 490px;
-      .card-event {
-        background-position: 0px -326px;
-      }
-    }
-    &[code="Deck[card_media]"] {
-      right: 655px;
-      .card-event {
-        background-position: -188px -654px;
-      }
-    }
-    &[code="Deck[card_distribution]"] {
-      right: 810px;
-      .card-event {
-        background-position: -569px -654px;
-      }
-    }
-    &[code="Deck[card_art]"] {
-      right: 975px;
-      .card-event {
-        background-position: 0px 0px;
-      }
-    }
-    &[code="Deck[card_it]"] {
-      right: 1140px;
-      .card-event {
-        background-position: -378px 0px;
-      }
-    }
-    &[code="Deck[card_engineering]"] {
-      right: 1305px;
-      .card-event {
-        background-position: -378px -326px;
-      }
-    }
-    &[code="Deck[card_chemistry]"] {
-      right: 1470px;
-      .card-event {
-        background-position: -569px -326px;
-      }
-    }
-    &[code="Deck[card_light]"] {
-      right: 1635px;
-      .card-event {
-        background-position: -188px -326px;
-      }
-    }
-  }
-}
-.card-event {
-  border-radius: 10px;
 }
 
 .has-tutorial-example {

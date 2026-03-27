@@ -7,11 +7,11 @@
       ...lib.game.decorators['@hasDeck'].decorate(),
     });
 
-    this.defaultClasses({
-      Player: domain.game._objects.Player,
-      Deck: domain.game._objects.Deck,
-      Card: domain.game._objects.Card,
-    });
+    // this.defaultClasses({
+    //   Player: domain.game._objects.Player,
+    //   Deck: domain.game._objects.Deck,
+    //   Card: domain.game._objects.Card,
+    // });
 
     this.preventSaveFields(['decks']);
     this.preventBroadcastFields(['decks']);

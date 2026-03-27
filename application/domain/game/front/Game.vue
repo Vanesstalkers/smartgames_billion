@@ -1,16 +1,14 @@
 <template>
-  <game
-    :debug="false"
-    :gamePlaneFillWidth="[0.4, 0.4, 0.4, 0.4, 0.4][state.guiScale - 1]"
-    :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]"
-  >
+  <game :debug="false" :gamePlaneFillWidth="0.2" :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]">
     <!-- <template #helper-guru="{ menuWrapper, menuButtonsMap } = {}">
       <tutorial :game="game" class="scroll-off" :customMenu="customMenu({ menuWrapper, menuButtonsMap })" />
     </template> -->
 
-    <template #gameplane="{
-      /* game = {}, gamePlaneScale */
-    } = {}">
+    <template
+      #gameplane="{
+        /* game = {}, gamePlaneScale */
+      } = {}"
+    >
       <billion-game-plane />
     </template>
 
@@ -27,11 +25,18 @@
             :class="['deck', deck.code.includes('_drop') ? 'drop' : '']"
             :code="deck.code"
           >
-            <div class="card-event">
+            <div class="card-event custom-card-background" :name="deck.subtype" :style="getCardCustomStyle()">
               {{ Object.keys(deck.itemMap).length }}
             </div>
           </div>
         </div>
+      </div>
+    </template>
+
+    <template #shown-card="{ closeCardInfo } = {}">
+      <div class="shown-card scroll-off" v-on:click.stop="closeCardInfo">
+        <div class="close" v-on:click.stop="closeCardInfo" />
+        <img class="img custom-card-background" :name="state.shownCard.code" :style="getCardCustomStyle()" />
       </div>
     </template>
 
@@ -77,9 +82,14 @@ export default {
   },
   props: {},
   setup() {
-    const gameGlobals = prepareGameGlobals({
-      defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
-    });
+    const gameGlobals = {
+      ...prepareGameGlobals({
+        defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
+      }),
+      getCardCustomStyle: ()=>({
+        backgroundImage: `url(${state.serverOrigin}/img/cards/default/industry/cards.png)`,
+      }),
+    };
 
     provide('gameGlobals', gameGlobals);
     return gameGlobals;
@@ -137,7 +147,6 @@ export default {
     // ??? попробовать убрать
     // customMenu({ menuWrapper, menuButtonsMap } = {}) {
     //   if (!menuButtonsMap) return [];
-
     //   const { cancel, restore, tutorials, helperLinks, leave } = menuButtonsMap();
     //   const fillTutorials = tutorials({
     //     showList: [
@@ -145,7 +154,6 @@ export default {
     //       { title: 'Управление игровым полем', action: { tutorial: 'game-tutorial-gamePlane' } },
     //     ],
     //   });
-
     //   return menuWrapper({
     //     buttons: [cancel(), restore(), fillTutorials, helperLinks({ inGame: true }), leave()],
     //   });

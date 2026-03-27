@@ -15,6 +15,7 @@
               :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
+              class="custom-card-background"
             />
           </div>
         </div>
@@ -24,14 +25,6 @@
           <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam">
             <template #money="{ money } = {}">
               <div class="money">{{ new Intl.NumberFormat().format((money || 0) * 1000) + '₽' }}</div>
-            </template>
-            <template #custom>
-              <div v-if="!iam" class="car-deck card-event">
-                {{ carDeckCount }}
-              </div>
-              <div v-if="!iam" class="service-deck card-event">
-                {{ serviceDeckCount }}
-              </div>
             </template>
           </card-worker>
         </slot>
