@@ -5,7 +5,12 @@
         /* game = {}, gamePlaneScale */
       } = {}"
     >
-      <billion-game-plane />
+      <div :class="['game-zones']">
+        <div class="roulette" />
+        <div class="dicecube-container">
+          <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
+        </div>
+      </div>
     </template>
 
     <template #gameinfo="{} = {}">
@@ -63,18 +68,17 @@ import { provide, reactive } from 'vue';
 import { prepareGameGlobals } from '~/lib/game/front/gameGlobals.mjs';
 import Game from '~/lib/game/front/Game.vue';
 import card from '~/lib/game/front/components/card.vue';
+import dicecube from '~/lib/game/front/components/dicecube.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
-
-import billionGamePlane from './components/plane.vue';
 
 export default {
   components: {
     Game,
     player,
     card,
+    dicecube,
     tutorial,
-    billionGamePlane,
   },
   props: {},
   setup() {
@@ -138,12 +142,47 @@ export default {
     deckList() {
       return Object.keys(this.game.deckMap).map((id) => this.store.deck?.[id]) || [];
     },
+    dicecubesIds() {
+      return Object.keys(this.game.dicecubeMap) || [];
+    },
   },
   methods: {},
 };
 </script>
 <style lang="scss">
 @import './css/game.css';
+
+#gamePlane {
+  .game-zones {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.roulette {
+  position: absolute;
+  left: calc(50% - 200px);
+  top: calc(50% - 200px);
+  background-image: url('assets/roulette.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 400px;
+  height: 400px;
+  z-index: 2;
+}
+
+.dicecube-container {
+  position: absolute;
+  top: 36px;
+  left: calc(50% - 60px);
+  display: flex;
+  gap: 2px;
+
+  .dicecube[subtype='black'] {
+    filter: invert(1);
+  }
+}
 
 .card-event.played {
   filter: none !important;

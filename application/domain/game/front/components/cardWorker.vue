@@ -19,7 +19,10 @@
         {{ localTimer }}
       </div>
     </slot>
-    <slot name="custom" />
+    <slot name="custom">
+      <div class="income-counter" :style="incomeCounterStyle" />
+      <div class="income-plane" />
+    </slot>
     <slot name="control" :controlAction="controlAction">
       <div
         v-if="showControlBtn"
@@ -47,6 +50,8 @@ export default {
       localTimer: null,
       localTimerUpdateTime: null,
       localTimerId: null,
+      /** позиция income-counter; во время броска кубиков не тянем за player.income до diceRollSettledSeq */
+      displayIncome: 0,
     };
   },
   setup() {
@@ -94,6 +99,12 @@ export default {
       style.backgroundImage = `url(${this.state.lobbyOrigin}/img/workers/${avatarCode}.png)`;
 
       return style;
+    },
+    incomeCounterStyle() {
+      const income = Number(this.displayIncome) || 0;
+      return {
+        left: `${72 - income * 12}px`,
+      };
     },
     controlBtn() {
       return this.player.eventData.controlBtn;
@@ -145,6 +156,24 @@ export default {
         })
         .catch(prettyAlert);
     },
+    syncDisplayIncomeFromPlayer() {
+      const v = this.player?.income;
+      this.displayIncome = v != null ? Number(v) : 0;
+    },
+  },
+  watch: {
+    'player.income': {
+      handler() {
+        if ((this.gameCustom.diceRollActiveCount || 0) > 0) return;
+        this.syncDisplayIncomeFromPlayer();
+      },
+    },
+    'gameCustom.diceRollSettledSeq'() {
+      this.syncDisplayIncomeFromPlayer();
+    },
+  },
+  mounted() {
+    this.syncDisplayIncomeFromPlayer();
   },
 };
 </script>
@@ -191,6 +220,34 @@ export default {
     display: flex;
     justify-content: center;
     align-content: center;
+  }
+
+  .income-plane {
+    position: absolute;
+    right: -62px;
+    top: -178px;
+    background-image: url('../assets/income_plane.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 242px;
+    height: 100px;
+    z-index: 2;
+    rotate: -90deg;
+  }
+  .income-counter {
+    position: absolute;
+    // left: 72px;
+    top: -286px;
+    transition: left 0.45s ease-out;
+    background-image: url('../assets/income_counter.png');
+    background-size: 58px;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 58px;
+    height: 202px;
+    z-index: 2;
+    rotate: -90deg;
   }
 }
 

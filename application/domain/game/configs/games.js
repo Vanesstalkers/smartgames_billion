@@ -37,6 +37,7 @@
         { type: 'card', subtype: 'construction' },
         { type: 'card', subtype: 'buster' },
       ],
+      dicecubeList: [{ _code: 'white', subtype: 'white' }, { _code: 'black', subtype: 'black' }],
     },
   },
   trainer: {

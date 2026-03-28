@@ -1,8 +1,8 @@
 () => [
   {
-    title: 'Игра "TO_CHANGE"',
-    description: 'TO_CHANGE',
-    pdfLinks: [{ label: 'Правила игры', path: '/rules/deck.pdf' }],
+    title: 'Игра на миллиард',
+    description: 'игра Игоря Рыбакова',
+    pdfLinks: [{ label: 'Правила игры', path: '/rules/manual.pdf' }],
     galleries: [{ label: 'Список карт', selectGroup: null }],
   },
 ];

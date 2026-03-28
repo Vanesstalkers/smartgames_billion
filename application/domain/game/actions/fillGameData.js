@@ -61,6 +61,16 @@
     }
   }
 
+  if (data.dicecubeMap) {
+    data.dicecubeList = [];
+    for (const _id of Object.keys(data.dicecubeMap)) data.dicecubeList.push(this.store.dicecube[_id]);
+  } else {
+    data.dicecubeList = data.settings.dicecubeList;
+  }
+  for (const item of data.dicecubeList || []) {
+    this.addDicecube(item);
+  }
+
   this.clearChanges(); // игра запишется в БД в store.create
   return this;
 });

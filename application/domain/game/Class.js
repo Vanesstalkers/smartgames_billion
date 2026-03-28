@@ -5,16 +5,17 @@
     Object.assign(this, {
       ...lib.chat['@class'].decorate(),
       ...lib.game.decorators['@hasDeck'].decorate(),
+      ...lib.game.decorators['@hasDicecube'].decorate(),
     });
 
-    // this.defaultClasses({
-    //   Player: domain.game._objects.Player,
-    //   Deck: domain.game._objects.Deck,
-    //   Card: domain.game._objects.Card,
-    // });
+    this.defaultClasses({
+      Player: domain.game._objects.Player,
+      // Deck: domain.game._objects.Deck,
+      // Card: domain.game._objects.Card,
+    });
 
-    this.preventSaveFields(['decks']);
-    this.preventBroadcastFields(['decks']);
+    this.preventSaveFields(['decks', 'dicecubes']);
+    this.preventBroadcastFields(['decks', 'dicecubes']);
   }
 
   stepLabel(label) {

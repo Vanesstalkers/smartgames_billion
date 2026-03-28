@@ -22,6 +22,17 @@
       result.statusLabel = `Раунд ${result.newRoundNumber}`;
       result.roundStep = 'ROUND_END';
 
+      this.rollAllDicecubes();
+      let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
+      const cardsCount = player.decks.industry.itemsCount();
+      let income = player.income + incomeChange;
+      if (income < 0) income = 0;
+      if (income > 10) income = 10;
+      // if (cardsCount == 1 && increaseAmount > 6) increaseAmount = 6;
+      // if (cardsCount == 2 && increaseAmount > 8) increaseAmount = 8;
+      // if (cardsCount == 3 && increaseAmount > 10) increaseAmount = 10;
+      player.set({ income });
+
       for (const player of this.players({ ai: true })) {
         if (!player.active) continue;
 
