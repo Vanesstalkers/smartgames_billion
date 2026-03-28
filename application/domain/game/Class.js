@@ -6,6 +6,7 @@
       ...lib.chat['@class'].decorate(),
       ...lib.game.decorators['@hasDeck'].decorate(),
       ...lib.game.decorators['@hasDicecube'].decorate(),
+      ...lib.game.decorators['@hasRoulette'].decorate(),
     });
 
     this.defaultClasses({
@@ -14,8 +15,8 @@
       // Card: domain.game._objects.Card,
     });
 
-    this.preventSaveFields(['decks', 'dicecubes']);
-    this.preventBroadcastFields(['decks', 'dicecubes']);
+    this.preventSaveFields(['decks', 'dicecubes', 'roulettes']);
+    this.preventBroadcastFields(['decks', 'dicecubes', 'roulettes']);
   }
 
   stepLabel(label) {

@@ -71,6 +71,16 @@
     this.addDicecube(item);
   }
 
+  if (data.rouletteMap) {
+    data.rouletteList = [];
+    for (const _id of Object.keys(data.rouletteMap)) data.rouletteList.push(this.store.roulette[_id]);
+  } else {
+    data.rouletteList = data.settings.rouletteList;
+  }
+  for (const item of data.rouletteList || []) {
+    this.addRoulette(item);
+  }
+
   this.clearChanges(); // игра запишется в БД в store.create
   return this;
 });

@@ -6,7 +6,7 @@
       } = {}"
     >
       <div :class="['game-zones']">
-        <div class="roulette" />
+        <roulette v-for="rid in rouletteIds" :key="rid" :rouletteId="rid" />
         <div class="dicecube-container">
           <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
         </div>
@@ -69,6 +69,7 @@ import { prepareGameGlobals } from '~/lib/game/front/gameGlobals.mjs';
 import Game from '~/lib/game/front/Game.vue';
 import card from '~/lib/game/front/components/card.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
+import roulette from './components/roulette.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
 
@@ -78,6 +79,7 @@ export default {
     player,
     card,
     dicecube,
+    roulette,
     tutorial,
   },
   props: {},
@@ -145,6 +147,9 @@ export default {
     dicecubesIds() {
       return Object.keys(this.game.dicecubeMap) || [];
     },
+    rouletteIds() {
+      return Object.keys(this.game.rouletteMap || {}) || [];
+    },
   },
   methods: {},
 };
@@ -157,19 +162,6 @@ export default {
     width: 100%;
     height: 100%;
   }
-}
-
-.roulette {
-  position: absolute;
-  left: calc(50% - 200px);
-  top: calc(50% - 200px);
-  background-image: url('assets/roulette.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 400px;
-  height: 400px;
-  z-index: 2;
 }
 
 .dicecube-container {

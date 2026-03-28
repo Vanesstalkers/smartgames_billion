@@ -1,7 +1,7 @@
 (function () {
   const { rounds, round: roundNumber } = this;
   const round = rounds[roundNumber];
-  const players = this.players();
+  const roundActivePlayer = this.roundActivePlayer();
   const result = { newRoundLogEvents: [], newRoundNumber: roundNumber };
 
   switch (this.roundStep) {
@@ -12,15 +12,15 @@
       this.set({ round: result.newRoundNumber }); // без этого не отработает prepareRoundObject -> calcClientMoney
       const round = this.prepareRoundObject();
 
+      result.statusLabel = `Раунд ${result.newRoundNumber}`;
+      result.roundStep = 'ROULETTE';
+
       const player = this.selectNextActivePlayer();
 
       player.activate({
         notifyUser: 'Твой ход',
-        setData: { eventData: { playDisabled: true, controlBtn: { label: 'Завершить раунд' } } },
+        setData: { eventData: { playDisabled: true, controlBtn: { label: 'Крутить рулетку' } } },
       });
-
-      result.statusLabel = `Раунд ${result.newRoundNumber}`;
-      result.roundStep = 'ROUND_END';
 
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
@@ -32,6 +32,10 @@
       // if (cardsCount == 2 && increaseAmount > 8) increaseAmount = 8;
       // if (cardsCount == 3 && increaseAmount > 10) increaseAmount = 10;
       player.set({ income });
+
+      result.newRoundLogEvents.push(
+        `На кубиках выпали значения: <a>${this.dicecubes.white.value} (белый)</a> и <a>${this.dicecubes.black.value} (чёрный)</a>`
+      );
 
       for (const player of this.players({ ai: true })) {
         if (!player.active) continue;
@@ -52,6 +56,20 @@
       return result;
     }
 
+    case 'ROULETTE': {
+      roundActivePlayer.activate({
+        setData: { eventData: { playDisabled: true, controlBtn: { label: 'Завершить раунд' } } },
+      });
+
+      this.rollAllRoulettes();
+      const name = this.roulettes.main.value.split('-')[0];
+      const [card] = this.select({ className: 'Card', directParent: false, attr: { name } });
+
+      result.newRoundLogEvents.push(`На рулетке выпало значение <a>${card?.title}</a>`);
+
+      result.roundStep = 'ROUND_END';
+      return result;
+    }
     case 'ROUND_END': {
       result.roundStep = 'ROUND_START';
       return { ...result, forcedEndRound: true };
