@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { inject } from 'vue';
+
 import chip from '~/lib/game/front/components/chip.vue';
 import domainChipsSprite from '../assets/chips.png';
 
@@ -33,6 +35,9 @@ export default {
     chip,
   },
   inheritAttrs: false,
+  setup() {
+    return inject('gameGlobals');
+  },
   props: {
     chipId: {
       type: String,
@@ -55,8 +60,19 @@ export default {
     };
   },
   computed: {
+    store() {
+      return this.getStore() || {};
+    },
+    /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
+    chipFromStore() {
+      return this.chipId ? this.store.chip?.[this.chipId] : null;
+    },
     innerFrameValue() {
-      if (this.chipId) return 1;
+      if (this.chipId) {
+        const raw = this.chipFromStore?.value;
+        if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+        return rouletteSectorKeyToChipFrame(raw);
+      }
       if (typeof this.value === 'number' && Number.isFinite(this.value)) return this.value;
       return rouletteSectorKeyToChipFrame(this.value);
     },

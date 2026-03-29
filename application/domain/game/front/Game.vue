@@ -6,21 +6,7 @@
       } = {}"
     >
       <div :class="['game-zones']">
-        <roulette v-for="rid in rouletteIds" :key="rid" :rouletteId="rid" :stop-outward-offset-ratio="0.22">
-          <template #stop="{ sectorAngleDeg }">
-            <div :style="{ transform: `rotate(${-sectorAngleDeg}deg)` }">
-              <chip
-                :value="rouletteValueById(rid)"
-                :size="48"
-                subtype="roulette-stop"
-                custom-class="roulette-stop-chip"
-              />
-            </div>
-          </template>
-        </roulette>
-        <div :style="{ color: 'red', position: 'absolute', bottom: 0, width: '100%' }">
-          Main: {{ mainRouletteValue }}
-        </div>
+        <roulette :stop-outward-offset-ratio="0.22" />
         <div class="dicecube-container">
           <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
         </div>
@@ -83,7 +69,6 @@ import { prepareGameGlobals } from '~/lib/game/front/gameGlobals.mjs';
 import Game from '~/lib/game/front/Game.vue';
 import card from '~/lib/game/front/components/card.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
-import chip from './components/chip.vue';
 import roulette from './components/roulette.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
@@ -94,7 +79,6 @@ export default {
     player,
     card,
     dicecube,
-    chip,
     roulette,
     tutorial,
   },
@@ -163,17 +147,6 @@ export default {
     dicecubesIds() {
       return Object.keys(this.game.dicecubeMap) || [];
     },
-    rouletteIds() {
-      return Object.keys(this.game.rouletteMap || {}) || [];
-    },
-    mainRouletteValue() {
-      return Object.values(this.store.roulette || {}).find((r) => r.subtype === 'main')?.value;
-    },
-  },
-  methods: {
-    rouletteValueById(rid) {
-      return this.store.roulette?.[rid]?.value;
-    },
   },
 };
 </script>
@@ -214,24 +187,5 @@ export default {
 
 #game.mobile-view .game-status-label {
   font-size: 1.5em;
-}
-
-/* Слот stop рулетки: фишка + подпись, общий контр-поворот на родителе `.roulette-stop-slot-inner` */
-.roulette-stop-slot-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  pointer-events: none;
-}
-
-.roulette-stop-chip {
-  pointer-events: auto;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
-}
-
-.roulette-stop-chip {
-  pointer-events: auto;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
 }
 </style>

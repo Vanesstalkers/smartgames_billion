@@ -1,6 +1,6 @@
 (function (data) {
   const { configs } = domain.game;
-  const { Card: deckItemClass } = this.defaultClasses();
+  const { Card: deckItemClass, Chip } = this.defaultClasses();
 
   const newGame = data.newGame;
 
@@ -77,8 +77,14 @@
   } else {
     data.rouletteList = data.settings.rouletteList;
   }
-  for (const item of data.rouletteList || []) {
-    this.addRoulette(item);
+  for (const rouletteSpec of data.rouletteList || []) {
+    const roulette = this.addRoulette(rouletteSpec);
+    for (const deckSpec of rouletteSpec.deckList || []) {
+      roulette.addDeck(
+        { ...deckSpec, type: deckSpec.type ?? 'chip', itemMap: deckSpec.itemMap || {} },
+        { deckItemClass: Chip },
+      );
+    }
   }
 
   this.clearChanges(); // игра запишется в БД в store.create

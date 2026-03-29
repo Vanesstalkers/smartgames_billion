@@ -11,6 +11,7 @@
 
     this.defaultClasses({
       Player: domain.game._objects.Player,
+      Roulette: domain.game._objects.Roulette,
       // Deck: domain.game._objects.Deck,
       // Card: domain.game._objects.Card,
     });

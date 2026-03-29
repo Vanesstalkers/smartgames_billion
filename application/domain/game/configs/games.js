@@ -13,6 +13,7 @@
               ...['light', 'mining-1', 'finance', 'media', 'engineering'],
               ...['electronic', 'mining-2', 'distribution', 'chemistry'],
             ],
+            deckList: [{ _code: 'selected', subtype: 'selected', itemType: 'chip' }],
           },
         ],
       },
@@ -28,6 +29,7 @@
               ...['it', 'engineering', 'light', 'chemistry', 'mining-2'],
               ...['finance', 'media', 'art'],
             ],
+            deckList: [{ _code: 'selected', subtype: 'selected', itemType: 'chip' }],
           },
         ],
       },
@@ -72,7 +74,13 @@
         { _code: 'white', subtype: 'white' },
         { _code: 'black', subtype: 'black' },
       ],
-      rouletteList: [{ _code: 'main', subtype: 'main' }],
+      rouletteList: [
+        {
+          _code: 'main',
+          subtype: 'main',
+          deckList: [{ _code: 'selected', subtype: 'selected' }],
+        },
+      ],
     },
   },
   // trainer: {
