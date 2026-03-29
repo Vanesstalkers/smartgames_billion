@@ -6,7 +6,19 @@
       } = {}"
     >
       <div :class="['game-zones']">
-        <roulette v-for="rid in rouletteIds" :key="rid" :rouletteId="rid" />
+        <roulette v-for="rid in rouletteIds" :key="rid" :rouletteId="rid" :stop-outward-offset-ratio="0.22">
+          <template #stop="{ sectorAngleDeg }">
+            <div
+              class="roulette-main-value-badge"
+              :style="{ transform: `rotate(${-sectorAngleDeg}deg)` }"
+            >
+              {{ mainRouletteValue }}
+            </div>
+          </template>
+        </roulette>
+        <div :style="{ color: 'red', position: 'absolute', bottom: 0, width: '100%' }">
+          Main: {{ mainRouletteValue }}
+        </div>
         <div class="dicecube-container">
           <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
         </div>
@@ -150,6 +162,9 @@ export default {
     rouletteIds() {
       return Object.keys(this.game.rouletteMap || {}) || [];
     },
+    mainRouletteValue() {
+      return Object.values(this.store.roulette || {}).find((r) => r.subtype === 'main')?.value;
+    },
   },
   methods: {},
 };
@@ -191,5 +206,24 @@ export default {
 
 #game.mobile-view .game-status-label {
   font-size: 1.5em;
+}
+
+/* Плашка на ободе рулетки (слот stop): контр-поворот, чтобы текст оставался горизонтальным */
+.roulette-main-value-badge {
+  pointer-events: auto;
+  min-width: 2.25em;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(230, 230, 230, 0.92));
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 </style>
