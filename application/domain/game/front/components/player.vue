@@ -6,7 +6,7 @@
     <div class="inner-content">
       <div class="player-hands">
         <div class="hand-cards-list" ref="scrollbar">
-          <div v-if="iam || gameState.viewerMode" class="hand-cards" :style="{ width: handCardsWidth }">
+          <div v-if="true || iam || gameState.viewerMode" class="hand-cards" :style="{ width: handCardsWidth }">
             <card
               v-for="card in handCards"
               :key="card.id"
@@ -52,7 +52,7 @@
 import { inject } from 'vue';
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 
-import card from '~/lib/game/front/components/card.vue';
+import card from './card.vue';
 import cardWorker from './cardWorker.vue';
 import dialogHelper from '~/lib/helper/front/components/dialog.vue';
 
@@ -99,7 +99,7 @@ export default {
     },
     cardDecks() {
       const map = this.deckIds.map((id) => this.store.deck?.[id] || {});
-      return map.filter((deck) => deck.type === 'card') || [];
+      return map.filter((deck) => deck.type === 'company') || [];
     },
     cardDecksData() {
       return this.cardDecks.map(({ code, eventData }) => ({ code, eventData }));
@@ -128,12 +128,6 @@ export default {
     },
     handCardsWidth() {
       return state.isMobile && state.isPortrait ? `${window.innerWidth - 80}px` : 'auto';
-    },
-    mainCardDeckItemsCount() {
-      return this.handCards.length;
-    },
-    playerDecks() {
-      return Object.keys(this.player.deckMap || {}).map((id) => this.store.deck?.[id] || {});
     },
   },
   methods: {
@@ -304,7 +298,8 @@ export default {
     margin-left: 0px;
   }
 
-  & > .card-event {
+  & > .card-event,
+  & > .domain-card {
     margin-left: -80px;
   }
 }

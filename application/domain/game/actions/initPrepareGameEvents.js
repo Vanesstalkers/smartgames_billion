@@ -4,14 +4,11 @@
       name: 'initPrepareGameEvents',
       initPrepareStep(player) {
         const { game } = this.eventContext();
-        const playerHand = player.find('Deck[card_industry]');
+        const playerHand = player.find('Deck[company_industry]');
         const decks = Object.values(game.decks).filter((d) => d.subtype !== 'buster');
-
+        
         for (const deck of decks) {
-          const sourceDeck = game.find(`Deck[card_${deck.subtype}]`);
-          if (!sourceDeck || sourceDeck.itemsCount() <= 0) continue;
-
-          const card = sourceDeck.getRandomItem();
+          const card = deck.getRandomItem();
           card.set({ eventData: { activeEvents: [this], cardClass: 'selectable', buttonText: 'Выбрать' } });
           card.moveToTarget(playerHand);
         }
@@ -29,20 +26,22 @@
         this.initPrepareStep(game.selectNextActivePlayer());
       },
       handlers: {
-        TRIGGER({ target: selectedCard, timerAutoPick }) {
+        TRIGGER({ target: selectedCompany, timerAutoPick }) {
           const { game, player } = this.eventContext();
 
-          if (!selectedCard) selectedCard = player.decks.industry.getRandomItem();
+          if (!selectedCompany) selectedCompany = player.decks.industry.getRandomItem();
 
-          for (const card of player.decks.industry.items()) {
-            card.set({ eventData: { activeEvents: [], cardClass: null, buttonText: null } });
-            if (selectedCard && card.id() === selectedCard.id()) continue;
-            card.moveToDeck();
+          for (const company of player.decks.industry.items()) {
+            company.set({ eventData: { activeEvents: [], cardClass: null, buttonText: null } });
+            if (selectedCompany && company.id() === selectedCompany.id()) continue;
+            company.moveToDeck();
           }
           player.deactivate({ setData: { eventData: { controlBtn: null, playDisabled: null } } });
 
+          selectedCompany.restoreResources();
+
           game.logs({
-            msg: `Игрок {{player}} выбрал стартовую карту "${selectedCard.getTitle()}"${
+            msg: `Игрок {{player}} выбрал стартовую карту "${selectedCompany.getTitle()}"${
               timerAutoPick ? ' (автоматический выбор).' : '.'
             }`,
             userId: player.userId,

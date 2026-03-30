@@ -67,7 +67,7 @@ import { provide, reactive } from 'vue';
 
 import { prepareGameGlobals } from '~/lib/game/front/gameGlobals.mjs';
 import Game from '~/lib/game/front/Game.vue';
-import card from '~/lib/game/front/components/card.vue';
+import card from './components/card.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
 import roulette from './components/roulette.vue';
 import player from './components/player.vue';

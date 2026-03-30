@@ -19,40 +19,52 @@
 }
 
 .custom-card-background {
-  &[name='construction'] {
+  &[name='construction'],
+  &[subtype='construction'] {
     background-position: -188px 0px;
   }
-  &[name='mining'] {
+  &[name='mining'],
+  &[subtype='mining'] {
     background-position: 0px -654px;
   }
-  &[name='finance'] {
+  &[name='finance'],
+  &[subtype='finance'] {
     background-position: -378px -654px;
   }
-  &[name='electronic'] {
+  &[name='electronic'],
+  &[subtype='electronic'] {
     background-position: 0px -326px;
   }
-  &[name='media'] {
+  &[name='media'],
+  &[subtype='media'] {
     background-position: -188px -654px;
   }
-  &[name='distribution'] {
+  &[name='distribution'],
+  &[subtype='distribution'] {
     background-position: -569px -654px;
   }
-  &[name='art'] {
+  &[name='art'],
+  &[subtype='art'] {
     background-position: 0px 0px;
   }
-  &[name='it'] {
+  &[name='it'],
+  &[subtype='it'] {
     background-position: -378px 0px;
   }
-  &[name='engineering'] {
+  &[name='engineering'],
+  &[subtype='engineering'] {
     background-position: -378px -326px;
   }
-  &[name='chemistry'] {
+  &[name='chemistry'],
+  &[subtype='chemistry'] {
     background-position: -569px -326px;
   }
-  &[name='light'] {
+  &[name='light'],
+  &[subtype='light'] {
     background-position: -188px -326px;
   }
-  &[name='buster'] {
+  &[name='buster'],
+  &[subtype='buster'] {
     background-position: -563px 24px;
     width: 131px;
     padding-top: 52px;
@@ -76,39 +88,39 @@
     }
   }
 
-  &[code='Deck[card_construction]'] {
+  &[code='Deck[company_construction]'] {
     right: 0px;
   }
 
-  &[code='Deck[card_mining]'] {
+  &[code='Deck[company_mining]'] {
     display: block !important;
     right: 160px;
   }
-  &[code='Deck[card_finance]'] {
+  &[code='Deck[company_finance]'] {
     right: 325px;
   }
-  &[code='Deck[card_electronic]'] {
+  &[code='Deck[company_electronic]'] {
     right: 490px;
   }
-  &[code='Deck[card_media]'] {
+  &[code='Deck[company_media]'] {
     right: 655px;
   }
-  &[code='Deck[card_distribution]'] {
+  &[code='Deck[company_distribution]'] {
     right: 810px;
   }
-  &[code='Deck[card_art]'] {
+  &[code='Deck[company_art]'] {
     right: 975px;
   }
-  &[code='Deck[card_it]'] {
+  &[code='Deck[company_it]'] {
     right: 1140px;
   }
-  &[code='Deck[card_engineering]'] {
+  &[code='Deck[company_engineering]'] {
     right: 1305px;
   }
-  &[code='Deck[card_chemistry]'] {
+  &[code='Deck[company_chemistry]'] {
     right: 1470px;
   }
-  &[code='Deck[card_light]'] {
+  &[code='Deck[company_light]'] {
     right: 1635px;
   }
   &[code='Deck[card_buster]'] {

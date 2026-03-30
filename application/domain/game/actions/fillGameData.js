@@ -1,6 +1,6 @@
 (function (data) {
   const { configs } = domain.game;
-  const { Card: deckItemClass, Chip } = this.defaultClasses();
+  const { Card: deckItemClass, CompanyCard, Chip } = this.defaultClasses();
 
   const newGame = data.newGame;
 
@@ -36,6 +36,13 @@
     data.playerList = data.settings.playerList;
   }
   for (const item of data.playerList || []) this.run('addPlayer', item);
+  for (const player of this.players({ readyOnly: false })) {
+    for (const deck of player.select({ className: 'Deck' })) {
+      if (deck.access === 'all') {
+        deck.access = this.playerMap;
+      }
+    }
+  }
 
   if (data.deckMap) {
     data.deckList = [];
@@ -44,8 +51,10 @@
     data.deckList = data.settings.deckList;
   }
   for (const item of data.deckList || []) {
-    if (item.access === 'all') item.access = this.playerMap;
-    const deck = this.addDeck(item, { deckItemClass });
+    if (item.access === 'all') {
+      item.access = this.playerMap;
+    }
+    const deck = this.addDeck(item, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
 
     if (newGame) {
       const cardsToRemove = this.settings.cardsToRemove || [];
@@ -55,7 +64,7 @@
 
       if (item.hasDrop) {
         const dropDeckData = { ...item, subtype: item.subtype + '_drop', placement: 'drop', parentDeckId: deck.id() };
-        const dropDeck = this.addDeck(dropDeckData, { deckItemClass });
+        const dropDeck = this.addDeck(dropDeckData, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
         deck.set({ dropDeckId: dropDeck.id() });
       }
     }
