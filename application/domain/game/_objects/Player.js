@@ -3,9 +3,9 @@
     super(data, { parent });
     this.broadcastableFields(
       //
-      this.broadcastableFields().concat(['income'])
+      this.broadcastableFields().concat(['income', 'money'])
     );
 
-    this.set({ income: data.income || 6 });
+    this.set({ money: data.money || 0, income: data.income || 6 });
   }
 });

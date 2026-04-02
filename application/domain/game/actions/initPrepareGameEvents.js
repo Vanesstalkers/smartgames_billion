@@ -4,23 +4,34 @@
       name: 'initPrepareGameEvents',
       initPrepareStep(player) {
         const { game } = this.eventContext();
-        const playerHand = player.find('Deck[company_industry]');
         const decks = Object.values(game.decks).filter((d) => d.subtype !== 'buster');
-        
+
         for (const deck of decks) {
           const card = deck.getRandomItem();
           card.set({ eventData: { activeEvents: [this], cardClass: 'selectable', buttonText: 'Выбрать' } });
-          card.moveToTarget(playerHand);
+          card.moveToTarget(player.decks.industry);
         }
 
         player.activate({
-          setData: { eventData: { controlBtn: { label: 'Помочь с выбором', triggerEvent: true } } },
+          setData: { eventData: { controlBtn: { label: 'Помочь выбрать', triggerEvent: true } } },
         });
         player.setEventWithTriggerListener(this);
         lib.timers.timerRestart(game, { time: game.settings.timer });
       },
       init() {
         const { game } = this.eventContext();
+
+        for (const player of game.players()) {
+          const decks = Object.values(game.decks).filter((d) => d.subtype !== 'buster');
+          for (const deck of decks) {
+            const card = deck.getRandomItem();
+            card.moveToTarget(player.decks.industry);
+            card.restoreResources();
+          }
+        }
+
+        game.run('startGame');
+        return { resetEvent: true };
 
         game.set({ statusLabel: 'Подготовка к игре', status: 'PREPARE_START' });
         this.initPrepareStep(game.selectNextActivePlayer());
@@ -60,6 +71,15 @@
         PLAYER_TIMER_END({ initPlayer: player }) {
           this.emit('TRIGGER', { timerAutoPick: true }, player);
           return { preventListenerRemove: true };
+        },
+        RESET() {
+          const { game } = this.eventContext();
+
+          for (const player of game.players()) {
+            player.removeEventWithTriggerListener();
+          }
+
+          this.destroy();
         },
       },
     },

@@ -6,6 +6,7 @@ export interface DomainGameActionsModule extends GameActionsModule {
   startGame(this: DomainGameInstance): void;
   roundEnd(this: DomainGameInstance, opts?: { timerOverdue?: boolean }, initPlayer?: any): void;
   initPrepareGameEvents(this: DomainGameInstance): any;
+  useRouletteChip(this: DomainGameInstance, data?: { rouletteId?: string }, initPlayer?: any): any;
   endGame(
     this: DomainGameInstance,
     opts?: { winningPlayer?: any; canceledByUser?: string | boolean; message?: string }

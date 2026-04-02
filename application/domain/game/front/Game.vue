@@ -66,6 +66,7 @@
 import { provide, reactive } from 'vue';
 
 import { prepareGameGlobals } from '~/lib/game/front/gameGlobals.mjs';
+import billionGameGlobals, { gameCustomArgs } from '~/domain/game/front/billionGameGlobals.mjs';
 import Game from '~/lib/game/front/Game.vue';
 import card from './components/card.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
@@ -88,10 +89,13 @@ export default {
       ...prepareGameGlobals({
         defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
       }),
+      gameCustomArgs: { ...gameCustomArgs },
       getCardCustomStyle: () => ({
         backgroundImage: `url(${state.serverOrigin}/img/cards/default/industry/cards.png)`,
       }),
     };
+
+    Object.assign(gameGlobals, billionGameGlobals);
 
     provide('gameGlobals', gameGlobals);
     return gameGlobals;
@@ -99,6 +103,12 @@ export default {
   watch: {
     gameDataLoaded: function () {
       // тут ловим обновление страницы
+    },
+    'player.eventData.triggerListenerEnabled': {
+      handler(newVal) {
+        if(!newVal) this.$set(this.gameCustom, 'selectedChipId', '');
+      },
+      deep: true,
     },
   },
   computed: {
@@ -110,6 +120,9 @@ export default {
     },
     game() {
       return this.getGame();
+    },
+    player() {
+      return this.sessionPlayer();
     },
     gameDataLoaded() {
       return this.game.addTime;
@@ -187,5 +200,24 @@ export default {
 
 #game.mobile-view .game-status-label {
   font-size: 1.5em;
+}
+
+.chip.selectable {
+  box-shadow: none !important;
+  .chip-face {
+    box-shadow: inset 0 0 10px 6px yellow;
+    border-radius: 16px;
+    &:hover {
+      box-shadow: none !important;
+    }
+  }
+
+  &:hover {
+    box-shadow: 2px 4px 4px 0px #333 !important;
+    border-radius: 16px;
+    margin-left: -2px;
+    margin-top: -2px;
+    margin-bottom: 2px;
+  }
 }
 </style>

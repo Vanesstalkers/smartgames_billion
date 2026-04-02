@@ -93,7 +93,7 @@ export default {
       const style = {};
       const gender = this.userData.gender;
 
-      if(this.player.avatarUrl) {
+      if (this.player.avatarUrl) {
         style.backgroundImage = `url(${this.player.avatarUrl}.png)`;
         return style;
       }
@@ -147,6 +147,7 @@ export default {
 
       if (this.showControlBtn) {
         if (this.controlBtn.triggerEvent) await this.handleGameApi({ name: 'eventTrigger', data: { eventData } });
+        else if (this.controlBtn.resetEvent) await this.handleGameApi({ name: 'eventReset' });
         else await this.endRound();
       }
     },

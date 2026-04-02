@@ -1,5 +1,9 @@
 (function () {
-  const { rounds, round: roundNumber } = this;
+  const {
+    rounds,
+    round: roundNumber,
+    roulettes: { main: roulette },
+  } = this;
   const round = rounds[roundNumber];
   const roundActivePlayer = this.roundActivePlayer();
   const result = { newRoundLogEvents: [], newRoundNumber: roundNumber };
@@ -61,9 +65,14 @@
         setData: { eventData: { playDisabled: true, controlBtn: { label: 'Завершить раунд' } } },
       });
 
-      this.rollAllRoulettes();
-      const name = this.roulettes.main.value.split('-')[0];
-      const [card] = this.select({ className: 'Card', directParent: false, attr: { name } });
+      roulette.spin();
+      const chip = roulette.chip();
+      chip.set({ eventData: { selectable: true } });
+
+      const [card] = this.select({
+        ...{ className: 'Card', directParent: false },
+        attr: { name: roulette.value.split('-')[0] },
+      });
 
       result.newRoundLogEvents.push(`На рулетке выпало значение <a>${card?.title}</a>`);
 
@@ -72,6 +81,10 @@
     }
     case 'ROUND_END': {
       result.roundStep = 'ROUND_START';
+
+      const chip = roulette.chip();
+      if (chip) chip.parent().removeItem(chip, { forceDelete: true });
+
       return { ...result, forcedEndRound: true };
     }
   }

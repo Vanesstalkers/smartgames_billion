@@ -13,4 +13,8 @@
     deck.removeAllItems({ markDelete: true });
     deck.addItem({ value: this.value });
   }
+
+  chip(){
+    return this.decks?.selected?.items()[0];
+  }
 });

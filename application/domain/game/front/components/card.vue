@@ -1,14 +1,32 @@
 <template>
-  <div class="domain-card">
-    <base-card class="custom-card-background" v-bind="baseCardBindings" v-on="$listeners" />
+  <div class="company-card">
+    <base-card
+      class="custom-card-background"
+      v-bind="baseCardBindings"
+      v-on="$listeners"
+      @click.native.stop="triggerCardEvent"
+    />
 
     <div v-if="innerChipIds.length || outerChipIds.length" class="chips-overlay">
       <div class="chip-lane chip-lane-inner">
-        <chip v-for="chipId in innerChipIds" :key="chipId" :chip-id="chipId" :size="40" />
+        <chip
+          v-for="chipId in innerChipIds"
+          :key="chipId"
+          :chip-id="chipId"
+          :size="40"
+          :custom-class="{ 'resource-selectable': isChipSelectable(chipId) }"
+          @click.native.stop="triggerChipEvent(chipId)"
+        />
       </div>
-      <div class="chip-lane chip-lane-outer">
+      <div :class="['chip-lane', 'chip-lane-outer', { selectable: this.outedDeck.eventData.selectable }]">
         <chip v-for="chipId in outerChipIds" :key="chipId" :chip-id="chipId" :size="40" />
-        <chip v-if="outerChipIds.length === 0" :chip-id="'fake'" :size="40" />
+        <chip
+          v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
+          :chip-id="gameCustom.selectedChipId"
+          :size="40"
+          class="fake-chip"
+          :on-click="() => triggerOutedDeckEvent()"
+        />
       </div>
     </div>
   </div>
@@ -21,7 +39,7 @@ import baseCard from '~/lib/game/front/components/card.vue';
 import chip from './chip.vue';
 
 export default {
-  name: 'domain-card',
+  name: 'company-card',
   inheritAttrs: false,
   components: {
     baseCard,
@@ -67,9 +85,12 @@ export default {
       const card = this.store.card?.[this.cardId];
       return card?._id ? card : { _id: this.cardId, eventData: {} };
     },
-    relatedDecks() {
+    cardDecks() {
       const deckIds = Object.keys(this.card.deckMap || {});
-      return deckIds.map((id) => this.store.deck?.[id]).filter(Boolean);
+      return deckIds.map((id) => this.store.deck?.[id]);
+    },
+    outedDeck() {
+      return this.cardDecks.find((d) => d.subtype === 'outer');
     },
     innerChipIds() {
       return this.getChipIdsBySubtype('inner');
@@ -79,19 +100,46 @@ export default {
     },
   },
   methods: {
+    canTriggerCardEvent() {
+      return this.card?.eventData?.buttonText === 'Выбрать ресурс' && this.sessionPlayerIsActive();
+    },
+    async triggerCardEvent() {
+      if (!this.canTriggerCardEvent()) return;
+      await this.handleGameApi({
+        name: 'eventTrigger',
+        data: { eventData: { targetId: this.cardId } },
+      });
+    },
+    isChipSelectable(chipId) {
+      return Boolean(this.store.chip?.[chipId]?.eventData?.selectable?.length);
+    },
+    async triggerChipEvent(chipId) {
+      if (!this.isChipSelectable(chipId)) return;
+      await this.handleGameApi({
+        name: 'eventTrigger',
+        data: { eventData: { targetId: chipId } },
+      });
+    },
     getChipIdsBySubtype(subtype) {
-      const targetDeck = this.relatedDecks.find((deck) => deck.subtype === subtype);
+      const targetDeck = this.cardDecks.find((deck) => deck.subtype === subtype);
       if (!targetDeck?.itemMap) return [];
       return Object.entries(targetDeck.itemMap)
         .filter(([, meta]) => Boolean(meta))
         .map(([id]) => id);
+    },
+    async triggerOutedDeckEvent() {
+      if (!this.outedDeck.eventData.selectable) return;
+      await this.handleGameApi({
+        name: 'eventTrigger',
+        data: { eventData: { targetId: this.outedDeck._id } },
+      });
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.domain-card {
+.company-card {
   position: relative;
 }
 
@@ -122,10 +170,35 @@ export default {
     left: 24px;
     width: 40px;
 
+    .fake-chip {
+      display: none;
+    }
     &.selectable {
-      border-radius: 16px;
+      box-shadow: none !important;
+      
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 16px;
+        box-shadow: inset 0 0 10px 8px yellow !important;
+        &:hover {
+          box-shadow: inset 0 0 10px 4px yellow !important;
+        }
+      }
+
       &:hover {
-        box-shadow: inset 0 0 10px 4px yellow !important;
+        box-shadow: none !important;
+        &:after {
+          display: none !important;
+        }
+        .fake-chip {
+          display: block;
+          opacity: 0.7;
+        }
       }
     }
   }

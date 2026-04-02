@@ -7,16 +7,16 @@
     :wheel-extra-style="{ rotate: '7deg' }"
     :stop-slot-gutter-px="stopSlotGutterPx"
     :stop-outward-offset-ratio="stopOutwardOffsetRatio"
-    :roulette-id="resolvedRouletteId"
+    :roulette-id="rouletteId"
   >
     <template #stop="{ sectorAngleDeg }">
-      <div :style="{ transform: `rotate(${-sectorAngleDeg}deg)` }">
+      <div v-if="rouletteChipId" :style="{ transform: `rotate(${-sectorAngleDeg}deg)` }">
         <chip
-          :chip-id="rouletteStopChipId"
+          :chip-id="rouletteChipId"
           :value="rouletteValue"
           :size="48"
           subtype="roulette-stop"
-          custom-class="roulette-stop-chip"
+          :on-click="useRouletteChip"
         />
       </div>
     </template>
@@ -41,8 +41,6 @@ export default {
     return inject('gameGlobals');
   },
   props: {
-    /** Если не задан — берётся единственная рулетка из `game.rouletteMap`. */
-    rouletteId: { type: String, default: '' },
     /** Запас вокруг колеса, чтобы слот `stop` мог выпирать за диск без обрезки. */
     stopSlotGutterPx: { type: Number, default: 40 },
     /** Доп. вынос якоря слота наружу от обода (доля от `size`). */
@@ -57,30 +55,43 @@ export default {
     store() {
       return this.getStore() || {};
     },
-    resolvedRouletteId() {
-      if (this.rouletteId) return this.rouletteId;
-      return Object.keys(this.getGame()?.rouletteMap || {})[0] || '';
+    game() {
+      return this.getGame();
     },
-    rouletteRecord() {
-      const rid = this.resolvedRouletteId;
-      return rid ? this.store.roulette?.[rid] : null;
+    rouletteId() {
+      return Object.keys(this.game.rouletteMap)[0] || '';
+    },
+    roulette() {
+      return this.game.store.roulette[this.rouletteId] || {};
     },
     rouletteValue() {
-      return this.rouletteRecord?.value;
+      return this.roulette?.value;
     },
-    /** id фишки маркера из itemMap колоды, на которую ссылается roulette.deckMap (подтип selected). */
-    rouletteStopChipId() {
-      const r = this.rouletteRecord;
-      if (!r?.deckMap) return '';
-      const deckIds = Object.keys(r.deckMap);
-      const deckId =
-        deckIds.find((id) => this.store.deck?.[id]?.subtype === 'selected') ?? deckIds[0];
-      if (!deckId) return '';
-      const itemMap = this.store.deck?.[deckId]?.itemMap;
-      if (!itemMap) return '';
-      const chipId = Object.keys(itemMap).find((id) => itemMap[id]);
-      return chipId || '';
+    rouletteChipId() {
+      const deckId = Object.keys(this.roulette.deckMap)[0];
+      return Object.keys(this.store.deck?.[deckId]?.itemMap || {})[0] || '';
+    },
+  },
+  methods: {
+    async useRouletteChip() {
+      if (!this.sessionPlayerIsActive()) return;
+      await this.handleGameApi({ name: 'useRouletteChip', data: { chipId: this.rouletteChipId } }).then(() => {
+        this.$set(this.gameCustom, 'selectedChipId', this.rouletteChipId);
+      });
     },
   },
 };
 </script>
+<style scoped lang="scss">
+.roulette {
+  .chip.selectable {
+    box-shadow: 0 0 20px 8px yellow !important;
+    border-radius: 50%;
+    &:hover {
+      box-shadow: none !important;
+      width: 60px !important;
+      height: 60px !important;
+    }
+  }
+}
+</style>

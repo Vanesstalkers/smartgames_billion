@@ -1,18 +1,19 @@
 <template>
-  <chip
+  <chip-component
     v-bind="$attrs"
     v-on="$listeners"
     :sprite-image-url="domainChipsSprite"
     :sprite-frame-count="domainChipsFrameCount"
     :chip-id="chipId || undefined"
     :value="innerFrameValue"
+    :on-click="onClick"
   />
 </template>
 
 <script>
 import { inject } from 'vue';
 
-import chip from '~/lib/game/front/components/chip.vue';
+import chipComponent from '~/lib/game/front/components/chip.vue';
 import domainChipsSprite from '../assets/chips.png';
 
 /** Порядок отраслей в `chips.png` (префикс ключа сектора рулетки до `-`). */
@@ -32,7 +33,7 @@ export function rouletteSectorKeyToChipFrame(value) {
 export default {
   name: 'domain-chip',
   components: {
-    chip,
+    chipComponent,
   },
   inheritAttrs: false,
   setup() {
@@ -51,6 +52,10 @@ export default {
       type: [String, Number],
       default: 1,
     },
+    onClick: {
+      type: Function,
+      default: null,
+    },
   },
   data() {
     return {
@@ -64,12 +69,12 @@ export default {
       return this.getStore() || {};
     },
     /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
-    chipFromStore() {
-      return this.chipId ? this.store.chip?.[this.chipId] : null;
+    chip() {
+      return this.store.chip?.[this.chipId] || {};
     },
     innerFrameValue() {
       if (this.chipId) {
-        const raw = this.chipFromStore?.value;
+        const raw = this.chip?.value;
         if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
         return rouletteSectorKeyToChipFrame(raw);
       }

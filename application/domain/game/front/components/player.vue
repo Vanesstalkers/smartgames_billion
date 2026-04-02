@@ -299,7 +299,7 @@ export default {
   }
 
   & > .card-event,
-  & > .domain-card {
+  & > .company-card {
     margin-left: -80px;
   }
 }
