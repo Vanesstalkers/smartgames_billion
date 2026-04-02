@@ -61,13 +61,17 @@
     }
 
     case 'ROULETTE': {
-      roundActivePlayer.activate({
-        setData: { eventData: { playDisabled: true, controlBtn: { label: 'Завершить раунд' } } },
-      });
-
       roulette.spin();
-      const chip = roulette.chip();
-      chip.set({ eventData: { selectable: true } });
+
+      roundActivePlayer.activate({
+        setData: {
+          eventData: {
+            playDisabled: true,
+            controlBtn: { label: 'Завершить раунд' },
+            chip: { [roulette.chip().id()]: { selectable: true } },
+          },
+        },
+      });
 
       const [card] = this.select({
         ...{ className: 'Card', directParent: false },

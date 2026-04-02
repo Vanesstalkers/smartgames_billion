@@ -7,43 +7,33 @@
     data: {
       rouletteChip: game.get(chipId),
     },
-    resetTargets() {
-      const { game } = this.eventContext();
-      for (const p of game.players()) {
-        for (const company of p.decks.industry.items()) {
-          company.set({ eventData: { selectable: null } });
-          company.decks.outer.set({ eventData: { selectable: null } });
-          company.decks.outer.items()[0]?.set({ eventData: { selectable: null } });
-
-          for (const chip of company.decks.inner.items()) {
-            chip.set({ eventData: { selectable: null } });
-          }
-        }
-      }
-    },
     init() {
       const { game, player } = this.eventContext();
+      const eventData = { chip: {}, deck: {} };
 
-      const chipValue = this.data.rouletteChip.value.split('-')[0];
+      const rouletteChipValue = this.data.rouletteChip.value.split('-')[0];
       for (const player of game.players()) {
         for (const company of player.decks.industry.items() || []) {
           const outerDeck = company.decks.outer;
           if (!outerDeck) continue;
 
           const outerChip = outerDeck.items()[0];
-          if (outerChip) outerChip.set({ eventData: { selectable: true } });
-          else outerDeck.set({ eventData: { selectable: true } });
+          if (outerChip) {
+            if (outerChip.value === rouletteChipValue) eventData.chip[outerChip.id()] = { selectable: true };
+          } else eventData.deck[outerDeck.id()] = { selectable: true };
         }
 
         for (const company of player.decks.industry.items() || []) {
-          if (company.subtype !== chipValue) continue;
+          if (company.subtype !== rouletteChipValue) continue;
+
           for (const chip of company.decks.inner.items() || []) {
-            chip.set({ eventData: { selectable: true } });
+            if (chip.value === rouletteChipValue) eventData.chip[chip.id()] = { selectable: true };
           }
         }
       }
 
-      player.set({ eventData: { controlBtn: { label: 'Отменить действие', resetEvent: true } } });
+      eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
+      player.set({ eventData });
     },
     handlers: {
       TRIGGER({ target, initPlayer: triggerPlayer }) {
@@ -57,14 +47,13 @@
             userId: actionPlayer.userId,
           });
 
-          this.resetTargets();
-          this.emit('RESET');
+          this.emit('RESET', { removeRouletteChipSelectable: true });
           return;
         }
 
         if (target.matches?.({ className: 'Chip' })) {
           const targetDeck = target.parent();
-          if (!target.eventData.selectable) throw new Error('Данная фишка не может быть выбрана.');
+          if (!player.eventData.chip?.[target.id()]?.selectable) throw new Error('Данная фишка не может быть выбрана.');
 
           targetDeck.removeItem(target, { forceDelete: true });
           this.data.rouletteChip.parent().removeItem(this.data.rouletteChip, { forceDelete: true });
@@ -73,18 +62,30 @@
           actionPlayer.set({ money: actionPlayer.money + income });
           game.logs({ msg: `Игрок {{player}} продал ресурс за ${income}к.`, userId: actionPlayer.userId });
 
-          this.resetTargets();
-          this.emit('RESET');
+          this.emit('RESET', { removeRouletteChipSelectable: true });
           return;
         }
 
         throw new Error('Некорректная цель действия.');
       },
-      RESET() {
+      END_ROUND() {
+        this.emit('RESET', { removeRouletteChipSelectable: true });
+      },
+      RESET({ removeRouletteChipSelectable = false } = {}) {
         const { game, player } = this.eventContext();
-        player.set({ eventData: { controlBtn: { label: 'Завершить раунд', resetEvent: null } } });
+        const rouletteChipId = this.data.rouletteChip.id();
+        player.set({
+          eventData: {
+            deck: null,
+            chip: Object.fromEntries(
+              Object.keys(player.eventData.chip)
+                .filter((key) => removeRouletteChipSelectable || key !== rouletteChipId)
+                .map((key) => [key, null])
+            ),
+            controlBtn: { label: 'Завершить раунд', resetEvent: null },
+          },
+        });
 
-        this.resetTargets();
         this.destroy();
       },
     },

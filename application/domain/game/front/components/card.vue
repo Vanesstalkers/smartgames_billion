@@ -14,11 +14,10 @@
           :key="chipId"
           :chip-id="chipId"
           :size="40"
-          :custom-class="{ 'resource-selectable': isChipSelectable(chipId) }"
-          @click.native.stop="triggerChipEvent(chipId)"
+          :on-click="() => triggerChipEvent(chipId)"
         />
       </div>
-      <div :class="['chip-lane', 'chip-lane-outer', { selectable: this.outedDeck.eventData.selectable }]">
+      <div :class="['chip-lane', 'chip-lane-outer', { selectable: this.outedDeckSelectable }]">
         <chip v-for="chipId in outerChipIds" :key="chipId" :chip-id="chipId" :size="40" />
         <chip
           v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
@@ -77,6 +76,9 @@ export default {
     store() {
       return this.getStore() || {};
     },
+    player() {
+      return this.sessionPlayer();
+    },
     card() {
       if (this.cardData) {
         if (!this.cardData.eventData) this.cardData.eventData = {};
@@ -91,6 +93,9 @@ export default {
     },
     outedDeck() {
       return this.cardDecks.find((d) => d.subtype === 'outer');
+    },
+    outedDeckSelectable() {
+      return this.player.eventData.deck?.[this.outedDeck._id]?.selectable;
     },
     innerChipIds() {
       return this.getChipIdsBySubtype('inner');
@@ -111,10 +116,11 @@ export default {
       });
     },
     isChipSelectable(chipId) {
-      return Boolean(this.store.chip?.[chipId]?.eventData?.selectable?.length);
+      return this.player.eventData.chip?.[chipId]?.selectable;
     },
     async triggerChipEvent(chipId) {
       if (!this.isChipSelectable(chipId)) return;
+
       await this.handleGameApi({
         name: 'eventTrigger',
         data: { eventData: { targetId: chipId } },
@@ -128,7 +134,8 @@ export default {
         .map(([id]) => id);
     },
     async triggerOutedDeckEvent() {
-      if (!this.outedDeck.eventData.selectable) return;
+      if (!this.outedDeckSelectable) return;
+
       await this.handleGameApi({
         name: 'eventTrigger',
         data: { eventData: { targetId: this.outedDeck._id } },
@@ -175,7 +182,7 @@ export default {
     }
     &.selectable {
       box-shadow: none !important;
-      
+
       &:after {
         content: '';
         position: absolute;
