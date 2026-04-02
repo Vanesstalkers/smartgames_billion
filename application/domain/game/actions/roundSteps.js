@@ -75,7 +75,7 @@
 
       const [card] = this.select({
         ...{ className: 'Card', directParent: false },
-        attr: { name: roulette.value.split('-')[0] },
+        attr: { name: roulette.chip().value },
       });
 
       result.newRoundLogEvents.push(`На рулетке выпало значение <a>${card?.title}</a>`);

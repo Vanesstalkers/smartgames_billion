@@ -11,7 +11,7 @@
       const { game, player } = this.eventContext();
       const eventData = { chip: {}, deck: {} };
 
-      const rouletteChipValue = this.data.rouletteChip.value.split('-')[0];
+      const rouletteChipValue = this.data.rouletteChip.value;
       for (const player of game.players()) {
         for (const company of player.decks.industry.items() || []) {
           const outerDeck = company.decks.outer;
@@ -32,6 +32,7 @@
         }
       }
 
+      eventData.chip[this.data.rouletteChip.id()] = { selectable: null };
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
       player.set({ eventData });
     },
@@ -77,14 +78,12 @@
         player.set({
           eventData: {
             deck: null,
-            chip: Object.fromEntries(
-              Object.keys(player.eventData.chip)
-                .filter((key) => removeRouletteChipSelectable || key !== rouletteChipId)
-                .map((key) => [key, null])
-            ),
+            chip: Object.fromEntries(Object.keys(player.eventData.chip).map((key) => [key, null])), // без этой логики при активном флаге removeRouletteChipSelectable не удалится chip
             controlBtn: { label: 'Завершить раунд', resetEvent: null },
           },
         });
+        if (!removeRouletteChipSelectable)
+          player.set({ eventData: { chip: { [rouletteChipId]: { selectable: true } } } });
 
         this.destroy();
       },

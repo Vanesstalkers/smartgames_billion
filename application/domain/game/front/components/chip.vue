@@ -25,8 +25,7 @@ export const DOMAIN_CHIP_SECTOR_ORDER = [
 /** Кадр 1…N в спрайте фишек по ключу сектора рулетки. */
 export function rouletteSectorKeyToChipFrame(value) {
   const key = value == null ? '' : String(value);
-  const prefix = key.split('-')[0];
-  const idx = DOMAIN_CHIP_SECTOR_ORDER.indexOf(prefix);
+  const idx = DOMAIN_CHIP_SECTOR_ORDER.indexOf(key);
   return idx >= 0 ? idx + 1 : 1;
 }
 

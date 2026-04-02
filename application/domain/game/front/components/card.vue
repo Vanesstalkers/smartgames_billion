@@ -1,7 +1,6 @@
 <template>
   <div class="company-card">
     <base-card
-      class="custom-card-background"
       v-bind="baseCardBindings"
       v-on="$listeners"
       @click.native.stop="triggerCardEvent"

@@ -11,7 +11,7 @@
     const deck = this.decks?.selected;
     if (!deck) return;
     deck.removeAllItems({ markDelete: true });
-    deck.addItem({ value: this.value });
+    deck.addItem({ value: this.value.split('-')[0] });
   }
 
   chip(){

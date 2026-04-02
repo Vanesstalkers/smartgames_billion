@@ -26,9 +26,15 @@
             :class="['deck', deck.code.includes('_drop') ? 'drop' : '']"
             :code="deck.code"
           >
-            <div class="card-event custom-card-background" :name="deck.subtype" :style="getCardCustomStyle()">
-              {{ Object.keys(deck.itemMap).length }}
-            </div>
+            <card
+              :content="Object.keys(deck.itemMap).length"
+              :cardData="{
+                name: deck.subtype,
+                group: 'industry',
+              }"
+              :imgExt="'png'"
+            >
+            </card>
           </div>
         </div>
       </div>
@@ -37,7 +43,7 @@
     <template #shown-card="{ closeCardInfo } = {}">
       <div class="shown-card scroll-off" v-on:click.stop="closeCardInfo">
         <div class="close" v-on:click.stop="closeCardInfo" />
-        <img class="img custom-card-background" :name="state.shownCard.code" :style="getCardCustomStyle()" />
+        <img class="img" :name="state.shownCard.code" />
       </div>
     </template>
 
@@ -90,9 +96,6 @@ export default {
         defaultDeviceOffset: 0, // сдвиг gamePlane влево от центра
       }),
       gameCustomArgs: { ...gameCustomArgs },
-      getCardCustomStyle: () => ({
-        backgroundImage: `url(${state.serverOrigin}/img/cards/default/industry/cards.png)`,
-      }),
     };
 
     Object.assign(gameGlobals, billionGameGlobals);
@@ -106,7 +109,7 @@ export default {
     },
     'player.eventData.triggerListenerEnabled': {
       handler(newVal) {
-        if(!newVal) this.$set(this.gameCustom, 'selectedChipId', '');
+        if (!newVal) this.$set(this.gameCustom, 'selectedChipId', '');
       },
       deep: true,
     },

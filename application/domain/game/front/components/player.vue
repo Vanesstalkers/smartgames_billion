@@ -6,16 +6,15 @@
     <div class="inner-content">
       <div class="player-hands">
         <div class="hand-cards-list" ref="scrollbar">
-          <div v-if="true || iam || gameState.viewerMode" class="hand-cards" :style="{ width: handCardsWidth }">
+          <div class="hand-cards" :style="{ width: handCardsWidth }">
             <card
               v-for="card in handCards"
               :key="card.id"
               :cardId="card.id"
-              :cardGroup="card.group"
+              :cardGroup="'industry'"
               :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
-              class="custom-card-background"
             />
           </div>
         </div>
