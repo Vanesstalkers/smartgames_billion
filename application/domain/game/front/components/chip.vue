@@ -7,6 +7,7 @@
     :chip-id="chipId || undefined"
     :value="innerFrameValue"
     :on-click="onClick"
+    :ownerId="chip.ownerId"
   />
 </template>
 
@@ -83,3 +84,8 @@ export default {
   },
 };
 </script>
+<style scoped lang="scss">
+  .chip[ownerId]:not(.selectable) {
+    filter: brightness(0.5);
+  }
+</style>

@@ -22,6 +22,12 @@
     <slot name="custom">
       <div class="income-counter" :style="incomeCounterStyle" />
       <div class="income-plane" />
+      <div
+        v-if="!iam"
+        class="handshake-action"
+        title="Действия с оппонентом"
+        @click.stop="onWorkerHandshakeClick"
+      />
     </slot>
     <slot name="control" :controlAction="controlAction">
       <div
@@ -147,6 +153,7 @@ export default {
 
       if (this.showControlBtn) {
         if (this.controlBtn.triggerEvent) await this.handleGameApi({ name: 'eventTrigger', data: { eventData } });
+        // else if (this.controlBtn.workerDealAbort) await this.handleGameApi({ name: 'workerDealAbortPick' });
         else if (this.controlBtn.resetEvent) await this.handleGameApi({ name: 'eventReset' });
         else await this.endRound();
       }
@@ -161,6 +168,23 @@ export default {
           args: [],
         })
         .catch(prettyAlert);
+    },
+    async onWorkerHandshakeClick() {
+      prettyAlertClear?.();
+
+      if (this.playerId) {
+        this.$set(this.$root.state, 'workerDealSellerPlayerId', this.playerId);
+      }
+
+      const user = this.state.store?.user?.[this.state.currentUser];
+      const payload = {
+        tutorial: 'game-tutorial-workerDeal',
+        isMobile: this.state.isMobile,
+        workerDealSellerPlayerId: this.playerId || undefined,
+      };
+      if (user?.currentTutorial?.active) payload.action = 'changeTutorial';
+
+      await api.action.call({ path: 'helper.api.action', args: [payload] }).catch(prettyAlert);
     },
     syncDisplayIncomeFromPlayer() {
       const v = this.player?.income;
@@ -255,6 +279,29 @@ export default {
     z-index: 2;
     rotate: -90deg;
   }
+
+  .handshake-action {
+    position: absolute;
+    top: calc(50% - 40px);
+    left: calc(50% - 40px);
+    width: 80px;
+    height: 80px;
+    background-image: url('../assets/handshake.png');
+    background-size: cover;
+    background-position: center;
+    display: none;
+
+    &:hover {
+      margin-left: -2px;
+      margin-top: -4px;
+      box-shadow: 2px 4px 8px black;
+      border-radius: 50%;
+    }
+  }
+}
+.card-worker:hover .handshake-action {
+  cursor: pointer;
+  display: block;
 }
 
 .card-worker.has-action:hover .action-btn {

@@ -12,24 +12,27 @@
       const eventData = { chip: {}, deck: {} };
 
       const rouletteChipValue = this.data.rouletteChip.value;
-      for (const player of game.players()) {
-        for (const company of player.decks.industry.items() || []) {
-          const outerDeck = company.decks.outer;
-          if (!outerDeck) continue;
+      for (const company of player.decks.industry.items() || []) {
+        const outerDeck = company.decks.outer;
+        if (!outerDeck) continue;
 
-          const outerChip = outerDeck.items()[0];
-          if (outerChip) {
-            if (outerChip.value === rouletteChipValue) eventData.chip[outerChip.id()] = { selectable: true };
-          } else eventData.deck[outerDeck.id()] = { selectable: true };
+        const outerChip = outerDeck.items()[0];
+        if (outerChip) {
+          if (outerChip.value === rouletteChipValue) eventData.chip[outerChip.id()] = { selectable: true };
+        } else eventData.deck[outerDeck.id()] = { selectable: true };
+      }
+
+      for (const company of player.decks.industry.items() || []) {
+        if (company.subtype !== rouletteChipValue) continue;
+
+        for (const chip of company.decks.inner.items() || []) {
+          if (!chip.ownerId && chip.value === rouletteChipValue) eventData.chip[chip.id()] = { selectable: true };
         }
-
-        for (const company of player.decks.industry.items() || []) {
-          if (company.subtype !== rouletteChipValue) continue;
-
-          for (const chip of company.decks.inner.items() || []) {
-            if (chip.value === rouletteChipValue) eventData.chip[chip.id()] = { selectable: true };
-          }
-        }
+      }
+      for (const chipId of Object.keys(player.acquired?.chip || {})) {
+        const chip = game.get(chipId);
+        if (chip.value !== rouletteChipValue) continue;
+        eventData.chip[chipId] = { selectable: true };
       }
 
       eventData.chip[this.data.rouletteChip.id()] = { selectable: null };
