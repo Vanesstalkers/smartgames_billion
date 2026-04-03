@@ -147,6 +147,8 @@ export default {
 <style lang="scss" scoped>
 .company-card {
   position: relative;
+  background-image: url(@/assets/clear-black-back.png);
+  border-radius: 10px;
 }
 
 .chips-overlay {

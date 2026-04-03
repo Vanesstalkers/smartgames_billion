@@ -31,91 +31,58 @@
       text: '',
       input: null,
       prepare({ step, user }) {
-        const game = user.gameId ? lib.store('game').get(user.gameId) : null;
-        const pl = game && user.playerId ? game.get(user.playerId) : null;
-        const ui = user.workerDealPickUI || pl?.eventData?.workerDealPickUI;
+        const game = lib.store('game').get(user.gameId);
+        const player = game.get(user.playerId);
+        const seller = game.get(player.eventData.dealSellerId);
 
-        if (ui?.pickButtons?.length) {
-          step.text = `<p>Укажи <b>сумму сделки</b> и способ оплаты, затем нажми кнопку с нужным <b>ресурсом</b> — условия применятся, и пойдёт предложение сделки.</p>`;
-          step.input = [
-            { placeholder: 'Сумма сделки', name: 'amount', value: String(ui.amount) },
-            {
-              type: 'select',
-              name: 'payment',
-              value: 'immediate',
-              options: [
-                { value: 'immediate', label: 'Оплата сразу' },
-                { value: 'deferred', label: 'В долг' },
-              ],
-            },
-          ];
-          step.buttons = [
-            { text: 'Назад', step: 'choose', icon: ['fas', 'arrow-left'] },
-            ...ui.pickButtons.map((b) => ({
-              text: b.text,
-              action: 'submitDealAmount',
-              step: 'buyResource',
-              pickChipId: b.workerDealPickChip,
-              key: null,
-            })),
-            { text: 'Отменить сделку', action: 'workerDealCancelDeal', exit: true },
-          ];
-          return;
+        const resourceButtons = [];
+        for (const card of domain.game.configs.cards({ unique: true })) {
+          const chip = seller.getChipBySubtype(card.group || card.name);
+          if (!chip) continue;
+          resourceButtons.push({
+            text: card.title,
+            action: 'submitDealAmount',
+            step: 'buyResource',
+            chipId: chip.id(),
+          });
         }
 
-        step.text = user.workerDealSellerPlayerId
-          ? `<p>Не удалось показать ресурсы оппонента — возможно, у него нет фишек в отраслевой колоде.</p>`
-          : `<p>Чтобы выбрать ресурс и сумму здесь, открой это действие с <b>карточки оппонента</b> (иконка рукопожатия).</p>`;
-        step.input = null;
+        step.text = `<p>Укажи <b>сумму сделки</b> и способ оплаты, затем нажми кнопку с нужным <b>ресурсом</b> — условия применятся, и пойдёт предложение сделки.</p>`;
+        step.input = [
+          { placeholder: 'Сумма сделки', name: 'amount' },
+          {
+            type: 'select',
+            name: 'payType',
+            value: 'immediate',
+            options: [
+              { value: 'immediate', label: 'Оплата сразу' },
+              { value: 'deferred', label: 'В долг' },
+            ],
+          },
+        ];
         step.buttons = [
-          { text: 'Назад', step: 'choose' },
-          { text: 'Закрыть', action: 'exit', exit: true },
+          { text: 'Назад', step: 'choose', icon: ['fas', 'arrow-left'] },
+          ...resourceButtons,
+          { text: 'Отменить сделку', action: 'workerDealCancelDeal', exit: true },
         ];
       },
       actions: {
-        submitDealAmount: async ({ inputData, state, clickedButton }) => {
-          const raw = String(inputData.amount ?? '').trim().replace(',', '.');
-          const amount = raw === '' ? NaN : Number(raw);
-          if (!Number.isFinite(amount) || amount <= 0) {
-            prettyAlert({ message: 'Введите корректную положительную сумму.' });
-            return { exit: true };
+        submitDealAmount: async ({ $helper, inputData, clickedButton }) => {
+          const amount = Number(inputData.amount);
+          if (inputData.amount === '' || !Number.isFinite(amount)) {
+            $helper.dialogError = 'Необходимо указать сумму сделки';
+            return;
           }
-          const sellerPlayerId =
-            state.workerDealSellerPlayerId || state.store?.user?.[state.currentUser]?.workerDealSellerPlayerId;
-          if (!sellerPlayerId) {
-            prettyAlert({ message: 'Сначала открой это действие с карточки оппонента (иконка рукопожатия).' });
-            return { exit: true };
-          }
-          try {
-            await api.action.call({ path: 'game.api.action', args: [{ name: 'workerDealAbortPick' }] }).catch(() => {});
-            await api.action.call({
-              path: 'game.api.action',
-              args: [{ name: 'workerDealStartPick', data: { sellerPlayerId, amount } }],
-            });
-          } catch (err) {
-            prettyAlert(err);
-            return { exit: true };
-          }
-          const chipId = clickedButton?.pickChipId;
-          const pay = inputData.payment;
-          const payment = pay === 'deferred' || pay === 'immediate' ? pay : 'immediate';
-          if (!chipId) {
-            prettyAlert({ message: 'Не выбран ресурс.' });
-            return { exit: true };
-          }
-          try {
-            await api.action.call({
-              path: 'game.api.action',
-              args: [{ name: 'workerDealPickChip', data: { chipId, payment } }],
-            });
-          } catch (e) {
-            prettyAlert(e);
-            return { exit: true };
-          }
+
+          const eventData = { amount, payType: inputData.payType, chipId: clickedButton.chipId };
+          await api.action
+            .call({ path: 'game.api.action', args: [{ name: 'eventTrigger', data: { eventData } }] })
+            .catch(prettyAlert);
+
           return { exit: true };
         },
         workerDealCancelDeal: async () => {
-          await api.action.call({ path: 'game.api.action', args: [{ name: 'workerDealAbortPick' }] }).catch(prettyAlert);
+          await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
           return { exit: true };
         },
       },

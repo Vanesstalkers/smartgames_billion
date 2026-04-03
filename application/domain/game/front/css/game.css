@@ -21,9 +21,6 @@
     background-repeat: no-repeat;
   }
 }
-.company-card {
-  background-image: url(@/assets/clear-black-back.png);
-}
 
 #gameInfo {
   .deck-list {

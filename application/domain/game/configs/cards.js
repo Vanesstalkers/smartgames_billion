@@ -1,4 +1,4 @@
-({ apiRequest, selectGroup, template } = {}) => {
+({ apiRequest, selectGroup, template, unique = false } = {}) => {
   const list = [
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
@@ -37,9 +37,8 @@
 
   const result = list
     .filter((card) => !selectGroup || card.group === selectGroup)
-    .map((card) =>
-      (apiRequest ? { path: `${template}/${card.group}/${card.name}.png` } : card)
-    );
+    .filter((card, index, self) => !unique || self.findIndex((c) => c.group === card.group) === index)
+    .map((card) => (apiRequest ? { path: `${template}/${card.group}/${card.name}.png` } : card));
 
   return result;
 };

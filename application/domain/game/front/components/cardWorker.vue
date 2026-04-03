@@ -22,12 +22,7 @@
     <slot name="custom">
       <div class="income-counter" :style="incomeCounterStyle" />
       <div class="income-plane" />
-      <div
-        v-if="!iam"
-        class="handshake-action"
-        title="Действия с оппонентом"
-        @click.stop="onWorkerHandshakeClick"
-      />
+      <div v-if="!iam" class="handshake-action" title="Действия с оппонентом" @click.stop="onWorkerHandshakeClick" />
     </slot>
     <slot name="control" :controlAction="controlAction">
       <div
@@ -153,7 +148,6 @@ export default {
 
       if (this.showControlBtn) {
         if (this.controlBtn.triggerEvent) await this.handleGameApi({ name: 'eventTrigger', data: { eventData } });
-        // else if (this.controlBtn.workerDealAbort) await this.handleGameApi({ name: 'workerDealAbortPick' });
         else if (this.controlBtn.resetEvent) await this.handleGameApi({ name: 'eventReset' });
         else await this.endRound();
       }
@@ -171,20 +165,7 @@ export default {
     },
     async onWorkerHandshakeClick() {
       prettyAlertClear?.();
-
-      if (this.playerId) {
-        this.$set(this.$root.state, 'workerDealSellerPlayerId', this.playerId);
-      }
-
-      const user = this.state.store?.user?.[this.state.currentUser];
-      const payload = {
-        tutorial: 'game-tutorial-workerDeal',
-        isMobile: this.state.isMobile,
-        workerDealSellerPlayerId: this.playerId || undefined,
-      };
-      if (user?.currentTutorial?.active) payload.action = 'changeTutorial';
-
-      await api.action.call({ path: 'helper.api.action', args: [payload] }).catch(prettyAlert);
+      await this.handleGameApi({ name: 'dealStart', data: { targetId: this.playerId } }).catch(prettyAlert);
     },
     syncDisplayIncomeFromPlayer() {
       const v = this.player?.income;

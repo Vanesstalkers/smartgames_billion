@@ -41,7 +41,7 @@
           style="display: block"
           :dialogStyle="{}"
           :customData="player.staticHelper"
-          :action="onStaticHelperDialogAction"
+          :action="dealAction"
         />
       </div>
     </div>
@@ -131,19 +131,13 @@ export default {
     },
   },
   methods: {
-    async onStaticHelperDialogAction(btn) {
-      if (btn.workerDealRespond === 'accept') {
-        await this.handleGameApi({ name: 'workerDealRespond', data: { accepted: true } });
-      } else if (btn.workerDealRespond === 'decline') {
-        await this.handleGameApi({ name: 'workerDealRespond', data: { accepted: false } });
-      } else if (btn.workerDealPickChip != null && btn.workerDealPickChip !== '') {
-        await this.handleGameApi({
-          name: 'workerDealPickChip',
-          data: { chipId: btn.workerDealPickChip, payment: btn.workerDealPayment },
-        });
-      } else if (btn.workerDealCancel) {
-        await this.handleGameApi({ name: 'eventReset' });
-      }
+    async dealAction(button) {
+      // !!! не работает, так как у seller нет event-а
+      // if (button.dealRespond === 'accept') {
+      //   await this.handleGameApi({ name: 'eventTrigger', data: { handler: 'SELLER_RESPOND', eventData: { accepted: true } } });
+      // } else if (button.dealRespond === 'decline') {
+      //   await this.handleGameApi({ name: 'eventTrigger', data: { handler: 'SELLER_RESPOND', eventData: { accepted: false } } });
+      // } 
     },
     canPlay(card) {
       const playerAvailable =
