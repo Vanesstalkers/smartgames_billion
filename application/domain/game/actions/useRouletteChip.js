@@ -2,6 +2,9 @@
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
 
+  // initPlayer.earnMoney(1);
+  // return;
+
   player.initEvent({
     name: 'rouletteChipEvent',
     data: {
@@ -63,8 +66,8 @@
           this.data.rouletteChip.parent().removeItem(this.data.rouletteChip, { forceDelete: true });
 
           const income = actionPlayer.income * 2;
-          actionPlayer.set({ money: actionPlayer.money + income });
           game.logs({ msg: `Игрок {{player}} продал ресурс за ${income}к.`, userId: actionPlayer.userId });
+          actionPlayer.earnMoney(income);
 
           this.emit('RESET', { removeRouletteChipSelectable: true });
           return;

@@ -19,8 +19,14 @@
   restoreResources() {
     this._ensureCompanyDecks();
 
+    // const resources = {};
+    // for (const card of domain.game.configs.cards({ unique: true })) resources[card.group] = card;
+    const resources = domain.game.configs
+      .cards({ unique: true })
+      .reduce((acc, card) => ({ ...acc, [card.group]: card }), {});
+
     for (let i = 0; i < 3; i++) {
-      this.decks.inner.addItem({ value: this.subtype });
+      this.decks.inner.addItem({ value: this.subtype, title: resources[this.subtype].title });
     }
   }
 });

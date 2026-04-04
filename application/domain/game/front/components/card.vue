@@ -1,10 +1,6 @@
 <template>
   <div class="company-card">
-    <base-card
-      v-bind="baseCardBindings"
-      v-on="$listeners"
-      @click.native.stop="triggerCardEvent"
-    />
+    <base-card v-bind="baseCardBindings" v-on="$listeners" @click.native.stop="triggerCardEvent" />
 
     <div v-if="innerChipIds.length || outerChipIds.length" class="chips-overlay">
       <div class="chip-lane chip-lane-inner">
@@ -12,16 +8,16 @@
           v-for="chipId in innerChipIds"
           :key="chipId"
           :chip-id="chipId"
-          :size="40"
+          :size="26"
           :on-click="() => triggerChipEvent(chipId)"
         />
       </div>
       <div :class="['chip-lane', 'chip-lane-outer', { selectable: this.outedDeckSelectable }]">
-        <chip v-for="chipId in outerChipIds" :key="chipId" :chip-id="chipId" :size="40" />
+        <chip v-for="chipId in outerChipIds" :key="chipId" :chip-id="chipId" :size="26" />
         <chip
           v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
           :chip-id="gameCustom.selectedChipId"
-          :size="40"
+          :size="26"
           class="fake-chip"
           :on-click="() => triggerOutedDeckEvent()"
         />
@@ -161,8 +157,8 @@ export default {
   display: flex;
   &.chip-lane-inner {
     position: absolute;
-    top: 156px;
-    left: 16px;
+    top: 108px;
+    left: 11px;
     flex-wrap: wrap;
     width: 40px;
 
@@ -174,8 +170,8 @@ export default {
   }
   &.chip-lane-outer {
     position: absolute;
-    top: -22px;
-    left: 24px;
+    top: -18px;
+    left: 17px;
     width: 40px;
 
     .fake-chip {
@@ -189,13 +185,10 @@ export default {
         position: absolute;
         top: 0;
         left: 0;
-        width: 40px;
-        height: 40px;
-        border-radius: 16px;
-        box-shadow: inset 0 0 10px 8px yellow !important;
-        &:hover {
-          box-shadow: inset 0 0 10px 4px yellow !important;
-        }
+        width: 26px;
+        height: 26px;
+        border-radius: 10px;
+        box-shadow: inset 0 0 8px 4px yellow !important;
       }
 
       &:hover {

@@ -6,10 +6,13 @@
       } = {}"
     >
       <div :class="['game-zones']">
-        <roulette :stop-outward-offset-ratio="0.22" />
-        <div class="dicecube-container">
-          <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
-        </div>
+        <roulette :stop-outward-offset-ratio="0.22">
+          <template #additional>
+            <div class="dicecube-container">
+              <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
+            </div>
+          </template>
+        </roulette>
       </div>
     </template>
 
@@ -178,7 +181,7 @@ export default {
 
 .dicecube-container {
   position: absolute;
-  top: 36px;
+  top: -120px;
   left: calc(50% - 60px);
   display: flex;
   gap: 2px;

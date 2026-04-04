@@ -20,6 +20,9 @@
         />
       </div>
     </template>
+    <template #additional>
+      <slot name="additional" />
+    </template>
   </roulette>
 </template>
 

@@ -70,6 +70,7 @@ export default {
     },
     /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
     chip() {
+      if(this.chipId === '69d1116976b0f1da3252b6eb') console.log('chip', this.store.chip?.[this.chipId] || {});
       return this.store.chip?.[this.chipId] || {};
     },
     innerFrameValue() {

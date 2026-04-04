@@ -132,12 +132,8 @@ export default {
   },
   methods: {
     async dealAction(button) {
-      // !!! не работает, так как у seller нет event-а
-      // if (button.dealRespond === 'accept') {
-      //   await this.handleGameApi({ name: 'eventTrigger', data: { handler: 'SELLER_RESPOND', eventData: { accepted: true } } });
-      // } else if (button.dealRespond === 'decline') {
-      //   await this.handleGameApi({ name: 'eventTrigger', data: { handler: 'SELLER_RESPOND', eventData: { accepted: false } } });
-      // } 
+      console.log(button);
+      await this.handleGameApi({ name: 'dealAction', data: { ...button } });
     },
     canPlay(card) {
       const playerAvailable =
@@ -203,6 +199,7 @@ export default {
   position: relative;
   height: 0px;
   width: 100%;
+  z-index: 2;
 
   .hand-cards-list {
     display: flex;
@@ -300,7 +297,7 @@ export default {
 .hand-cards {
   display: flex;
   flex-wrap: nowrap;
-  margin-left: 80px;
+  margin-left: 50px;
 
   &[cardcount='0'] {
     margin-left: 0px;
@@ -308,7 +305,7 @@ export default {
 
   & > .card-event,
   & > .company-card {
-    margin-left: -80px;
+    margin-left: -40px;
   }
 }
 

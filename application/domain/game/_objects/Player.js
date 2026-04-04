@@ -1,4 +1,6 @@
 (class Player extends lib.game._objects.Player {
+  dealsMap = {};
+
   constructor(data, { parent }) {
     super(data, { parent });
     this.broadcastableFields(
@@ -22,5 +24,28 @@
       }
     }
     return null;
+  }
+  earnMoney(amount) {
+    this.set({ money: this.money + amount });
+
+    const deal = this.deals().filter((deal) => deal.sellerId)[0];
+    if (deal) {
+      const seller = this.game().get(deal.sellerId);
+      this.set({
+        staticHelper: {
+          text: `Заключенные сделки:`,
+          showList: [
+            {
+              title: `Оплатить долг <a>${deal.amount}₽₽₽</a> игроку <a>${seller.userName}</a>`,
+              action: { code: 'CLOSE_DEAL', dealId: deal.dealId },
+            },
+          ],
+          buttons: [{ text: 'Отмена' }],
+        },
+      });
+    }
+  }
+  deals() {
+    return Object.values(this.dealsMap);
   }
 });

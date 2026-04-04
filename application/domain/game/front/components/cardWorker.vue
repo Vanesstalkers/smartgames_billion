@@ -20,8 +20,11 @@
       </div>
     </slot>
     <slot name="custom">
-      <div class="income-counter" :style="incomeCounterStyle" />
-      <div class="income-plane" />
+      <div class="income-block">
+        <div class="income-counter" :style="incomeCounterStyle" />
+        <div class="income-plane" />
+        <div class="income-value" :style="incomeValueStyle">{{ displayIncome }}</div>
+      </div>
       <div v-if="!iam" class="handshake-action" title="Действия с оппонентом" @click.stop="onWorkerHandshakeClick" />
     </slot>
     <slot name="control" :controlAction="controlAction">
@@ -107,10 +110,18 @@ export default {
       return style;
     },
     incomeCounterStyle() {
-      const income = Number(this.displayIncome) || 0;
       return {
-        left: `${72 - income * 12}px`,
+        left: `${-48 - this.displayIncome * 6}px`,
       };
+    },
+    incomeValueStyle() {
+      let backgroundColor = '#7db442';
+      
+      if (this.displayIncome < 18) backgroundColor = '#f7ad3b';
+      if (this.displayIncome < 14) backgroundColor = '#e5542a';
+      if (this.displayIncome < 2) backgroundColor = '#be1a2e';
+      
+      return { backgroundColor };
     },
     controlBtn() {
       return this.player.eventData.controlBtn;
@@ -168,7 +179,7 @@ export default {
       await this.handleGameApi({ name: 'dealStart', data: { targetId: this.playerId } }).catch(prettyAlert);
     },
     syncDisplayIncomeFromPlayer() {
-      const v = this.player?.income;
+      const v = (this.player?.income || 0) * 2;
       this.displayIncome = v != null ? Number(v) : 0;
     },
   },
@@ -233,34 +244,53 @@ export default {
     align-content: center;
   }
 
-  .income-plane {
+  .income-block {
     position: absolute;
-    right: -62px;
-    top: -178px;
-    background-image: url('../assets/income_plane.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 242px;
-    height: 100px;
-    z-index: 2;
-    rotate: -90deg;
+    scale: 0.7;
+    z-index: -1;
+    top: -2px;
+    right: 0px;
+    .income-plane {
+      position: absolute;
+      right: -62px;
+      top: -28px;
+      background-image: url('../assets/income_plane.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 242px;
+      height: 100px;
+      z-index: -1;
+      rotate: -90deg;
+    }
+    .income-counter {
+      position: absolute;
+      top: -136px;
+      transition: left 0.45s ease-out;
+      background-image: url('../assets/income_counter.png');
+      background-size: 58px;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 58px;
+      height: 202px;
+      z-index: -1;
+      rotate: -90deg;
+    }
+    .income-value {
+      text-align: center;
+      position: absolute;
+      top: -96px;
+      left: -80px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 24px;
+      color: #fff;
+      text-shadow: 2px 1px 0 #000;
+      padding-right: 2px;
+    }
   }
-  .income-counter {
-    position: absolute;
-    // left: 72px;
-    top: -286px;
-    transition: left 0.45s ease-out;
-    background-image: url('../assets/income_counter.png');
-    background-size: 58px;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 58px;
-    height: 202px;
-    z-index: 2;
-    rotate: -90deg;
-  }
-
   .handshake-action {
     position: absolute;
     top: calc(50% - 40px);
@@ -280,6 +310,7 @@ export default {
     }
   }
 }
+
 .card-worker:hover .handshake-action {
   cursor: pointer;
   display: block;

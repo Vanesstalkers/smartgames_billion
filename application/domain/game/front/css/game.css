@@ -1,7 +1,7 @@
 .card-event {
   position: relative;
-  width: 152px;
-  height: 296px;
+  width: 100px;
+  height: 200px;
   border: none;
   border-radius: 10px;
   font-size: 108px;
@@ -14,11 +14,15 @@
 
   &[name='buster'] {
     top: 104px;
-    width: 140px;
-    height: 193px;
-    font-size: 80px;
+    width: 94px;
+    height: 130px;
+    font-size: 60px;
     background-size: contain;
     background-repeat: no-repeat;
+  }
+
+  .card-info-btn {
+    right: 35px !important;
   }
 }
 
@@ -26,15 +30,15 @@
   .deck-list {
     position: absolute;
     top: 50px;
-    right: 20px;
+    right: 24px;
     scale: 0.5;
     transform-origin: right top;
     display: flex;
     flex-wrap: wrap;
-    width: 160px;
+    width: 80px;
 
     .deck {
-      margin-bottom: -240px;
+      margin-bottom: -160px;
       cursor: default;
 
       .card-event {
@@ -42,22 +46,27 @@
           content: attr(content);
           position: absolute;
           top: 0px;
-          right: -28px;
-          font-size: 46px;
+          right: -24px;
+          font-size: 28px;
+          text-shadow: 2px 1px 0 #fff;
         }
       }
 
       &[code='Deck[card_buster]'] {
         position: absolute;
         top: 0px;
-        top: -100px;
-        right: 190px;
+        top: -104px;
+        right: 100px;
 
-        .card-event {
-          &:before {
-            position: relative;
-            right: auto;
-            font-size: 80px;
+        .company-card {
+          background-image: none;
+
+          .card-event {
+            &:before {
+              position: relative;
+              right: auto;
+              font-size: 60px;
+            }
           }
         }
       }

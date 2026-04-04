@@ -20,8 +20,10 @@
       text: `
         Одолжить деньги — отдельные правила займа появятся в партии. Сделку с ресурсом и суммой можно оформить через пункт «Купить ресурс»: сумма и выбор ресурса — в одном окне подсказки.
       `,
+      input: [{ placeholder: 'Сумма', name: 'amount' }],
       buttons: [
         { text: 'Назад', step: 'choose' },
+        { text: 'Отправить запрос', action: 'TRIGGER', exit: true },
         { text: 'Закрыть', action: 'exit', exit: true },
       ],
     },
@@ -33,19 +35,6 @@
       prepare({ step, user }) {
         const game = lib.store('game').get(user.gameId);
         const player = game.get(user.playerId);
-        const seller = game.get(player.eventData.dealSellerId);
-
-        const resourceButtons = [];
-        for (const card of domain.game.configs.cards({ unique: true })) {
-          const chip = seller.getChipBySubtype(card.group || card.name);
-          if (!chip) continue;
-          resourceButtons.push({
-            text: card.title,
-            action: 'submitDealAmount',
-            step: 'buyResource',
-            chipId: chip.id(),
-          });
-        }
 
         step.text = `<p>Укажи <b>сумму сделки</b> и способ оплаты, затем нажми кнопку с нужным <b>ресурсом</b> — условия применятся, и пойдёт предложение сделки.</p>`;
         step.input = [
@@ -62,27 +51,25 @@
         ];
         step.buttons = [
           { text: 'Назад', step: 'choose', icon: ['fas', 'arrow-left'] },
-          ...resourceButtons,
-          { text: 'Отменить сделку', action: 'workerDealCancelDeal', exit: true },
+          ...Object.entries(player.eventData.deal.resources).map(([group, { title: text }]) => {
+            return { group, text, action: 'TRIGGER', exit: true };
+          }),
+          { text: 'Отменить сделку', action: 'RESET', exit: true },
         ];
       },
       actions: {
-        submitDealAmount: async ({ $helper, inputData, clickedButton }) => {
+        TRIGGER: async ({ $helper, inputData, clickedButton }) => {
           const amount = Number(inputData.amount);
           if (inputData.amount === '' || !Number.isFinite(amount)) {
             $helper.dialogError = 'Необходимо указать сумму сделки';
             return;
           }
 
-          const eventData = { amount, payType: inputData.payType, chipId: clickedButton.chipId };
+          const eventData = { amount, payType: inputData.payType, group: clickedButton.group };
           await api.action
             .call({ path: 'game.api.action', args: [{ name: 'eventTrigger', data: { eventData } }] })
             .catch(prettyAlert);
 
-          return { exit: true };
-        },
-        workerDealCancelDeal: async () => {
-          await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
           return { exit: true };
         },
       },
