@@ -16,6 +16,8 @@
         for (let idx = 0; idx < players.length; idx++) {
           const player = players[idx];
 
+          player.set({ money: game.settings.playerStartMoney });
+
           if (startDecks.length) {
             for (const [deckType, { start: count }] of startDecks) {
               if (typeof count === 'object') {

@@ -191,10 +191,6 @@ export default {
   }
 }
 
-.card-event.played {
-  filter: none !important;
-}
-
 .game-status-label {
   text-align: right;
   color: white;

@@ -38,7 +38,7 @@
       timer: 60,
       cardsToRemove: [],
       autoFinishAfterRoundsOverdue: 10,
-
+      playerStartMoney: 6,
       playerList: [
         {
           _code: 1,

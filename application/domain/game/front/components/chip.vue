@@ -6,8 +6,9 @@
     :sprite-frame-count="domainChipsFrameCount"
     :chip-id="chipId || undefined"
     :value="innerFrameValue"
-    :on-click="onClick"
+    :on-click="canPlay ? onClick : null"
     :ownerId="chip.ownerId"
+    :class="{ canPlay }"
   />
 </template>
 
@@ -24,7 +25,7 @@ export const DOMAIN_CHIP_SECTOR_ORDER = [
 ];
 
 /** Кадр 1…N в спрайте фишек по ключу сектора рулетки. */
-export function rouletteSectorKeyToChipFrame(value) {
+export function rouletteSectorKeyToChipFrame(value, chipId) {
   const key = value == null ? '' : String(value);
   const idx = DOMAIN_CHIP_SECTOR_ORDER.indexOf(key);
   return idx >= 0 ? idx + 1 : 1;
@@ -56,6 +57,10 @@ export default {
       type: Function,
       default: null,
     },
+    inMyHand: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -68,25 +73,37 @@ export default {
     store() {
       return this.getStore() || {};
     },
+    player() {
+      return this.sessionPlayer();
+    },
     /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
     chip() {
-      if(this.chipId === '69d1116976b0f1da3252b6eb') console.log('chip', this.store.chip?.[this.chipId] || {});
       return this.store.chip?.[this.chipId] || {};
     },
+    isSelectable() {
+      return this.sessionPlayerIsActive() && this.player.eventData.chip?.[this.chipId]?.selectable;
+    },
+    canPlay() {
+      return (
+        this.sessionPlayerIsActive() &&
+        ((this.inMyHand && !this.chip.ownerId) || this.chip.ownerId === this.gameState.sessionPlayerId || this.isSelectable)
+      );
+    },
     innerFrameValue() {
-      if (this.chipId) {
+      if (this.chipId && this.chipId !== 'fake') {
         const raw = this.chip?.value;
         if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
         return rouletteSectorKeyToChipFrame(raw);
       }
       if (typeof this.value === 'number' && Number.isFinite(this.value)) return this.value;
-      return rouletteSectorKeyToChipFrame(this.value);
+      return rouletteSectorKeyToChipFrame(this.value, this.chipId);
     },
   },
 };
 </script>
 <style scoped lang="scss">
-  .chip[ownerId]:not(.selectable) {
-    filter: brightness(0.5);
-  }
+.chip:not(.canPlay),
+.chip[ownerId]:not(.selectable):not(.canPlay) {
+  filter: brightness(0.5);
+}
 </style>

@@ -22,6 +22,7 @@
   }
 
   .card-info-btn {
+    display: none !important;
     right: 35px !important;
   }
 }

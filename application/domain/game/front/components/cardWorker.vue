@@ -127,7 +127,7 @@ export default {
       return this.player.eventData.controlBtn;
     },
     selectable() {
-      return this.sessionPlayerIsActive() && this.player.eventData.selectable;
+      return this.sessionPlayerIsActive() && this.sessionPlayer().eventData?.player?.[this.playerId]?.selectable;
     },
     showControlBtn() {
       return (

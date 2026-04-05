@@ -23,7 +23,7 @@
         <slot name="worker" :playerId="playerId" :viewerId="viewerId" :iam="iam">
           <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam">
             <template #money="{ money } = {}">
-              <div class="money">{{ new Intl.NumberFormat().format((money || 0) * 1000) + '₽' }}</div>
+              <div class="money">{{ money + ' ₽₽₽' }}</div>
             </template>
           </card-worker>
         </slot>
@@ -225,10 +225,10 @@ export default {
   }
 
   .helper-dialog {
-    // z-index: 0 !important;
     display: block;
     position: relative;
     transform-origin: right bottom;
+    padding-bottom: 4px;
 
     .content {
       width: auto;

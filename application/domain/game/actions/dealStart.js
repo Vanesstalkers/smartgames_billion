@@ -16,35 +16,79 @@
       for (const card of domain.game.configs.cards({ unique: true })) {
         const chip = this.data.seller.getChipBySubtype(card.group);
         if (!chip) continue;
+        if (chip.ownerId) continue;
         resources[card.group] = { title: card.title, chipId: chip.id() };
+      }
+
+      const companies = {};
+      for (const company of this.data.seller.decks.industry.items() || []) {
+        if (company.used) continue;
+        companies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 
       player.set({
         eventData: {
-          deal: { sellerId: this.data.seller.id(), resources },
+          deal: { sellerId: this.data.seller.id(), resources, companies },
           controlBtn: { label: 'Отменить сделку', resetEvent: true },
         },
       });
       this.data.seller.set({ eventData: { deal: { buyerId: player.id() } } });
     },
     handlers: {
-      async TRIGGER({ amount, payType, group, initPlayer }) {
+      async TRIGGER({ dealType, amount, payType, group, initPlayer, target }) {
         const { game, player } = this.eventContext();
-        const chip = game.get(player.eventData.deal.resources[group].chipId);
 
         player.set({
           staticHelper: {
             text: `Продавец оценивает предложение...`,
           },
         });
-        this.data.seller.set({
-          eventData: { deal: { buyerId: initPlayer.id(), group, amount, payType }, disableActivePlayerCheck: true },
-          staticHelper: {
-            text: `Игрок <b>${
+
+        let text = '';
+        switch (dealType) {
+          case 'buyResource': {
+            const chip = game.get(player.eventData.deal.resources[group].chipId);
+
+            text = `Игрок <b>${
               player.userName
-            }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount}</a> на условии <a>${
+            }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
               payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
-            }</a>. Согласны продать на этих условиях?`,
+            }</a>. Согласны продать на этих условиях?`;
+
+            break;
+          }
+          case 'borrowMoney': {
+            text = `Игрок <b>${player.userName}</b> просит одолжить деньги в размере <a>${amount} ₽₽₽</a>. Вы согласны?`;
+
+            break;
+          }
+
+          case 'useService': {
+            const company = game.get(player.eventData.deal.companies[group].companyId);
+
+            text = `Игрок <b>${
+              player.userName
+            }</b> просит воспользоваться услугой: <a>${company.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
+              payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
+            }</a>. Согласны продать на этих условиях?`;
+
+            // text = `Игрок <b>${
+            //   player.userName
+            // }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
+            //   payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
+            // }</a>. Согласны продать на этих условиях?`;
+
+            break;
+          }
+        }
+
+        this.data.seller.set({
+          eventData: {
+            deal: { dealType, buyerId: initPlayer.id(), group, amount, payType },
+            disableActivePlayerCheck: true,
+          },
+          staticHelper: {
+            text,
             buttons: [
               { text: 'Согласиться', code: 'ACCEPT_DEAL' },
               { text: 'Отказаться', code: 'DECLINE_DEAL' },

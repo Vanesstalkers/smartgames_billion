@@ -1,28 +1,43 @@
 <template>
   <div class="company-card">
-    <base-card v-bind="baseCardBindings" v-on="$listeners" @click.native.stop="triggerCardEvent" />
-
-    <div v-if="innerChipIds.length || outerChipIds.length" class="chips-overlay">
-      <div class="chip-lane chip-lane-inner">
-        <chip
-          v-for="chipId in innerChipIds"
-          :key="chipId"
-          :chip-id="chipId"
-          :size="26"
-          :on-click="() => triggerChipEvent(chipId)"
-        />
-      </div>
-      <div :class="['chip-lane', 'chip-lane-outer', { selectable: this.outedDeckSelectable }]">
-        <chip v-for="chipId in outerChipIds" :key="chipId" :chip-id="chipId" :size="26" />
-        <chip
-          v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
-          :chip-id="gameCustom.selectedChipId"
-          :size="26"
-          class="fake-chip"
-          :on-click="() => triggerOutedDeckEvent()"
-        />
-      </div>
-    </div>
+    <base-card
+      v-bind="baseCardBindings"
+      v-on="$listeners"
+      @click.native.stop="triggerCardEvent"
+      :class="{ selectable: isSelectable }"
+    >
+      <template #additional>
+        <div v-if="innerChipIds.length || outerChipIds.length" class="chips-overlay">
+          <div class="chip-lane chip-lane-inner">
+            <chip
+              v-for="chipId in innerChipIds"
+              :key="chipId"
+              :chip-id="chipId"
+              :size="26"
+              :on-click="() => triggerChipEvent(chipId)"
+              :in-my-hand="myCard"
+            />
+          </div>
+          <div :class="['chip-lane', 'chip-lane-outer', { selectable: outedDeckSelectable }]">
+            <chip
+              v-for="chipId in outerChipIds"
+              :key="chipId"
+              :chip-id="chipId"
+              :size="26"
+              :on-click="() => triggerChipEvent(chipId)"
+              :in-my-hand="myCard"
+            />
+            <chip
+              v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
+              :chip-id="gameCustom.selectedChipId"
+              :size="26"
+              class="fake-chip"
+              :on-click="() => triggerOutedDeckEvent()"
+            />
+          </div>
+        </div>
+      </template>
+    </base-card>
   </div>
 </template>
 
@@ -40,13 +55,13 @@ export default {
     chip,
   },
   props: {
-    playCard: Function,
     customStyle: {
       type: Object,
       default: () => null,
     },
     cardId: String,
     canPlay: Boolean,
+    myCard: Boolean,
     playerActive: {
       type: Boolean,
       default: true,
@@ -89,6 +104,9 @@ export default {
     outedDeck() {
       return this.cardDecks.find((d) => d.subtype === 'outer');
     },
+    isSelectable() {
+      return this.player.eventData.company?.[this.cardId]?.selectable;
+    },
     outedDeckSelectable() {
       return this.player.eventData.deck?.[this.outedDeck._id]?.selectable;
     },
@@ -100,11 +118,11 @@ export default {
     },
   },
   methods: {
-    canTriggerCardEvent() {
-      return this.card?.eventData?.buttonText === 'Выбрать ресурс' && this.sessionPlayerIsActive();
-    },
+    // canTriggerCardEvent() {
+    //   return this.card?.eventData?.buttonText === 'Выбрать ресурс' && this.sessionPlayerIsActive();
+    // },
     async triggerCardEvent() {
-      if (!this.canTriggerCardEvent()) return;
+      if (!this.isSelectable) return;
       await this.handleGameApi({
         name: 'eventTrigger',
         data: { eventData: { targetId: this.cardId } },
@@ -114,12 +132,16 @@ export default {
       return this.player.eventData.chip?.[chipId]?.selectable;
     },
     async triggerChipEvent(chipId) {
-      if (!this.isChipSelectable(chipId)) return;
+      if (this.card.played) return;
 
-      await this.handleGameApi({
-        name: 'eventTrigger',
-        data: { eventData: { targetId: chipId } },
-      });
+      if (this.isChipSelectable(chipId)) {
+        await this.handleGameApi({
+          name: 'eventTrigger',
+          data: { eventData: { targetId: chipId } },
+        });
+      } else {
+        await this.handleGameApi({ name: 'useChip', data: { chipId } });
+      }
     },
     getChipIdsBySubtype(subtype) {
       const targetDeck = this.cardDecks.find((deck) => deck.subtype === subtype);
@@ -128,6 +150,25 @@ export default {
         .filter(([, meta]) => Boolean(meta))
         .map(([id]) => id);
     },
+    // async playCard() {
+    //   await this.handleGameApi(
+    //     {
+    //       name: 'playCard',
+    //       data: {
+    //         cardId: this.cardId,
+    //         targetPlayerId: this.$parent.playerId,
+    //       },
+    //     },
+    //     {
+    //       onSuccess: () => {
+    //         this.preventDoubleClick = false;
+    //       },
+    //       onError: () => {
+    //         this.preventDoubleClick = false;
+    //       },
+    //     }
+    //   );
+    // },
     async triggerOutedDeckEvent() {
       if (!this.outedDeckSelectable) return;
 
@@ -145,6 +186,26 @@ export default {
   position: relative;
   background-image: url(@/assets/clear-black-back.png);
   border-radius: 10px;
+
+  .card-event:not(.played) {
+    .chip.canPlay {
+      border-radius: 12px;
+
+      &:hover {
+        cursor: pointer;
+        margin-left: -2px;
+        margin-top: -2px;
+        padding-bottom: 2px;
+        box-shadow: 1px 2px 2px 1px black !important;
+
+        &:active {
+          margin-left: -1px;
+          margin-top: -1px;
+          box-shadow: 1px 1px 2px 1px black !important;
+        }
+      }
+    }
+  }
 }
 
 .chips-overlay {
@@ -170,8 +231,8 @@ export default {
   }
   &.chip-lane-outer {
     position: absolute;
-    top: -18px;
-    left: 17px;
+    top: -16px;
+    left: 16px;
     width: 40px;
 
     .fake-chip {

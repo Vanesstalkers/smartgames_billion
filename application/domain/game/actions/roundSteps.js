@@ -88,6 +88,9 @@
 
       const chip = roulette.chip();
       if (chip) chip.parent().removeItem(chip, { forceDelete: true });
+      for (const company of roundActivePlayer.decks.industry.items() || []) {
+        company.set({ played: null });
+      }
 
       return { ...result, forcedEndRound: true };
     }
