@@ -86,7 +86,11 @@ export default {
     canPlay() {
       return (
         this.sessionPlayerIsActive() &&
-        ((this.inMyHand && !this.chip.ownerId) || this.chip.ownerId === this.gameState.sessionPlayerId || this.isSelectable)
+        ((this.inMyHand && !this.chip.ownerId) ||
+          this.chip.ownerId === this.gameState.sessionPlayerId ||
+          this.isSelectable ||
+          this.chipId === this.gameCustom.selectedChipId // тут будет roulette-chip
+        )
       );
     },
     innerFrameValue() {

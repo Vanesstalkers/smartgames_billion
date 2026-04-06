@@ -19,8 +19,6 @@
   restoreResources() {
     this._ensureCompanyDecks();
 
-    // const resources = {};
-    // for (const card of domain.game.configs.cards({ unique: true })) resources[card.group] = card;
     const resources = domain.game.configs
       .cards({ unique: true })
       .reduce((acc, card) => ({ ...acc, [card.group]: card }), {});

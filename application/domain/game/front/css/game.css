@@ -12,13 +12,27 @@
   text-shadow: 4px 4px 0 #fff;
   background-color: transparent;
 
-  &[name='buster'] {
-    top: 104px;
+  &:before {
+    content: attr(content);
+    position: relative;
+    font-size: 60px;
+    box-shadow: inset 0px -20px 20px 0px #111;
+    padding: 0px 10px 0px 4px;
+    border-radius: 50%;
+  }
+
+  &[name='buster'],
+  &[name='buster_drop'] {
     width: 94px;
     height: 130px;
     font-size: 60px;
     background-size: contain;
     background-repeat: no-repeat;
+
+    &[name='buster_drop'] {
+      width: 47px;
+      height: 65px;
+    }
   }
 
   .card-info-btn {
@@ -43,20 +57,19 @@
       cursor: default;
 
       .card-event {
-        &:before {
-          content: attr(content);
-          position: absolute;
-          top: 0px;
-          right: -24px;
-          font-size: 28px;
-          text-shadow: 2px 1px 0 #fff;
+        &:hover {
+          cursor: pointer;
+          box-shadow: inset 0 0 0 4px #f4e205;
+          &:active {
+            box-shadow: inset 0 0 4px 8px #f4e205;
+          }
         }
       }
 
-      &[code='Deck[card_buster]'] {
+      &[code='Deck[card_buster]'],
+      &[code='Deck[card_buster_drop]'] {
         position: absolute;
         top: 0px;
-        top: -104px;
         right: 100px;
 
         .company-card {
@@ -65,8 +78,29 @@
           .card-event {
             &:before {
               position: relative;
-              right: auto;
+              left: 4px;
               font-size: 60px;
+              box-shadow: inset 0px -20px 20px 0px #111;
+              padding: 8px 10px 0px 0px;
+              border-radius: 50%;
+            }
+          }
+        }
+
+        &[code='Deck[card_buster_drop]'] {
+          top: 100px;
+          filter: grayscale(1);
+
+          .card-event {
+            &:before {
+              font-size: 30px;
+              color: white;
+              text-shadow: none;
+              font-weight: bold;
+            }
+            &:hover {
+              box-shadow: none;
+              cursor: default;
             }
           }
         }

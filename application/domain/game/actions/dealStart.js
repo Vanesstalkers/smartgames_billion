@@ -22,7 +22,7 @@
 
       const companies = {};
       for (const company of this.data.seller.decks.industry.items() || []) {
-        if (company.used) continue;
+        if (company.played) continue;
         companies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 

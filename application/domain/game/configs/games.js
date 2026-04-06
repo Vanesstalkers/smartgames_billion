@@ -57,7 +57,7 @@
         },
       ],
       deckList: [
-        { type: 'card', subtype: 'buster' },
+        { type: 'card', subtype: 'buster', hasDrop: true },
         { type: 'company', subtype: 'light' },
         { type: 'company', subtype: 'mining' },
         { type: 'company', subtype: 'finance' },

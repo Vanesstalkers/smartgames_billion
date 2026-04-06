@@ -236,7 +236,6 @@
       storage,
       proxy: new Proxy(tmpObject, {
         set(target, name, value) {
-          console.log('set', { target, name, value, path });
           if (
             !Array.isArray(target) && // для массивов не придумал ничего лучше, чем обновлять их целиком
             !lib.utils.isObjectID(value) &&
@@ -261,7 +260,6 @@
           return true;
         },
         deleteProperty(target, name) {
-          console.log('deleteProperty', { target, name });
           delete target[name];
           delete sourceObject[name];
 

@@ -1,4 +1,4 @@
-({ apiRequest, selectGroup, template, unique = false } = {}) => {
+({ apiRequest, selectGroup, template, unique = false, ignoreBuster = true } = {}) => {
   const list = [
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
@@ -33,10 +33,17 @@
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
+    
+    { group: 'buster', name: 'test1', title: 'БустерТест1' },
+    { group: 'buster', name: 'test2', title: 'БустерТест2' },
+    { group: 'buster', name: 'test3', title: 'БустерТест3' },
+    { group: 'buster', name: 'test4', title: 'БустерТест4' },
+    { group: 'buster', name: 'test5', title: 'БустерТест5' },
   ];
 
   const result = list
     .filter((card) => !selectGroup || card.group === selectGroup)
+    .filter((card) => !ignoreBuster || card.group !== 'buster')
     .filter((card, index, self) => !unique || self.findIndex((c) => c.group === card.group) === index)
     .map((card) => (apiRequest ? { path: `${template}/${card.group}/${card.name}.png` } : card));
 

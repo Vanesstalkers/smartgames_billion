@@ -58,13 +58,15 @@
 
     if (newGame) {
       const cardsToRemove = this.settings.cardsToRemove || [];
-      const cardsList = configs.cards().filter((card) => !cardsToRemove.includes(card.name));
+      const cardsList = configs.cards({ ignoreBuster: false }).filter((card) => !cardsToRemove.includes(card.name));
       const items = lib.utils.structuredClone(cardsList.filter(({ group }) => group === deck.subtype));
       for (const item of items) deck.addItem({ ...item, subtype: deck.subtype });
 
       if (item.hasDrop) {
         const dropDeckData = { ...item, subtype: item.subtype + '_drop', placement: 'drop', parentDeckId: deck.id() };
-        const dropDeck = this.addDeck(dropDeckData, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
+        const dropDeck = this.addDeck(dropDeckData, {
+          deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass,
+        });
         deck.set({ dropDeckId: dropDeck.id() });
       }
     }
@@ -91,7 +93,7 @@
     for (const deckSpec of rouletteSpec.deckList || []) {
       roulette.addDeck(
         { ...deckSpec, type: deckSpec.type ?? 'chip', itemMap: deckSpec.itemMap || {} },
-        { deckItemClass: Chip },
+        { deckItemClass: Chip }
       );
     }
   }

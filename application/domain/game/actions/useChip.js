@@ -5,21 +5,27 @@
     name: 'useChipEvent',
     data: {
       chip: game.get(chipId),
+      beforeEventControlBtn: lib.utils.clone(player.eventData.controlBtn),
     },
     init: function () {
       const { game, player } = this.eventContext();
 
       const eventData = { company: {}, player: {} };
       for (const company of player.decks.industry.items() || []) {
-        if (company.used || company.subtype !== this.data.chip.value) continue;
+        if (company.played || company.subtype !== this.data.chip.value) continue;
 
         eventData.company[company.id()] = { selectable: true };
       }
-      for (const [companyId, { sellerId }] of Object.entries(player.acquired.company)) {
+      for (const [companyId, { sellerId }] of Object.entries(player.acquired?.company || {})) {
         const company = game.get(companyId);
         if (company.played) continue;
         eventData.player[sellerId] = { selectable: true };
         eventData.company[companyId] = { selectable: true };
+      }
+
+      if (Object.keys(eventData.company).length === 0) {
+        player.notifyUser('Нет доступных предприятий для выполнения действия');
+        return { resetEvent: true };
       }
 
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
@@ -38,7 +44,11 @@
         const { game, player } = this.eventContext();
 
         player.set({
-          eventData: { company: null, player: null, controlBtn: { label: 'Завершить раунд', resetEvent: null } },
+          eventData: {
+            company: null,
+            player: null,
+            controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null },
+          },
         });
 
         this.destroy();

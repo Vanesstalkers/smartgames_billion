@@ -7,7 +7,7 @@
       <div class="player-hands">
         <div class="hand-cards-list" ref="scrollbar">
           <div class="hand-cards" :style="{ width: handCardsWidth }">
-            <card
+            <company-card
               v-for="card in handCards"
               :key="card.id"
               :cardId="card.id"
@@ -15,6 +15,18 @@
               :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
+            />
+          </div>
+          <div v-if="busterCards.length > 0" class="buster-cards">
+            <company-card
+              :content="busterCards.length"
+              :cardData="{
+                name: 'buster',
+                group: 'industry',
+              }"
+              :imgExt="'png'"
+              :canPlay="iam && sessionPlayerIsActive()"
+              :playCard="playBusterCard"
             />
           </div>
         </div>
@@ -52,14 +64,16 @@
 import { inject } from 'vue';
 import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 
-import card from './card.vue';
+import companyCard from './company.vue';
+import busterCard from './buster.vue';
 import cardWorker from './cardWorker.vue';
 import dialogHelper from '~/lib/helper/front/components/dialog.vue';
 
 export default {
   components: {
     PerfectScrollbar,
-    card,
+    companyCard,
+    busterCard,
     cardWorker,
     dialogHelper,
   },
@@ -97,15 +111,17 @@ export default {
     viewer() {
       return this.store.viewer?.[this.viewerId] || {};
     },
-    cardDecks() {
-      const map = this.deckIds.map((id) => this.store.deck?.[id] || {});
-      return map.filter((deck) => deck.type === 'company') || [];
+    busterCards() {
+      const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
+      console.log('busterCards', deck, 'this.cardDecks', this.cardDecks);
+      return deck ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck })) : [];
     },
-    cardDecksData() {
-      return this.cardDecks.map(({ code, eventData }) => ({ code, eventData }));
+    cardDecks() {
+      return this.deckIds.map((id) => this.store.deck?.[id] || {});
     },
     handCards() {
       return this.cardDecks
+        .filter((deck) => deck.type === 'company')
         .filter(({ placement }) => placement !== 'table')
         .reduce((arr, deck) => {
           return arr.concat(
@@ -116,13 +132,6 @@ export default {
         }, [])
         .sort((a, b) => (a.cardOrder > b.cardOrder ? -1 : 1));
     },
-    tableCards() {
-      return this.cardDecks
-        .filter(({ placement }) => placement === 'table')
-        .reduce((arr, deck) => {
-          return arr.concat(Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck })));
-        }, []);
-    },
     deckIds() {
       return Object.keys(this.player.deckMap || {});
     },
@@ -132,7 +141,6 @@ export default {
   },
   methods: {
     async dealAction(button) {
-      console.log(button);
       await this.handleGameApi({ name: 'dealAction', data: { ...button } });
     },
     canPlay(card) {
@@ -141,6 +149,10 @@ export default {
       const deckAvailable = !card.deck.eventData.playDisabled;
 
       return this.iam && playerAvailable && deckAvailable;
+    },
+    async playBusterCard() {
+      console.log('playBusterCard');
+      // return true;
     },
     tutorialAction() {
       this.helperChecked = true;

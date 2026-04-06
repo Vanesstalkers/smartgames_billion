@@ -63,13 +63,37 @@
       buyer.notifyUser({ message: `Сделка состоялась` });
       break;
     }
-    case 'DECLINE_DEAL': {
-      const buyer = game.get(player.eventData.deal.buyerId);
+    case 'USE_DECK': {
+      const { deckId, price } = player.eventData.deal;
+      const deck = game.get(deckId);
+      deck.getRandomItem().moveToTarget(deck.subtype === 'buster' ? player.decks.buster : player.decks.company);
+
+      player.set({ money: player.money - price, eventData: { deal: null } });
+
       game.logs({
-        msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${buyer.userName}</a>.`,
+        msg:
+          deck.subtype === 'buster'
+            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price} ₽₽₽</a>.`
+            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.getTitle()}</a> за <a>${price} ₽₽₽</a>.`,
         userId: player.userId,
       });
-      buyer.notifyUser({ message: `Сделка отменена` });
+      player.notifyUser({
+        message:
+          deck.subtype === 'buster'
+            ? `Вы приобрели бустер за <a>${price} ₽₽₽</a>.`
+            : `Вы приобрели предприятие <a>${deck.getTitle()}</a> за <a>${price} ₽₽₽</a>.`,
+      });
+      break;
+    }
+    case 'DECLINE_DEAL': {
+      const buyer = game.get(player.eventData.deal.buyerId);
+      if (buyer) {
+        game.logs({
+          msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${buyer.userName}</a>.`,
+          userId: player.userId,
+        });
+        buyer.notifyUser({ message: `Сделка отменена` });
+      }
       break;
     }
     case 'CLOSE_DEAL': {

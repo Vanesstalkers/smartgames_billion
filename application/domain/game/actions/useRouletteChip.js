@@ -2,13 +2,11 @@
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
 
-  // initPlayer.earnMoney(1);
-  // return;
-
   player.initEvent({
     name: 'rouletteChipEvent',
     data: {
       rouletteChip: game.get(chipId),
+      beforeEventControlBtn: lib.utils.clone(player.eventData.controlBtn),
     },
     init() {
       const { game, player } = this.eventContext();
@@ -69,7 +67,7 @@
           eventData: {
             deck: null,
             chip: Object.fromEntries(Object.keys(player.eventData.chip).map((key) => [key, null])), // без этой логики при активном флаге removeRouletteChipSelectable не удалится chip
-            controlBtn: { label: 'Завершить раунд', resetEvent: null },
+            controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null },
           },
         });
         if (!removeRouletteChipSelectable)

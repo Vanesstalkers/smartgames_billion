@@ -1,5 +1,17 @@
 <template>
   <div class="company-card">
+    <div
+      :class="{ 'company-card-background': true, played: card.played }"
+      :style="{
+        backgroundImage: getCustomStyle.backgroundImage,
+        left: '0px',
+        top: '0px',
+        width: '100%',
+        height: '100%',
+        backgroundSize: 'cover',
+        position: 'absolute',
+      }"
+    />
     <base-card
       v-bind="baseCardBindings"
       v-on="$listeners"
@@ -67,6 +79,8 @@ export default {
       default: true,
     },
     cardData: Object,
+    deckEvent: Function,
+    deck: Object,
     cardGroup: String,
     imgExt: String,
     imgFullPath: String,
@@ -76,6 +90,7 @@ export default {
   },
   computed: {
     baseCardBindings() {
+      console.log('baseCardBindings', this.$attrs, this.$props);
       return {
         ...this.$attrs,
         ...this.$props,
@@ -83,8 +98,14 @@ export default {
         subtype: this.card?.subtype || '',
       };
     },
+    state() {
+      return this.$root.state || {};
+    },
     store() {
       return this.getStore() || {};
+    },
+    game() {
+      return this.getGame();
     },
     player() {
       return this.sessionPlayer();
@@ -116,12 +137,17 @@ export default {
     outerChipIds() {
       return this.getChipIdsBySubtype('outer');
     },
+    getCustomStyle() {
+      return this.getCardCustomStyle(this);
+    },
   },
   methods: {
-    // canTriggerCardEvent() {
-    //   return this.card?.eventData?.buttonText === 'Выбрать ресурс' && this.sessionPlayerIsActive();
-    // },
     async triggerCardEvent() {
+      if (this.deckEvent) {
+        await this.deckEvent(this.deck);
+        return;
+      }
+
       if (!this.isSelectable) return;
       await this.handleGameApi({
         name: 'eventTrigger',
@@ -132,8 +158,6 @@ export default {
       return this.player.eventData.chip?.[chipId]?.selectable;
     },
     async triggerChipEvent(chipId) {
-      if (this.card.played) return;
-
       if (this.isChipSelectable(chipId)) {
         await this.handleGameApi({
           name: 'eventTrigger',
@@ -150,25 +174,6 @@ export default {
         .filter(([, meta]) => Boolean(meta))
         .map(([id]) => id);
     },
-    // async playCard() {
-    //   await this.handleGameApi(
-    //     {
-    //       name: 'playCard',
-    //       data: {
-    //         cardId: this.cardId,
-    //         targetPlayerId: this.$parent.playerId,
-    //       },
-    //     },
-    //     {
-    //       onSuccess: () => {
-    //         this.preventDoubleClick = false;
-    //       },
-    //       onError: () => {
-    //         this.preventDoubleClick = false;
-    //       },
-    //     }
-    //   );
-    // },
     async triggerOutedDeckEvent() {
       if (!this.outedDeckSelectable) return;
 
@@ -187,7 +192,16 @@ export default {
   background-image: url(@/assets/clear-black-back.png);
   border-radius: 10px;
 
-  .card-event:not(.played) {
+  .company-card-background.played {
+    filter: grayscale(1);
+  }
+
+  .card-event {
+    background-image: none !important;
+    &.played {
+      filter: none !important;
+    }
+
     .chip.canPlay {
       border-radius: 12px;
 
