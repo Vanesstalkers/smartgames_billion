@@ -18,15 +18,18 @@
             />
           </div>
           <div v-if="busterCards.length > 0" class="buster-cards">
-            <company-card
-              :content="busterCards.length"
+            <buster-card
+              v-for="card in busterCards"
+              :key="card.id"
+              :cardId="card.id"
+              :content="card.name"
               :cardData="{
                 name: 'buster',
                 group: 'industry',
               }"
               :imgExt="'png'"
               :canPlay="iam && sessionPlayerIsActive()"
-              :playCard="playBusterCard"
+              :_playCard="playBusterCard"
             />
           </div>
         </div>
@@ -105,6 +108,9 @@ export default {
     store() {
       return this.getStore();
     },
+    game() {
+      return this.getGame();
+    },
     player() {
       return this.store.player?.[this.playerId] || {};
     },
@@ -113,8 +119,12 @@ export default {
     },
     busterCards() {
       const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
-      console.log('busterCards', deck, 'this.cardDecks', this.cardDecks);
-      return deck ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck })) : [];
+      const cards = deck
+        ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
+        : [];
+      console.log('busterCards', cards, 'this.cardDecks', this.cardDecks);
+
+      return cards;
     },
     cardDecks() {
       return this.deckIds.map((id) => this.store.deck?.[id] || {});
@@ -152,7 +162,6 @@ export default {
     },
     async playBusterCard() {
       console.log('playBusterCard');
-      // return true;
     },
     tutorialAction() {
       this.helperChecked = true;
@@ -343,5 +352,18 @@ export default {
 
 .deck-counters b {
   font-size: 42px;
+}
+
+.buster-cards {
+  display: flex;
+  padding-bottom: 60px;
+  height: 120px;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: end;
+
+  .buster-card {
+    margin-bottom: -80px;
+  }
 }
 </style>

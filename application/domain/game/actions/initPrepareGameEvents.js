@@ -14,6 +14,7 @@
           eventData.company[card.id()] = { selectable: true };
         }
 
+        eventData.playDisabled = true;
         eventData.controlBtn = { label: 'Помочь выбрать', triggerEvent: true };
         player.activate({ setData: { eventData } });
         player.setEventWithTriggerListener(this);

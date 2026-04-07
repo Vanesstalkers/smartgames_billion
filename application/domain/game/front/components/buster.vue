@@ -1,10 +1,6 @@
 <template>
-  <div
-    :class="{ 'buster-card': true, selectable: isSelectable }"
-    :style="getCustomStyle"
-    v-on:click.stop="playCard"
-  >
-  </div>
+  <base-card v-bind="baseCardBindings" v-on="$listeners" :class="{ 'buster-card': true, selectable: isSelectable }">
+  </base-card>
 </template>
 
 <script>
@@ -46,8 +42,13 @@ export default {
     isSelectable() {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
     },
-    getCustomStyle() {
-      return this.getCardCustomStyle(this);
+    baseCardBindings() {
+      return {
+        ...this.$attrs,
+        ...this.$props,
+        name: this.card?.name || this.card?.subtype || '',
+        subtype: this.card?.subtype || '',
+      };
     },
   },
   methods: {
@@ -80,5 +81,18 @@ export default {
   height: 130px;
   background-size: contain;
   background-repeat: no-repeat;
+
+  &:before {
+    box-shadow: inset 0px 20px 20px 0px #111;
+    padding: 0px 10px 0px 4px;
+    border-radius: 50%;
+    font-size: 30px;
+    text-shadow: none;
+    color: white;
+    top: 4px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+  }
 }
 </style>

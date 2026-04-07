@@ -34,18 +34,13 @@
       height: 65px;
     }
   }
-
-  .card-info-btn {
-    display: none !important;
-    right: 35px !important;
-  }
 }
 
 #gameInfo {
   .deck-list {
     position: absolute;
     top: 50px;
-    right: 24px;
+    right: 10px;
     scale: 0.5;
     transform-origin: right top;
     display: flex;

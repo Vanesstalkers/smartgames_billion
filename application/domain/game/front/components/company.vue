@@ -90,7 +90,6 @@ export default {
   },
   computed: {
     baseCardBindings() {
-      console.log('baseCardBindings', this.$attrs, this.$props);
       return {
         ...this.$attrs,
         ...this.$props,
@@ -218,6 +217,15 @@ export default {
           box-shadow: 1px 1px 2px 1px black !important;
         }
       }
+    }
+
+    &:before {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      font-size: 30px;
+      text-shadow: none;
+      text-shadow: 2px 1px 0 #fff;
     }
   }
 }
