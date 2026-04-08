@@ -33,7 +33,7 @@
               :content="Object.keys(deck.itemMap).length"
               :cardData="{
                 name: deck.subtype,
-                group: 'industry',
+                group: 'company',
               }"
               :imgExt="'png'"
               :deckEvent="useDeck"

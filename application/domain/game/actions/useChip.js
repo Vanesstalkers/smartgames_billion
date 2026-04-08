@@ -11,15 +11,15 @@
       const { game, player } = this.eventContext();
 
       const eventData = { company: {}, player: {} };
-      for (const company of player.decks.industry.items() || []) {
+      for (const company of player.decks.company.items() || []) {
         if (company.played || company.subtype !== this.data.chip.value) continue;
 
         eventData.company[company.id()] = { selectable: true };
       }
-      for (const [companyId, { sellerId }] of Object.entries(player.acquired?.company || {})) {
+      for (const [companyId, { playerId }] of Object.entries(player.acquired?.company || {})) {
         const company = game.get(companyId);
-        if (company.played) continue;
-        eventData.player[sellerId] = { selectable: true };
+        if (company.played || company.subtype !== this.data.chip.value) continue;
+        eventData.player[playerId] = { selectable: true };
         eventData.company[companyId] = { selectable: true };
       }
 
@@ -35,8 +35,29 @@
       TRIGGER({ target }) {
         const { game, player } = this.eventContext();
 
+        if (target) {
+          this.data.target = target;
+
+          player.set({
+            staticHelper: {
+              text: `Подтверждаете использование услуги '${target.getTitle()}'?`,
+              buttons: [
+                { text: 'Подтвердить', triggerEvent: true },
+                { text: 'Отменить', resetEvent: true },
+              ],
+            },
+          });
+
+          return { preventListenerRemove: true };
+        }
+        target = this.data.target;
+
         this.data.chip.delete();
         target.set({ played: true });
+
+        if (player !== target.getPlayer()) {
+          player.set({ acquired: { company: { [target.id()]: null } } });
+        }
 
         this.emit('RESET');
       },
@@ -44,6 +65,7 @@
         const { game, player } = this.eventContext();
 
         player.set({
+          staticHelper: null,
           eventData: {
             company: null,
             player: null,

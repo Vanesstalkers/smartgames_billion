@@ -15,12 +15,12 @@
     const game = this.game();
     const result = [];
 
-    for (const company of this.decks.industry.items() || []) {
+    for (const company of this.decks.company.items() || []) {
       const outerChip = company.decks.outer.items()[0];
       if (outerChip && outerChip.value === value) result.push(outerChip);
     }
 
-    for (const company of this.decks.industry.items() || []) {
+    for (const company of this.decks.company.items() || []) {
       if (company.subtype !== value) continue;
 
       for (const chip of company.decks.inner.items() || []) {
@@ -38,9 +38,7 @@
   }
 
   getChipBySubtype(subtype, { ownedOnly = true } = {}) {
-    const industry = this.decks?.industry;
-    if (!industry) return null;
-    for (const company of industry.items() || []) {
+    for (const company of this.decks?.company.items() || []) {
       for (const deck of [company.decks?.outer, company.decks?.inner].filter(Boolean)) {
         for (const chip of deck.items() || []) {
           if (ownedOnly && chip.ownerId) continue;
@@ -62,9 +60,11 @@
   showDealsHelper() {
     const showList = [];
     for (const deal of this.deals()) {
-      const seller = this.game().get(deal.sellerId);
+      if (!deal.playerDebt) continue;
+
+      const contractor = this.game().get(deal.contractorId);
       showList.push({
-        title: `Оплатить долг <a>${deal.amount}₽₽₽</a> игроку <a>${seller.userName}</a>`,
+        title: `Оплатить долг <a>${deal.amount}₽₽₽</a> игроку <a>${contractor.userName}</a>`,
         action: { code: 'CLOSE_DEAL', dealId: deal.dealId },
       });
     }

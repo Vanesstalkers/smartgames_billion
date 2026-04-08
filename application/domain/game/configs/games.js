@@ -44,14 +44,14 @@
           _code: 1,
           active: true,
           deckList: [
-            { type: 'company', subtype: 'industry', access: 'all' },
+            { type: 'company', subtype: 'company', access: 'all' },
             { type: 'card', subtype: 'buster' },
           ],
         },
         {
           _code: 2,
           deckList: [
-            { type: 'company', subtype: 'industry', access: 'all' },
+            { type: 'company', subtype: 'company', access: 'all' },
             { type: 'card', subtype: 'buster' },
           ],
         },
@@ -102,14 +102,14 @@
   //         _code: 1,
   //         active: true,
   //         deckList: [
-  //           { type: 'card', subtype: 'industry' },
+  //           { type: 'card', subtype: 'company' },
   //           { type: 'card', subtype: 'buster' },
   //         ],
   //       },
   //       {
   //         _code: 2,
   //         deckList: [
-  //           { type: 'card', subtype: 'industry' },
+  //           { type: 'card', subtype: 'company' },
   //           { type: 'card', subtype: 'buster' },
   //         ],
   //       },

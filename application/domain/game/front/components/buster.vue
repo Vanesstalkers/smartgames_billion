@@ -83,16 +83,17 @@ export default {
   background-repeat: no-repeat;
 
   &:before {
-    box-shadow: inset 0px 20px 20px 0px #111;
-    padding: 0px 10px 0px 4px;
-    border-radius: 50%;
-    font-size: 30px;
+    box-shadow: inset 0px 10px 20px 0px #111;
+    padding: 4px 0px 0px 0px;
+    font-size: 10px;
     text-shadow: none;
     color: white;
-    top: 4px;
+    top: 0px;
     position: absolute;
     width: 100%;
     text-align: center;
+    height: 20px;
+    border-radius: 10px;
   }
 }
 </style>

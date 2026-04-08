@@ -28,7 +28,7 @@
 
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
-      const cardsCount = player.decks.industry.itemsCount();
+      const cardsCount = player.decks.company.itemsCount();
       let income = player.income + incomeChange;
       if (income < 0) income = 0;
       if (income > 10) income = 10;
@@ -90,7 +90,7 @@
       if (chip) chip.parent().removeItem(chip, { forceDelete: true });
 
       for(const player of this.players()) {
-        for(const company of player.decks.industry.items() || []) {
+        for(const company of player.decks.company.items() || []) {
           company.set({ played: null });
         }
       }

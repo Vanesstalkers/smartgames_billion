@@ -15,7 +15,7 @@
       for (const chip of player.getAvailableChipsByValue(this.data.rouletteChip.value)) {
         eventData.chip[chip.id()] = { selectable: true };
       }
-      for (const company of player.decks.industry.items() || []) {
+      for (const company of player.decks.company.items() || []) {
         const outerDeck = company.decks.outer;
         if (!outerDeck.items()[0]) eventData.deck[outerDeck.id()] = { selectable: true };
       }

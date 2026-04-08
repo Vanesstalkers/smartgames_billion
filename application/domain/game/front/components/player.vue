@@ -11,7 +11,7 @@
               v-for="card in handCards"
               :key="card.id"
               :cardId="card.id"
-              :cardGroup="'industry'"
+              :cardGroup="'company'"
               :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
@@ -22,10 +22,10 @@
               v-for="card in busterCards"
               :key="card.id"
               :cardId="card.id"
-              :content="card.name"
+              :content="card.title"
               :cardData="{
                 name: 'buster',
-                group: 'industry',
+                group: 'company',
               }"
               :imgExt="'png'"
               :canPlay="iam && sessionPlayerIsActive()"
@@ -38,7 +38,7 @@
         <slot name="worker" :playerId="playerId" :viewerId="viewerId" :iam="iam">
           <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam">
             <template #money="{ money } = {}">
-              <div class="money">{{ money + ' ₽₽₽' }}</div>
+              <div class="money">{{ money + '₽' }}</div>
             </template>
           </card-worker>
         </slot>
@@ -56,7 +56,7 @@
           style="display: block"
           :dialogStyle="{}"
           :customData="player.staticHelper"
-          :action="dealAction"
+          :action="action"
         />
       </div>
     </div>
@@ -150,8 +150,14 @@ export default {
     },
   },
   methods: {
-    async dealAction(button) {
-      await this.handleGameApi({ name: 'dealAction', data: { ...button } });
+    async action(button) {
+      if (button.triggerEvent) {
+        await this.handleGameApi({ name: 'eventTrigger', data: { eventData: { button } } });
+      } else if (button.resetEvent) {
+        await this.handleGameApi({ name: 'eventReset' });
+      } else if (this.player.eventData?.deal) {
+        await this.handleGameApi({ name: 'dealAction', data: { ...button } });
+      }
     },
     canPlay(card) {
       const playerAvailable =

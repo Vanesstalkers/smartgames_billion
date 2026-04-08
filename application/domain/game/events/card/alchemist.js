@@ -1,19 +1,11 @@
 () => ({
   tutorial: {
-    text: 'Описание для карты тест1',
+    text: 'Положи бустер рядом со своей шкалой дохода. При каждом твоём броске кубиков дохода будет +1 к результату',
     showTitle: true,
     superPos: true,
   },
   init: function () {
     const { game, player } = this.eventContext();
-
-    // const eventData = { chip: {}, deck: {} };
-
-    // for (const chip of player.getAvailableChipsByValue('art')) {
-    //   eventData.chip[chip.id()] = { selectable: true };
-    // }
-    // player.set({ eventData });
-
     return { resetEvent: true };
   },
   handlers: {
@@ -23,8 +15,6 @@
     },
     RESET() {
       const { game, player, source: card } = this.eventContext();
-      player.set({ eventData: { chip: null, deck: null } });
-      card.set({ played: null });
       this.destroy();
     },
   },

@@ -6,36 +6,56 @@
 
   const event = player.initEvent({
     name: 'deal',
-    data: { seller: this.get(targetId) },
+    data: { contractor: this.get(targetId) },
     init() {
       const { player } = this.eventContext();
 
       this.data.prevControlBtn = JSON.stringify(player.eventData.controlBtn);
 
-      const resources = {};
+      const playerResources = {};
       for (const card of domain.game.configs.cards({ unique: true })) {
-        const chip = this.data.seller.getChipBySubtype(card.group);
+        const chip = player.getChipBySubtype(card.group);
         if (!chip) continue;
         if (chip.ownerId) continue;
-        resources[card.group] = { title: card.title, chipId: chip.id() };
+        playerResources[card.group] = { title: card.title, chipId: chip.id() };
       }
 
-      const companies = {};
-      for (const company of this.data.seller.decks.industry.items() || []) {
+      const contractorResources = {};
+      for (const card of domain.game.configs.cards({ unique: true })) {
+        const chip = this.data.contractor.getChipBySubtype(card.group);
+        if (!chip) continue;
+        if (chip.ownerId) continue;
+        contractorResources[card.group] = { title: card.title, chipId: chip.id() };
+      }
+
+      const contractorCompanies = {};
+      for (const company of this.data.contractor.decks.company.items() || []) {
         if (company.played) continue;
-        companies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
+        contractorCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
+      }
+
+      const playerCompanies = {};
+      for (const company of player.decks.company.items() || []) {
+        if (company.played) continue;
+        playerCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 
       player.set({
         eventData: {
-          deal: { sellerId: this.data.seller.id(), resources, companies },
+          deal: {
+            contractorId: this.data.contractor.id(),
+            contractorResources,
+            contractorCompanies,
+            playerResources,
+            playerCompanies,
+          },
           controlBtn: { label: 'Отменить сделку', resetEvent: true },
         },
       });
-      this.data.seller.set({ eventData: { deal: { buyerId: player.id() } } });
+      this.data.contractor.set({ eventData: { deal: { contractorId: player.id() } } });
     },
     handlers: {
-      async TRIGGER({ dealType, amount, payType, group, initPlayer, target }) {
+      async TRIGGER({ dealType, amount, payType, group, initPlayer, target, repayType }) {
         const { game, player } = this.eventContext();
 
         player.set({
@@ -47,34 +67,54 @@
         let text = '';
         switch (dealType) {
           case 'buyResource': {
-            const chip = game.get(player.eventData.deal.resources[group].chipId);
+            const chip = game.get(player.eventData.deal.contractorResources[group].chipId);
 
             text = `Игрок <b>${
               player.userName
-            }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
+            }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount}₽</a> на условии <a>${
               payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
             }</a>. Согласны продать на этих условиях?`;
 
             break;
           }
           case 'borrowMoney': {
-            text = `Игрок <b>${player.userName}</b> просит одолжить деньги в размере <a>${amount} ₽₽₽</a>. Вы согласны?`;
+            let repayDescription = '';
+            if (repayType === 'money') {
+              repayDescription = 'Возврат предполагается деньгами.';
+            } else if (repayType === 'booster') {
+              repayDescription = 'Возврат предполагается бустером.';
+            } else if (repayType === 'resource') {
+              const br = group && player.eventData.deal.playerResources?.[group];
+              const pledgeChip = br ? game.get(br.chipId) : null;
+              repayDescription = pledgeChip
+                ? `Возврат предполагается ресурсом: <a>${pledgeChip.getTitle()}</a>.`
+                : 'Возврат предполагается ресурсом.';
+            } else if (repayType === 'service') {
+              const pc = group && player.eventData.deal.playerCompanies?.[group];
+              const pledgeCo = pc ? game.get(pc.companyId) : null;
+              repayDescription = pledgeCo
+                ? `Возврат предполагается услугой: <a>${pledgeCo.getTitle()}</a>.`
+                : 'Возврат предполагается услугой.';
+            }
+            text = `Игрок <b>${player.userName}</b> просит одолжить деньги в размере <a>${amount}₽</a>.${
+              repayDescription ? ` ${repayDescription}` : ''
+            } Вы согласны?`;
 
             break;
           }
 
           case 'useService': {
-            const company = game.get(player.eventData.deal.companies[group].companyId);
+            const company = game.get(player.eventData.deal.contractorCompanies[group].companyId);
 
             text = `Игрок <b>${
               player.userName
-            }</b> просит воспользоваться услугой: <a>${company.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
+            }</b> просит воспользоваться услугой: <a>${company.getTitle()}</a> за <a>${amount}₽</a> на условии <a>${
               payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
             }</a>. Согласны продать на этих условиях?`;
 
             // text = `Игрок <b>${
             //   player.userName
-            // }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount} ₽₽₽</a> на условии <a>${
+            // }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount}₽</a> на условии <a>${
             //   payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
             // }</a>. Согласны продать на этих условиях?`;
 
@@ -82,9 +122,28 @@
           }
         }
 
-        this.data.seller.set({
+        let repayChipId;
+        if (repayType === 'resource' && group && player.eventData.deal.playerResources?.[group]) {
+          repayChipId = player.eventData.deal.playerResources[group].chipId;
+        }
+
+        let repayCompanyId;
+        if (repayType === 'service' && group && player.eventData.deal.playerCompanies?.[group]) {
+          repayCompanyId = player.eventData.deal.playerCompanies[group].companyId;
+        }
+
+        this.data.contractor.set({
           eventData: {
-            deal: { dealType, buyerId: initPlayer.id(), group, amount, payType },
+            deal: {
+              dealType,
+              contractorId: initPlayer.id(),
+              group,
+              amount,
+              payType,
+              repayType,
+              ...(repayChipId && { repayChipId }),
+              ...(repayCompanyId && { repayCompanyId }),
+            },
             disableActivePlayerCheck: true,
           },
           staticHelper: {

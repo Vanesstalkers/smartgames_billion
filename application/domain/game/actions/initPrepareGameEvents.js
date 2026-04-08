@@ -10,7 +10,7 @@
         for (const deck of decks) {
           const card = deck.getRandomItem();
           card.set({ eventData: { activeEvents: [this], buttonText: 'Выбрать' } });
-          card.moveToTarget(player.decks.industry);
+          card.moveToTarget(player.decks.company);
           eventData.company[card.id()] = { selectable: true };
         }
 
@@ -24,17 +24,17 @@
       init() {
         const { game } = this.eventContext();
 
-        // for (const player of game.players()) {
-        //   const decks = Object.values(game.decks).filter((d) => d.type === 'company');
-        //   for (const deck of decks) {
-        //     const card = deck.getRandomItem();
-        //     card.moveToTarget(player.decks.industry);
-        //     card.restoreResources();
-        //   }
-        // }
+        for (const player of game.players()) {
+          const decks = Object.values(game.decks).filter((d) => d.type === 'company');
+          for (const deck of decks) {
+            const card = deck.getRandomItem();
+            card.moveToTarget(player.decks.company);
+            card.restoreResources();
+          }
+        }
 
-        // game.run('startGame');
-        // return { resetEvent: true };
+        game.run('startGame');
+        return { resetEvent: true };
 
         game.set({ statusLabel: 'Подготовка к игре', status: 'PREPARE_START' });
         this.initPrepareStep(game.selectNextActivePlayer());
@@ -43,9 +43,9 @@
         TRIGGER({ target: selectedCompany, timerAutoPick }) {
           const { game, player } = this.eventContext();
 
-          if (!selectedCompany) selectedCompany = player.decks.industry.getRandomItem();
+          if (!selectedCompany) selectedCompany = player.decks.company.getRandomItem();
 
-          for (const company of player.decks.industry.items()) {
+          for (const company of player.decks.company.items()) {
             company.set({ eventData: { activeEvents: [], cardClass: null, buttonText: null } });
             if (selectedCompany && company.id() === selectedCompany.id()) continue;
             company.moveToDeck();
@@ -61,7 +61,7 @@
             userId: player.userId,
           });
 
-          const prepareReady = game.players().every((p) => (p.decks.industry?.itemsCount() || 0) > 0);
+          const prepareReady = game.players().every((p) => (p.decks.company?.itemsCount() || 0) > 0);
           if (prepareReady) {
             this.emit('RESET');
             game.run('startGame');

@@ -3,64 +3,92 @@
 
   switch (code) {
     case 'ACCEPT_DEAL': {
-      const { dealType, group, amount, payType, buyerId } = player.eventData.deal;
-      const buyer = game.get(buyerId);
+      const { dealType, group, amount, payType, contractorId, repayType, repayChipId, repayCompanyId } =
+        player.eventData.deal;
+      const contractor = game.get(contractorId);
 
       let logMessage = '';
       switch (dealType) {
         case 'borrowMoney': {
           const dealId = db.mongo.ObjectID().toString();
-          buyer.set({
-            money: buyer.money + amount,
-            dealsMap: { [dealId]: { dealId, amount, sellerId: player.id() } },
+          const repay = repayType ? { repayType } : {};
+          const acquired = {};
+
+          switch (repayType) {
+            case 'resource': {
+              if (group) repay.group = group;
+              if (repayChipId) repay.repayChipId = repayChipId;
+              acquired.chip = { [repayChipId]: { playerId: contractor.id() } };
+              game.get(repayChipId).set({ ownerId: player.id() });
+              break;
+            }
+            case 'service': {
+              if (group) repay.group = group;
+              if (repayCompanyId) repay.repayCompanyId = repayCompanyId;
+              acquired.company = { [repayCompanyId]: { playerId: contractor.id() } };
+              game.get(repayCompanyId).set({ ownerId: player.id() });
+              break;
+            }
+          }
+          contractor.set({
+            money: contractor.money + amount,
+            dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id(), ...repay } },
           });
           player.set({
             money: player.money - amount,
-            dealsMap: { [dealId]: { dealId, amount, buyerId: buyer.id() } },
+            dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id(), ...repay } },
+            acquired: { ...acquired },
           });
 
-          logMessage = `Игрок <a>{{player}}</a> одолжил <a>${amount} ₽₽₽</a> игроку <a>${buyer.userName}</a>.`;
+          logMessage = `Игрок <a>{{player}}</a> одолжил <a>${amount}₽</a> игроку <a>${contractor.userName}</a>.`;
           break;
         }
 
         case 'buyResource': {
-          const chip = game.get(buyer.eventData.deal.resources[group].chipId);
+          const chip = game.get(contractor.eventData.deal.contractorResources[group].chipId);
 
-          chip.set({ ownerId: buyer.id() });
-          buyer.set({ acquired: { chip: { [chip.id()]: { sellerId: player.id() } } } });
+          chip.set({ ownerId: contractor.id() });
+          contractor.set({ acquired: { chip: { [chip.id()]: { playerId: player.id() } } } });
           if (payType === 'deferred') {
             const dealId = db.mongo.ObjectID().toString();
-            buyer.set({ dealsMap: { [dealId]: { dealId, amount, sellerId: player.id() } } });
-            player.set({ dealsMap: { [dealId]: { dealId, amount, buyerId: buyer.id() } } });
+            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id() } } });
+            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id() } } });
           } else {
-            buyer.set({ money: buyer.money - amount });
+            contractor.set({ money: contractor.money - amount });
             player.set({ money: player.money + amount });
           }
 
           logMessage = `Игрок <a>{{player}}</a> продал ресурс <a>${chip.getTitle()}</a> игроку <a>${
-            buyer.userName
-          }</a> за <a>${amount} ₽₽₽</a>.`;
+            contractor.userName
+          }</a> за <a>${amount}₽</a>.`;
           break;
         }
 
         case 'useService': {
-          const company = game.get(buyer.eventData.deal.companies[group].companyId);
+          const company = game.get(contractor.eventData.deal.contractorCompanies[group].companyId);
 
-          company.set({ used: true });
-          buyer.set({ acquired: { company: { [company.id()]: { sellerId: player.id() } } } });
+          contractor.set({ acquired: { company: { [company.id()]: { playerId: player.id() } } } });
+          if (payType === 'deferred') {
+            const dealId = db.mongo.ObjectID().toString();
+            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id() } } });
+            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id() } } });
+          } else {
+            contractor.set({ money: contractor.money - amount });
+            player.set({ money: player.money + amount });
+          }
 
           logMessage = `Игрок <a>{{player}}</a> дал доступ к услуге <a>${company.getTitle()}</a> игроку <a>${
-            buyer.userName
-          }</a> за <a>${amount} ₽₽₽</a>.`;
+            contractor.userName
+          }</a> за <a>${amount}₽</a>.`;
           break;
         }
       }
 
       player.set({ eventData: { deal: null, disableActivePlayerCheck: null } });
-      buyer.set({ staticHelper: null, eventData: { deal: null } });
+      contractor.set({ staticHelper: null, eventData: { deal: null } });
 
       game.logs({ msg: logMessage, userId: player.userId });
-      buyer.notifyUser({ message: `Сделка состоялась` });
+      contractor.notifyUser({ message: `Сделка состоялась` });
       break;
     }
     case 'USE_DECK': {
@@ -73,38 +101,39 @@
       game.logs({
         msg:
           deck.subtype === 'buster'
-            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price} ₽₽₽</a>.`
-            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.getTitle()}</a> за <a>${price} ₽₽₽</a>.`,
+            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>.`
+            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.getTitle()}</a> за <a>${price}₽</a>.`,
         userId: player.userId,
       });
       player.notifyUser({
         message:
           deck.subtype === 'buster'
-            ? `Вы приобрели бустер за <a>${price} ₽₽₽</a>.`
-            : `Вы приобрели предприятие <a>${deck.getTitle()}</a> за <a>${price} ₽₽₽</a>.`,
+            ? `Вы приобрели бустер за <a>${price}₽</a>.`
+            : `Вы приобрели предприятие <a>${deck.getTitle()}</a> за <a>${price}₽</a>.`,
       });
       break;
     }
     case 'DECLINE_DEAL': {
-      const buyer = game.get(player.eventData.deal.buyerId);
-      if (buyer) {
+      const contractor = game.get(player.eventData.deal.contractorId);
+      if (contractor) {
         game.logs({
-          msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${buyer.userName}</a>.`,
+          msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${contractor.userName}</a>.`,
           userId: player.userId,
         });
-        buyer.notifyUser({ message: `Сделка отменена` });
+        contractor.set({ staticHelper: null });
+        contractor.notifyUser({ message: `Сделка отменена` });
       }
       break;
     }
     case 'CLOSE_DEAL': {
       const deal = player.deals().find((d) => d.dealId === dealId);
       if (deal) {
-        const seller = game.get(deal.sellerId);
-        seller.set({ money: seller.money + deal.amount, dealsMap: { [deal.dealId]: null } });
+        const contractor = game.get(deal.contractorId);
+        contractor.set({ money: contractor.money + deal.amount, dealsMap: { [deal.dealId]: null } });
         player.set({ money: player.money - deal.amount, dealsMap: { [deal.dealId]: null } });
 
         game.logs({
-          msg: `Игрок <a>{{player}}</a> вернул <a>${deal.amount} ₽₽₽</a> игроку <a>${seller.userName}</a>.`,
+          msg: `Игрок <a>{{player}}</a> вернул <a>${deal.amount}₽</a> игроку <a>${contractor.userName}</a>.`,
           userId: player.userId,
         });
 
