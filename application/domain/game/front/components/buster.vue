@@ -1,5 +1,8 @@
 <template>
   <base-card v-bind="baseCardBindings" v-on="$listeners" :class="{ 'buster-card': true, selectable: isSelectable }">
+    <template #additional v-if="chip._id">
+      <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
+    </template>
   </base-card>
 </template>
 
@@ -7,12 +10,13 @@
 import { inject } from 'vue';
 
 import baseCard from '~/lib/game/front/components/card.vue';
-
+import chip from './chip.vue';
 export default {
   name: 'buster-card',
   inheritAttrs: false,
   components: {
     baseCard,
+    chip,
   },
   props: {
     cardId: String,
@@ -38,6 +42,9 @@ export default {
     card() {
       const card = this.store.card?.[this.cardId];
       return card?._id ? card : { _id: this.cardId };
+    },
+    chip() {
+      return this.store.chip?.[this.card?.eventData?.chipId] || {};
     },
     isSelectable() {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
@@ -94,6 +101,10 @@ export default {
     text-align: center;
     height: 20px;
     border-radius: 10px;
+  }
+
+  .chip {
+    filter: none;
   }
 }
 </style>

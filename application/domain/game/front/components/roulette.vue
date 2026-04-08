@@ -3,8 +3,8 @@
     v-bind="$attrs"
     v-on="$listeners"
     indicator-mode="arrow"
-    :wheel-image-url="domainRouletteWheel"
-    :wheel-extra-style="{ rotate: '7deg' }"
+    :wheel-image-url="isTraining ? domainTrainingRouletteWheel : domainRouletteWheel"
+    :wheel-extra-style="{ rotate: isTraining ? '0deg' : '7deg' }"
     :stop-slot-gutter-px="stopSlotGutterPx"
     :stop-outward-offset-ratio="stopOutwardOffsetRatio"
     :roulette-id="rouletteId"
@@ -22,6 +22,21 @@
     </template>
     <template #additional>
       <slot name="additional" />
+
+      <div class="buster-cards">
+        <buster-card
+          v-for="card in rouletteBusterCards"
+          :key="card.id"
+          :cardId="card.id"
+          :content="card.title"
+          :cardData="{
+            name: 'buster',
+            group: 'company',
+          }"
+          :imgExt="'png'"
+          :canPlay="false"
+        />
+      </div>
     </template>
   </roulette>
 </template>
@@ -31,13 +46,16 @@ import { inject } from 'vue';
 
 import roulette from '~/lib/game/front/components/roulette.vue';
 import chip from './chip.vue';
+import busterCard from './buster.vue';
 import domainRouletteWheel from '../assets/roulette.png';
+import domainTrainingRouletteWheel from '../assets/roulette_training.png';
 
 export default {
   name: 'domain-roulette',
   components: {
     roulette,
     chip,
+    busterCard,
   },
   inheritAttrs: false,
   setup() {
@@ -52,6 +70,7 @@ export default {
   data() {
     return {
       domainRouletteWheel,
+      domainTrainingRouletteWheel,
     };
   },
   computed: {
@@ -60,6 +79,9 @@ export default {
     },
     game() {
       return this.getGame();
+    },
+    isTraining() {
+      return this.game.gameConfig === 'training';
     },
     rouletteId() {
       return Object.keys(this.game.rouletteMap)[0] || '';
@@ -70,9 +92,19 @@ export default {
     rouletteValue() {
       return this.roulette?.value;
     },
+    rouletteDecks() {
+      return Object.keys(this.roulette.deckMap).map((id) => this.store.deck?.[id] || {});
+    },
     rouletteChipId() {
-      const deckId = Object.keys(this.roulette.deckMap)[0];
-      return Object.keys(this.store.deck?.[deckId]?.itemMap || {})[0] || '';
+      const deck = this.rouletteDecks.find((deck) => deck.subtype === 'selected');
+      return Object.keys(deck?.itemMap || {})[0] || '';
+    },
+    rouletteBusterCards() {
+      const deck = this.rouletteDecks.find((deck) => deck.subtype === 'buster');
+      console.log('rouletteBusterCards', deck);
+      return deck
+        ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
+        : [];
     },
   },
   methods: {
@@ -95,6 +127,11 @@ export default {
       width: 60px !important;
       height: 60px !important;
     }
+  }
+
+  .buster-cards {
+    flex-direction: row;
+    gap: 10px;
   }
 }
 </style>

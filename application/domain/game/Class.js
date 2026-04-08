@@ -21,6 +21,10 @@
     this.preventBroadcastFields(['decks', 'dicecubes', 'roulettes']);
   }
 
+  isTraining() {
+    return this.gameConfig === 'training';
+  }
+
   stepLabel(label) {
     return `Раунд ${this.round} (${label})`;
   }

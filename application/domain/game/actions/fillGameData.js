@@ -92,9 +92,13 @@
     const roulette = this.addRoulette(rouletteSpec);
     for (const deckSpec of rouletteSpec.deckList || []) {
       roulette.addDeck(
-        { ...deckSpec, type: deckSpec.type ?? 'chip', itemMap: deckSpec.itemMap || {} },
-        { deckItemClass: Chip }
+        { ...deckSpec, type: deckSpec.itemType ?? 'card', itemMap: deckSpec.itemMap || {} },
+        { deckItemClass: deckSpec.itemType === 'chip' ? Chip : deckItemClass }
       );
+    }
+
+    for(const deck of Object.values(this.decks)) {
+      roulette.sectorTitle(deck.subtype, deck.title);
     }
   }
 

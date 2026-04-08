@@ -5,7 +5,15 @@
     superPos: true,
   },
   init: function () {
-    const { game, player } = this.eventContext();
+    const { game, player, source: card } = this.eventContext();
+
+    card.moveToTarget(game.roulettes.main.decks.buster, { markDelete: true });
+
+    const { Chip } = game.defaultClasses();
+    const chip = new Chip({ value: 'art' }, { parent: card });
+    card.set({ eventData: { chipId: chip.id() } });
+    chip.markNew();
+
     return { resetEvent: true };
   },
   handlers: {
@@ -15,6 +23,7 @@
     },
     RESET() {
       const { game, player, source: card } = this.eventContext();
+      card.set({ played: null });
       this.destroy();
     },
   },

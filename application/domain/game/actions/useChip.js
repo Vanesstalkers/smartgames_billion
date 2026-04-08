@@ -52,14 +52,15 @@
         }
         target = this.data.target;
 
-        this.data.chip.delete();
-        target.set({ played: true });
+        // this.data.chip.delete(); // !!!
 
         if (player !== target.getPlayer()) {
           player.set({ acquired: { company: { [target.id()]: null } } });
         }
 
         this.emit('RESET');
+
+        target.play({ player });
       },
       RESET() {
         const { game, player } = this.eventContext();

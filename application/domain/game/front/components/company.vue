@@ -1,16 +1,8 @@
 <template>
   <div class="company-card">
     <div
-      :class="{ 'company-card-background': true, played: card.played }"
-      :style="{
-        backgroundImage: getCustomStyle.backgroundImage,
-        left: '0px',
-        top: '0px',
-        width: '100%',
-        height: '100%',
-        backgroundSize: 'cover',
-        position: 'absolute',
-      }"
+      :class="{ 'company-card-background': true, played: card.played, selected: isSelected }"
+      :style="{ backgroundImage: getCustomStyle.backgroundImage }"
     />
     <base-card
       v-bind="baseCardBindings"
@@ -124,6 +116,9 @@ export default {
     outedDeck() {
       return this.cardDecks.find((d) => d.subtype === 'outer');
     },
+    isSelected() {
+      return this.cardId === this.gameCustom.selectedCard;
+    },
     isSelectable() {
       return this.player.eventData.company?.[this.cardId]?.selectable;
     },
@@ -191,8 +186,21 @@ export default {
   background-image: url(@/assets/clear-black-back.png);
   border-radius: 10px;
 
-  .company-card-background.played {
-    filter: grayscale(1);
+  .company-card-background {
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    position: absolute;
+    // z-index: 1;
+    &.played {
+      filter: grayscale(1);
+    }
+
+    &.selected {
+      z-index: 1;
+    }
   }
 
   .card-event {
