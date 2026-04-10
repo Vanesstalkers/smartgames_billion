@@ -29,7 +29,7 @@
     { group: 'engineering', name: 'engineering', title: 'Машиностроение' },
     { group: 'chemistry', name: 'chemistry', title: 'Химия' },
     { group: 'chemistry', name: 'chemistry', title: 'Химия' },
-    { group: 'chemistry', name: 'chemistry', title: 'Химия' },
+    // { group: 'chemistry', name: 'chemistry', title: 'Химия' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },

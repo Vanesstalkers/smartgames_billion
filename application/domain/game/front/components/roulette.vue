@@ -101,7 +101,6 @@ export default {
     },
     rouletteBusterCards() {
       const deck = this.rouletteDecks.find((deck) => deck.subtype === 'buster');
-      console.log('rouletteBusterCards', deck);
       return deck
         ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
         : [];

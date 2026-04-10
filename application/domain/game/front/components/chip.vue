@@ -78,7 +78,6 @@ export default {
     },
     /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
     chip() {
-      console.log('chip', this.chipId, this.store.chip?.[this.chipId]);
       return this.store.chip?.[this.chipId] || {};
     },
     isSelectable() {

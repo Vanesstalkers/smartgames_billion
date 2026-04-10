@@ -1,4 +1,4 @@
-(async function ({ code, dealId }, player) {
+(async function ({ code, dealId, eventData = {} } = {}, player) {
   const game = this;
 
   switch (code) {
@@ -94,7 +94,19 @@
     case 'USE_DECK': {
       const { deckId, price } = player.eventData.deal;
       const deck = game.get(deckId);
-      deck.getRandomItem().moveToTarget(deck.subtype === 'buster' ? player.decks.buster : player.decks.company);
+
+      if (eventData.changeCompanyEvent) {
+        player.set({ eventData: { deal: { price: 10 } } });
+        return this.initEvent(domain.game.events.card.light(), { game, player, initData: { sourceDeck: deck } });
+      }
+
+      if (deck.subtype === 'buster') {
+        deck.getRandomItem().moveToTarget(player.decks.buster, {
+          restoreResources: true,
+        });
+      } else {
+        deck.getRandomItem().moveToTarget(player.decks.company, { restoreResources: true });
+      }
 
       player.set({ money: player.money - price, eventData: { deal: null } });
 
@@ -102,14 +114,14 @@
         msg:
           deck.subtype === 'buster'
             ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>.`
-            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.getTitle()}</a> за <a>${price}₽</a>.`,
+            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>.`,
         userId: player.userId,
       });
       player.notifyUser({
         message:
           deck.subtype === 'buster'
             ? `Вы приобрели бустер за <a>${price}₽</a>.`
-            : `Вы приобрели предприятие <a>${deck.getTitle()}</a> за <a>${price}₽</a>.`,
+            : `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>.`,
       });
       break;
     }
@@ -123,6 +135,8 @@
         contractor.set({ staticHelper: null });
         contractor.notifyUser({ message: `Сделка отменена` });
       }
+      player.set({ eventData: { deal: null } });
+      game.toggleEventHandlers('RESET', {}, player);
       break;
     }
     case 'CLOSE_DEAL': {

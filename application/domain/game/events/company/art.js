@@ -7,7 +7,7 @@
 
     const eventData = { chip: {}, deck: {} };
 
-    for (const chip of player.getAvailableChipsByValue('media')) {
+    for (const chip of player.getAvailableChipsByValue('art')) {
       eventData.chip[chip.id()] = { selectable: true };
     }
     player.set({ eventData });
@@ -20,6 +20,7 @@
     RESET() {
       const { game, player, source: card } = this.eventContext();
       player.set({ eventData: { chip: null, deck: null } });
+      
       card.set({ played: null });
       this.destroy();
     },

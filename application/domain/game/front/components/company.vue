@@ -143,10 +143,13 @@ export default {
       }
 
       if (!this.isSelectable) return;
+      this.gameCustom.selectedCard = null
+      
       await this.handleGameApi({
         name: 'eventTrigger',
         data: { eventData: { targetId: this.cardId } },
       });
+      
     },
     isChipSelectable(chipId) {
       return this.player.eventData.chip?.[chipId]?.selectable;
@@ -180,7 +183,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .company-card {
   position: relative;
   background-image: url(@/assets/clear-black-back.png);
@@ -234,6 +237,11 @@ export default {
       font-size: 30px;
       text-shadow: none;
       text-shadow: 2px 1px 0 #fff;
+    }
+
+    .card-info-btn {
+      left: 15px;
+      top: 15px;
     }
   }
 }

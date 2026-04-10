@@ -24,17 +24,16 @@
       init() {
         const { game } = this.eventContext();
 
-        for (const player of game.players()) {
-          const decks = Object.values(game.decks).filter((d) => d.type === 'company');
-          for (const deck of decks) {
-            const card = deck.getRandomItem();
-            card.moveToTarget(player.decks.company);
-            card.restoreResources();
-          }
-        }
+        // for (const player of game.players()) {
+        //   const decks = Object.values(game.decks).filter((d) => d.type === 'company');
+        //   for (const deck of decks) {
+        //     const card = deck.getRandomItem();
+        //     card.moveToTarget(player.decks.company, { restoreResources: true });
+        //   }
+        // }
 
-        game.run('startGame');
-        return { resetEvent: true };
+        // game.run('startGame');
+        // return { resetEvent: true };
 
         game.set({ statusLabel: 'Подготовка к игре', status: 'PREPARE_START' });
         this.initPrepareStep(game.selectNextActivePlayer());

@@ -26,17 +26,22 @@
           <div
             v-for="deck in deckList"
             :key="deck._id"
-            :class="['deck', deck.code.includes('_drop') ? 'drop' : '']"
+            :class="{
+              deck: true,
+              drop: deck.code.includes('_drop'),
+              selectable: player.eventData.deck?.[deck._id]?.selectable,
+              empty: deckItemCount(deck).length === 0,
+            }"
             :code="deck.code"
           >
             <company-card
-              :content="Object.keys(deck.itemMap).length"
+              :content="deckItemCount(deck)"
               :cardData="{
                 name: deck.subtype,
                 group: 'company',
               }"
               :imgExt="'png'"
-              :deckEvent="useDeck"
+              :deckEvent="deckItemCount(deck).length !== 0 ? useDeck : null"
               :deck="deck"
             />
           </div>
@@ -169,6 +174,9 @@ export default {
     },
   },
   methods: {
+    deckItemCount(deck) {
+      return Object.keys(deck.itemMap || {}).length;
+    },
     async useDeck(deck) {
       console.log('useDeck', deck);
       if (deck.subtype === 'buster_drop') return;

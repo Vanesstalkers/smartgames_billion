@@ -22,10 +22,6 @@
       
       player.set({ eventData: { chip: null, deck: null }, acquired: { company: {[source.id()]: null}} });
 
-      // for (const player of game.players()) {
-      //   player.removeEventWithTriggerListener();
-      // }
-
       this.destroy();
     },
   },

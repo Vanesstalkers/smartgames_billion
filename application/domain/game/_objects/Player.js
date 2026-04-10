@@ -11,6 +11,10 @@
     this.set({ money: data.money || 0, income: data.income || 6 });
   }
 
+  hasCompany(value) {
+    return this.decks.company.items().some((company) => company.subtype === value);
+  }
+
   getAvailableChipsByValue(value) {
     const game = this.game();
     const result = [];

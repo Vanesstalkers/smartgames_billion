@@ -30,18 +30,14 @@
       roulette.spin({ toValue: sector });
       player.set({ eventData: { chip: { [roulette.chip().id()]: { selectable: true } } } });
 
-      this.emit('RESET');
+      this.emit('RESET', { success: true });
     },
-    RESET() {
+    RESET({ success } = {}) {
       const { game, player, source } = this.eventContext();
 
       player.set({ staticHelper: null });
-      source.set({ played: null }); // !!!
 
-      // for (const player of game.players()) {
-      //   player.removeEventWithTriggerListener();
-      // }
-
+      this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },
   },

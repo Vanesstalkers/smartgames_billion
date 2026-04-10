@@ -52,7 +52,7 @@
         ]"
       >
         <dialog-helper
-          v-if="iam && player.staticHelper"
+          v-if="iam && (player.staticHelper?.text || player.staticHelper?.html)"
           style="display: block"
           :dialogStyle="{}"
           :customData="player.staticHelper"
@@ -122,8 +122,6 @@ export default {
       const cards = deck
         ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
         : [];
-      console.log('busterCards', cards, 'this.cardDecks', this.cardDecks);
-
       return cards;
     },
     cardDecks() {
