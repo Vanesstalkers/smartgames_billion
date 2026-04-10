@@ -40,7 +40,8 @@
       .reduce((acc, card) => ({ ...acc, [card.group]: card }), {});
 
     const currentResourcesCount = this.decks.inner.items().length;
-    for (let i = 0; i < 3 - currentResourcesCount; i++) {
+    // for (let i = 0; i < 3 - currentResourcesCount; i++) {
+    for (let i = 0; i < 1; i++) {
       this.decks.inner.addItem({ value: this.subtype, title: resources[this.subtype].title });
     }
   }

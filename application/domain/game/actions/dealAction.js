@@ -97,7 +97,7 @@
 
       if (eventData.changeCompanyEvent) {
         player.set({ eventData: { deal: { price: 10 } } });
-        return this.initEvent(domain.game.events.card.light(), { game, player, initData: { sourceDeck: deck } });
+        return this.initEvent(domain.game.events.company.light(), { game, player, initData: { sourceDeck: deck } });
       }
 
       if (deck.subtype === 'buster') {

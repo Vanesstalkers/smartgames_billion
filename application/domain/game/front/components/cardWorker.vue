@@ -7,9 +7,11 @@
       'card-worker-' + player.code,
       player.active ? 'active' : '',
       selectable ? 'selectable' : '',
+      highlight ? 'highlight' : '',
       showControlBtn || showLeaveBtn ? 'has-action' : '',
     ]"
     :style="customStyle"
+    @click="selectable ? triggerSelectable() : null"
   >
     <slot name="money" :money="player.money">
       <div class="money">{{ player.money || 0 }}</div>
@@ -30,8 +32,13 @@
     <slot name="control" :controlAction="controlAction">
       <div
         v-if="showControlBtn"
-        :class="['action-btn', 'end-round-btn', controlBtn.class || '']"
-        @click="controlAction"
+        :class="{
+          'action-btn': true,
+          'end-round-btn': true,
+          [controlBtn.class || '']: true,
+          'reset-event': controlBtn.resetEvent,
+        }"
+        @click.stop="controlAction()"
       >
         {{ controlBtn.label || 'Закончить раунд' }}
       </div>
@@ -116,15 +123,18 @@ export default {
     },
     incomeValueStyle() {
       let backgroundColor = '#7db442';
-      
+
       if (this.displayIncome < 18) backgroundColor = '#f7ad3b';
       if (this.displayIncome < 14) backgroundColor = '#e5542a';
       if (this.displayIncome < 2) backgroundColor = '#be1a2e';
-      
+
       return { backgroundColor };
     },
     controlBtn() {
       return this.player.eventData.controlBtn;
+    },
+    highlight() {
+      return this.sessionPlayer().eventData.player?.[this.playerId]?.highlight;
     },
     selectable() {
       return this.sessionPlayerIsActive() && this.sessionPlayer().eventData?.player?.[this.playerId]?.selectable;
@@ -150,10 +160,15 @@ export default {
     },
   },
   methods: {
+    triggerSelectable() {
+      console.log('triggerSelectable', this.playerId);
+      this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.playerId } } });
+    },
     async controlAction(eventData = {}) {
+      console.log('controlAction this.controlBtn=', this.controlBtn, eventData);
       prettyAlertClear?.();
 
-      if (this.selectable) return; // выбор игрока в контексте события карты
+      // if (this.selectable) return; // выбор игрока в контексте события карты
 
       if (this.showLeaveBtn) return await this.leaveGame();
 
@@ -213,6 +228,10 @@ export default {
   border-radius: 10px;
   margin: 0px 0px 0px 5px;
   box-shadow: inset 0px 20px 20px 0px black;
+
+  &.highlight {
+    box-shadow: inset 0 0 20px 8px lightgreen !important;
+  }
 
   &.active {
     outline: 4px solid green;
@@ -316,12 +335,12 @@ export default {
   display: block;
 }
 
-.card-worker.has-action:hover .action-btn {
+.card-worker.has-action:hover .action-btn:not(.reset-event) {
   cursor: pointer;
   background: green;
 }
 
-.card-worker.selectable .end-round-btn,
+.card-worker.selectable .end-round-btn:not(.reset-event),
 .card-worker.selectable .end-round-timer {
   display: none;
 }
@@ -340,9 +359,18 @@ export default {
   background: #008000de;
   color: white;
   font-size: 16px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 
   &:hover {
-    background: #008000;
+    opacity: 0.7;
+  }
+
+  &.reset-event {
+    background: orange;
+    &:hover {
+      opacity: 0.7;
+    }
   }
 }
 

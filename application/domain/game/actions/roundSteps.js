@@ -28,7 +28,7 @@
 
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
-      const cardsCount = player.decks.company.itemsCount();
+      const companyCount = player.decks.company.itemsCount();
       const hasLightCompany = player.hasCompany('light');
 
       let income = player.income + incomeChange;
@@ -38,9 +38,9 @@
         income++;
         if (income > 10) income = 10;
       } else {
-        if (cardsCount == 1 && income > 6) income = 6;
-        if (cardsCount == 2 && income > 8) income = 8;
-        if (cardsCount >= 3 && income > 10) income = 10;
+        if (companyCount == 1 && income > 6) income = 6;
+        if (companyCount == 2 && income > 8) income = 8;
+        if (companyCount >= 3 && income > 10) income = 10;
       }
       player.set({ income });
 
@@ -95,6 +95,11 @@
 
       const chip = roulette.chip();
       if (chip) chip.parent().removeItem(chip, { forceDelete: true });
+      if (roulette.eventData.roundChipId) {
+        const roundChip = this.get(roulette.eventData.roundChipId);
+        if (roundChip) roundChip.set({ disabled: null });
+        roulette.set({ eventData: { roundChipId: null } });
+      }
 
       for (const player of this.players()) {
         for (const company of player.decks.company.items() || []) {

@@ -86,11 +86,11 @@ export default {
     canPlay() {
       return (
         this.sessionPlayerIsActive() &&
+        !this.chip.disabled &&
         ((this.inMyHand && !this.chip.ownerId) ||
           this.chip.ownerId === this.gameState.sessionPlayerId ||
           this.isSelectable ||
-          this.chipId === this.gameCustom.selectedChipId // тут будет roulette-chip
-        )
+          this.chipId === this.gameCustom.selectedChipId) // тут будет roulette-chip
       );
     },
     innerFrameValue() {
@@ -107,7 +107,8 @@ export default {
 </script>
 <style scoped lang="scss">
 .chip:not(.canPlay),
-.chip[ownerId]:not(.selectable):not(.canPlay) {
+.chip[ownerId]:not(.selectable):not(.canPlay),
+.chip.disabled {
   filter: brightness(0.5);
 }
 </style>

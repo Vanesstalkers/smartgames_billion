@@ -7,6 +7,8 @@
     const roulette = game.roulettes.main;
     const { value, sectors, sectorTitle } = roulette;
 
+    if(!roulette.chip()) throw new Error('Рулетку можно повернуть только до использования ресурса');
+
     const valueIndex = sectors.indexOf(value);
     const beforeSector = sectors[(sectors.length + valueIndex - 1) % sectors.length];
     const afterSector = sectors[(sectors.length + valueIndex + 1) % sectors.length];

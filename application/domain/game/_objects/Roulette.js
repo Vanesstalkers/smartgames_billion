@@ -1,6 +1,5 @@
 (class Roulette extends lib.game._objects.Roulette {
-  
-  #sectorTitles = {}
+  #sectorTitles = {};
 
   constructor(data, { parent }) {
     super(data, { parent });
@@ -10,8 +9,8 @@
   }
 
   spin({ toValue = null } = {}) {
-    if(this.chip()) this.decks.selected.removeItem(this.chip(), { forceDelete: true });
-    
+    if (this.chip()) this.decks.selected.removeItem(this.chip(), { forceDelete: true });
+
     if (this.eventData?.embargoAction) this.set({ eventData: { embargoAction: null } });
 
     if (!this.game().isTraining()) {
@@ -24,7 +23,10 @@
 
     const deck = this.decks?.selected;
     deck.removeAllItems({ markDelete: true });
-    deck.addItem({ value: this.value.split('-')[0] });
+
+    const value = this.value.split('-')[0];
+    const title = domain.game.configs.cards().find((card) => card.name === value).title;
+    deck.addItem({ value, title });
   }
 
   chip() {
@@ -33,7 +35,7 @@
 
   sectorTitle(sector, title) {
     sector = sector.split('-')[0]; // mining-1, mining-2 -> mining
-    if(title) this.#sectorTitles[sector] = title;
+    if (title) this.#sectorTitles[sector] = title;
     return this.#sectorTitles[sector] || sector;
   }
 });

@@ -32,7 +32,6 @@
               :in-my-hand="myCard"
             />
             <chip
-              v-if="outerChipIds.length === 0 && gameCustom.selectedChipId"
               :chip-id="gameCustom.selectedChipId"
               :size="26"
               class="fake-chip"

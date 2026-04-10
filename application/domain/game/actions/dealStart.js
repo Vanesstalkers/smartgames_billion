@@ -1,14 +1,10 @@
 (async function ({ targetId } = {}, player) {
-  // ??? проверить что это работает
-  const active = player.eventData.activeEvents || [];
-  const existingDeal = active.find((ev) => ev.name === 'deal');
-  if (existingDeal) existingDeal.emit('RESET');
-
   const event = player.initEvent({
     name: 'deal',
-    data: { contractor: this.get(targetId) },
+    data: { contractorId: targetId },
     init() {
-      const { player } = this.eventContext();
+      const { game, player } = this.eventContext();
+      const contractor = game.get(this.data.contractorId);
 
       this.data.prevControlBtn = JSON.stringify(player.eventData.controlBtn);
 
@@ -22,14 +18,14 @@
 
       const contractorResources = {};
       for (const card of domain.game.configs.cards({ unique: true })) {
-        const chip = this.data.contractor.getChipBySubtype(card.group);
+        const chip = contractor.getChipBySubtype(card.group);
         if (!chip) continue;
         if (chip.ownerId) continue;
         contractorResources[card.group] = { title: card.title, chipId: chip.id() };
       }
 
       const contractorCompanies = {};
-      for (const company of this.data.contractor.decks.company.items() || []) {
+      for (const company of contractor.decks.company.items() || []) {
         if (company.played) continue;
         contractorCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
@@ -43,7 +39,7 @@
       player.set({
         eventData: {
           deal: {
-            contractorId: this.data.contractor.id(),
+            contractorId: contractor.id(),
             contractorResources,
             contractorCompanies,
             playerResources,
@@ -52,11 +48,12 @@
           controlBtn: { label: 'Отменить сделку', resetEvent: true },
         },
       });
-      this.data.contractor.set({ eventData: { deal: { contractorId: player.id() } } });
+      contractor.set({ eventData: { deal: { contractorId: player.id() } } });
     },
     handlers: {
       async TRIGGER({ dealType, amount, payType, group, initPlayer, target, repayType }) {
         const { game, player } = this.eventContext();
+        const contractor = game.get(this.data.contractorId);
 
         player.set({
           staticHelper: {
@@ -132,7 +129,7 @@
           repayCompanyId = player.eventData.deal.playerCompanies[group].companyId;
         }
 
-        this.data.contractor.set({
+        contractor.set({
           eventData: {
             deal: {
               dealType,

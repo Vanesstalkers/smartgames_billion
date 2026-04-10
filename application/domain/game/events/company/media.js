@@ -2,27 +2,47 @@
   tutorial: {
     // text: 'Игрок делает еще один ход вне очереди',
   },
+  data: {},
   init: function () {
-    const { game, player } = this.eventContext();
+    const { game, player, source: card } = this.eventContext();
 
-    const eventData = { chip: {}, deck: {} };
+    if (game.roundStep !== 'ROULETTE') throw new Error('Услуга может быть предоставлена только до вращения рулетки');
 
-    for (const chip of player.getAvailableChipsByValue('media')) {
-      eventData.chip[chip.id()] = { selectable: true };
+    const eventData = { player: {} };
+    for (const player of game.players()) {
+      eventData.player[player.id()] = { selectable: true };
     }
-    player.set({ eventData });
+
+    this.data.beforeEventControlBtn = lib.utils.clone(player.eventData.controlBtn);
+    eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
+    player.set({
+      eventData,
+      staticHelper: { text: `Необходимо выбрать игрока для восстановления уровня дохода` },
+    });
   },
   handlers: {
     TRIGGER({ target }) {
       const { game, player } = this.eventContext();
-      this.emit('RESET');
+
+      const companyCount = target.decks.company.itemsCount();
+      const hasLightCompany = target.hasCompany('light');
+      let income = 6;
+      if (companyCount >= 3 || hasLightCompany) income = 10;
+      else if (companyCount == 2) income = 8;
+
+      target.set({ income });
+
+      return this.emit('RESET', { success: true });
     },
-    RESET() {
-      const { game, player, source: card } = this.eventContext();
+    RESET({ success } = {}) {
+      const { game, player } = this.eventContext();
 
-      player.set({ eventData: { chip: null, deck: null } });
+      player.set({
+        eventData: { player: null, controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null } },
+        staticHelper: null,
+      });
 
-      card.set({ played: null });
+      this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },
   },
