@@ -11,7 +11,7 @@
       :class="{ selectable: isSelectable }"
     >
       <template #additional>
-        <div v-if="innerChipIds.length || outerChipIds.length" class="chips-overlay">
+        <div class="chips-overlay">
           <div class="chip-lane chip-lane-inner">
             <chip
               v-for="chipId in innerChipIds"
@@ -110,9 +110,11 @@ export default {
     },
     cardDecks() {
       const deckIds = Object.keys(this.card.deckMap || {});
+      if(this.myCard) console.log(deckIds.map((id) => this.store.deck?.[id]));
       return deckIds.map((id) => this.store.deck?.[id]);
     },
     outedDeck() {
+      if(this.myCard) console.log(this.cardDecks.find((d) => d.subtype === 'outer'), "gameCustom.selectedChipId=", this.gameCustom.selectedChipId);
       return this.cardDecks.find((d) => d.subtype === 'outer');
     },
     isSelected() {
@@ -122,7 +124,8 @@ export default {
       return this.player.eventData.company?.[this.cardId]?.selectable;
     },
     outedDeckSelectable() {
-      return this.player.eventData.deck?.[this.outedDeck._id]?.selectable;
+      if(this.myCard) console.log("outedDeckSelectable=", this.player.eventData.deck, this.outedDeck?._id);
+      return this.player.eventData.deck?.[this.outedDeck?._id]?.selectable;
     },
     innerChipIds() {
       return this.getChipIdsBySubtype('inner');

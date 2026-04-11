@@ -1,9 +1,19 @@
 (class CompanyCard extends lib.game._objects.Card {
   constructor(data, { parent }) {
     super(data, { parent });
-    Object.assign(this, lib.game.decorators['@hasDeck'].decorate());
+    lib.game.decorators['@hasDeck'].decorate(this);
 
-    this.broadcastableFields(this.broadcastableFields().concat(['deckMap']));
+    if (data.deckMap) {
+      const game = this.game();
+      this.deckMap = data.deckMap;
+
+      const { Chip } = game.defaultClasses();
+      for (const _id of Object.keys(data.deckMap)) {
+        const deckData = game.store.deck[_id];
+        const deck = this.addDeck(deckData, { deckItemClass: Chip });
+        deck.access = game.playerMap;
+      }
+    }
   }
 
   getEvent(eventName) {

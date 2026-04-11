@@ -46,7 +46,7 @@
       for (const deck of [company.decks?.outer, company.decks?.inner].filter(Boolean)) {
         for (const chip of deck.items() || []) {
           if (ownedOnly && chip.ownerId) continue;
-          if (company.subtype === subtype || chip.value === subtype || chip.subtype === subtype) {
+          if (chip.value === subtype || chip.subtype === subtype) {
             return chip;
           }
         }

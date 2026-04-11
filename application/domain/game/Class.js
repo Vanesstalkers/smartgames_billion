@@ -2,12 +2,10 @@
   constructor(...args) {
     super(...args);
 
-    Object.assign(this, {
-      ...lib.chat['@class'].decorate(),
-      ...lib.game.decorators['@hasDeck'].decorate(),
-      ...lib.game.decorators['@hasDicecube'].decorate(),
-      ...lib.game.decorators['@hasRoulette'].decorate(),
-    });
+    lib.chat['@class'].decorate(this);
+    lib.game.decorators['@hasDeck'].decorate(this);
+    lib.game.decorators['@hasDicecube'].decorate(this);
+    lib.game.decorators['@hasRoulette'].decorate(this);
 
     this.defaultClasses({
       Player: domain.game._objects.Player,
@@ -16,9 +14,6 @@
       // Deck: domain.game._objects.Deck,
       // Card: domain.game._objects.Card,
     });
-
-    this.preventSaveFields(['decks', 'dicecubes', 'roulettes']);
-    this.preventBroadcastFields(['decks', 'dicecubes', 'roulettes']);
   }
 
   isTraining() {

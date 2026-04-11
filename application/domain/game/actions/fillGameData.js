@@ -51,9 +51,7 @@
     data.deckList = data.settings.deckList;
   }
   for (const item of data.deckList || []) {
-    if (item.access === 'all') {
-      item.access = this.playerMap;
-    }
+    if (item.access === 'all') item.access = this.playerMap;
     const deck = this.addDeck(item, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
 
     if (newGame) {
@@ -88,16 +86,20 @@
   } else {
     data.rouletteList = data.settings.rouletteList;
   }
-  for (const rouletteSpec of data.rouletteList || []) {
-    const roulette = this.addRoulette(rouletteSpec);
-    for (const deckSpec of rouletteSpec.deckList || []) {
+  for (const rouletteData of data.rouletteList || []) {
+    const roulette = this.addRoulette(rouletteData);
+    if (rouletteData.deckMap) {
+      rouletteData.deckList = [];
+      for (const _id of Object.keys(rouletteData.deckMap)) rouletteData.deckList.push(this.store.deck[_id]);
+    }
+    for (const deckData of rouletteData.deckList || []) {
       roulette.addDeck(
-        { ...deckSpec, type: deckSpec.itemType ?? 'card', itemMap: deckSpec.itemMap || {} },
-        { deckItemClass: deckSpec.itemType === 'chip' ? Chip : deckItemClass }
+        { ...deckData, type: deckData.itemType ?? 'card', itemMap: deckData.itemMap || {} },
+        { deckItemClass: deckData.itemType === 'chip' ? Chip : deckItemClass }
       );
     }
 
-    for(const deck of Object.values(this.decks)) {
+    for (const deck of Object.values(this.decks)) {
       roulette.sectorTitle(deck.subtype, deck.title);
     }
   }

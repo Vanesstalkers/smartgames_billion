@@ -3,9 +3,7 @@
 
   constructor(data, { parent }) {
     super(data, { parent });
-    Object.assign(this, lib.game.decorators['@hasDeck'].decorate());
-
-    this.broadcastableFields(this.broadcastableFields().concat(['deckMap']));
+    lib.game.decorators['@hasDeck'].decorate(this);
   }
 
   spin({ toValue = null } = {}) {
