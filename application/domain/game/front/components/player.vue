@@ -1,7 +1,17 @@
 <template>
   <div
     v-if="player._id || viewer._id"
-    :class="['player', ...customClass, iam ? 'iam' : '', player.active ? 'active' : '']"
+    :class="[
+      'player',
+      ...customClass,
+      iam ? 'iam' : '',
+      player.active ? 'active' : '',
+      selected ? 'selected' : '',
+      hovered ? 'hovered' : '',
+    ]"
+    @click="selectPlayer()"
+    @mouseover="mouseOverPlayer()"
+    @mouseleave="mouseLeavePlayer()"
   >
     <div class="inner-content">
       <div class="player-hands">
@@ -15,6 +25,7 @@
               :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
+              :class="{ 'acquired-company': card.acquired }"
             />
           </div>
           <div v-if="busterCards.length > 0" class="buster-cards">
@@ -87,7 +98,7 @@ export default {
     iam: Boolean,
   },
   data() {
-    return { helperVisible: false, helperChecked: false };
+    return { helperVisible: false, helperChecked: false, selected: false, hovered: false };
   },
   watch: {
     'player.staticHelper.text': function (val) {
@@ -134,7 +145,7 @@ export default {
         .reduce((arr, deck) => {
           return arr.concat(
             Object.entries(deck.itemMap).map(([id, { group }]) => {
-              return { id, group, deck };
+              return { id, group, deck, acquired: this.sessionPlayer().acquired?.company?.[id] };
             })
           );
         }, [])
@@ -148,6 +159,16 @@ export default {
     },
   },
   methods: {
+    selectPlayer() {
+      if (this.iam) return;
+      this.selected = !this.selected;
+    },
+    mouseOverPlayer() {
+      this.hovered = true;
+    },
+    mouseLeavePlayer() {
+      this.hovered = false;
+    },
     async action(button) {
       if (button.triggerEvent) {
         await this.handleGameApi({ name: 'eventTrigger', data: { eventData: { button } } });
@@ -363,12 +384,85 @@ export default {
   display: flex;
   padding-bottom: 60px;
   height: 120px;
+  width: 212px;
   flex-direction: column;
   flex-wrap: wrap;
   align-content: end;
 
   .buster-card {
     margin-bottom: -80px;
+  }
+}
+
+.acquired-company {
+  .company-card-background {
+    border-radius: 10px;
+    box-shadow: inset 0 0 4px 4px green;
+  }
+}
+
+.player:not(.iam) {
+  cursor: pointer;
+  padding-top: 70px;
+
+  &.selected {
+    .card-worker {
+      outline: 2px solid green;
+    }
+    // box-shadow: 0 0 10px 10px #f4e205;
+  }
+}
+.player:not(.iam):not(.selected):not(.hovered) {
+  padding-top: 0px;
+
+  .card-worker {
+    width: 72px;
+    height: 108px;
+    .end-round-timer {
+      font-size: 32px;
+      bottom: 0px;
+      height: auto;
+      line-height: 32px;
+      display: none;
+    }
+    .handshake-action {
+      width: 40px;
+      height: 40px;
+      top: calc(100% - 50px);
+      left: calc(50% - 20px);
+    }
+    .income-block {
+      display: none;
+    }
+  }
+  .player-hands {
+    z-index: -1;
+    left: -68px;
+    top: -108px;
+
+    .hand-cards {
+      flex-direction: column !important;
+
+      .company-card {
+        margin-bottom: 0px;
+        height: 30px;
+
+        .company-card-background {
+          border-radius: 10px;
+        }
+        .card-event {
+          width: 80px;
+          height: 160px;
+        }
+
+        .chip-lane {
+          display: none;
+          &.chip-lane-all {
+            display: flex;
+          }
+        }
+      }
+    }
   }
 }
 </style>

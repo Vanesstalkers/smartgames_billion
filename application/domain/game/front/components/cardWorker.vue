@@ -13,7 +13,7 @@
     :style="customStyle"
     @click="selectable ? triggerSelectable() : null"
   >
-    <slot name="money" :money="player.money">
+    <slot v-if="!viewerId" name="money" :money="player.money">
       <div class="money">{{ player.money || 0 }}</div>
     </slot>
     <slot name="timer" :timer="localTimer" :showTimer="showTimer">
@@ -21,7 +21,7 @@
         {{ localTimer }}
       </div>
     </slot>
-    <slot name="custom">
+    <slot v-if="!viewerId" name="custom">
       <div class="income-block">
         <div class="income-counter" :style="incomeCounterStyle" />
         <div class="income-plane" />
@@ -131,7 +131,7 @@ export default {
       return { backgroundColor };
     },
     controlBtn() {
-      return this.player.eventData.controlBtn;
+      return this.player.eventData?.controlBtn;
     },
     highlight() {
       return this.sessionPlayer().eventData.player?.[this.playerId]?.highlight;

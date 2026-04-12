@@ -38,6 +38,16 @@
               :on-click="() => triggerOutedDeckEvent()"
             />
           </div>
+          <div class="chip-lane chip-lane-all">
+            <chip
+              v-for="chipId in innerChipIds.concat(outerChipIds)"
+              :key="'all-' + chipId"
+              :chip-id="chipId"
+              :size="26"
+              :on-click="() => triggerChipEvent(chipId)"
+              :in-my-hand="myCard"
+            />
+          </div>
         </div>
       </template>
     </base-card>
@@ -142,13 +152,12 @@ export default {
       }
 
       if (!this.isSelectable) return;
-      this.gameCustom.selectedCard = null
-      
+      this.gameCustom.selectedCard = null;
+
       await this.handleGameApi({
         name: 'eventTrigger',
         data: { eventData: { targetId: this.cardId } },
       });
-      
     },
     isChipSelectable(chipId) {
       return this.player.eventData.chip?.[chipId]?.selectable;
@@ -300,6 +309,12 @@ export default {
         }
       }
     }
+  }
+  &.chip-lane-all {
+    display: none;
+    position: absolute;
+    left: 82px;
+    top: 2px;
   }
 }
 </style>

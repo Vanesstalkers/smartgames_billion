@@ -84,6 +84,7 @@ export default {
       return this.sessionPlayerIsActive() && this.player.eventData.chip?.[this.chipId]?.selectable;
     },
     canPlay() {
+      if (this.isGameMaster()) return true;
       return (
         this.sessionPlayerIsActive() &&
         !this.chip.disabled &&

@@ -71,10 +71,12 @@
           if (this.data.rouletteChip.value === target.value) {
             this.data.rouletteChip.parent().removeItem(this.data.rouletteChip, { forceDelete: true });
 
-            const income = actionPlayer.income * 2;
-            game.logs({ msg: `Игрок {{player}} продал ресурс за <a>${income}₽</a>.`, userId: actionPlayer.userId });
             actionPlayer.processDistributionIncome();
+
+            const income = actionPlayer.income * 2;
             actionPlayer.earnMoney(income);
+
+            game.logs({ msg: `Игрок {{player}} продал ресурс за <a>${income}₽</a>.`, userId: actionPlayer.userId });
           } else {
             this.data.rouletteChip.moveToTarget(targetDeck, {
               setData: { disabled: true, eventData: { selectable: null } },

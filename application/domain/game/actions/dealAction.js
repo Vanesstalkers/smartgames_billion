@@ -1,7 +1,7 @@
 (async function ({ code, dealId, eventData = {} } = {}, player) {
   const game = this;
   const playerId = player.id();
-  const chip = game.roulettes.main.chip();
+  const rouletteChip = game.roulettes.main.chip();
 
   switch (code) {
     case 'ACCEPT_DEAL': {
@@ -36,7 +36,7 @@
                 contractor.set({ acquired: { chip: { [repayChipId]: null } } });
               }
 
-              if (repayChip.value === group) {
+              if (rouletteChip?.value === group) {
                 player.processDistributionIncome();
                 contractor.processDistributionIncome();
               }
@@ -48,7 +48,7 @@
               acquired.company = { [repayCompanyId]: { playerId: contractorId } };
               game.get(repayCompanyId).set({ ownerId: playerId });
 
-              if (chip.value === group) {
+              if (rouletteChip?.value === group) {
                 player.processDistributionIncome();
                 contractor.processDistributionIncome();
               }
@@ -98,7 +98,7 @@
             contractor.userName
           }</a> за <a>${amount}₽</a>`;
 
-          if (chip.value === group) {
+          if (rouletteChip?.value === group) {
             player.processDistributionIncome();
             contractor.processDistributionIncome();
           }
@@ -122,7 +122,7 @@
             contractor.userName
           }</a> за <a>${amount}₽</a>`;
 
-          if (chip.value === group) {
+          if (rouletteChip?.value === group) {
             player.processDistributionIncome();
             contractor.processDistributionIncome();
           }

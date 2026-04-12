@@ -39,7 +39,7 @@
 #gamePlane .game-zones .deck-list--roulette-orbit {
   position: absolute;
   left: 50%;
-  top: 30%;
+  top: calc(50% - 100px);
   z-index: 4;
   width: 0;
   height: 0;
@@ -51,6 +51,7 @@
 #gamePlane .game-zones .deck-list--beside-dice {
   flex-shrink: 0;
   position: relative;
+  width: 100px;
 }
 
 #gamePlane .game-zones .deck-list--roulette-orbit .deck {
@@ -72,20 +73,21 @@
       overflow: visible;
     }
 
-    &[code='Deck[card_buster]'], &[code='Deck[card_buster_drop]'] {
+    &[code='Deck[card_buster]'],
+    &[code='Deck[card_buster_drop]'] {
       .deck-cards-stack {
-        height: 140px!important;
+        height: 140px !important;
+      }
+      .deck-card-layer.deck-card--top {
+        height: 140px;
+
+        .card-event {
+          height: 100%;
+          width: 100%;
+        }
       }
     }
 
-    .deck-card-layer.deck-card--top {
-      height: 140px;
-
-      .card-event {
-        height: 100%;
-        width: 100%;
-      }
-    }
     .deck-card-layer:not(.deck-card--top) .card-event:before {
       display: none;
     }

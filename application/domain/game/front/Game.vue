@@ -10,8 +10,9 @@
           <roulette :stop-outward-offset-ratio="0.22">
             <template #additional>
               <div class="roulette-additional-tools">
-                <div v-if="busterDropDeck" class="deck-list deck-list--beside-dice">
+                <div class="deck-list deck-list--beside-dice">
                   <div
+                  v-if="busterDropDeck" 
                     :class="{
                       deck: true,
                       drop: true,
@@ -35,8 +36,9 @@
                     </div>
                   </div>
                 </div>
-                <div v-if="busterDeck" class="deck-list deck-list--beside-dice">
+                <div class="deck-list deck-list--beside-dice">
                   <div
+                  v-if="busterDeck" 
                     :class="{
                       deck: true,
                       drop: busterDeck.code.includes('_drop'),
@@ -63,19 +65,21 @@
                 <div class="dicecube-container">
                   <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
                 </div>
-                <div v-if="rouletteBusterCards.length" class="buster-cards">
-                  <buster-card
-                    v-for="card in rouletteBusterCards"
-                    :key="card.id"
-                    :cardId="card.id"
-                    :content="card.title"
-                    :cardData="{
-                      name: 'buster',
-                      group: 'company',
-                    }"
-                    :imgExt="'png'"
-                    :canPlay="false"
-                  />
+                <div class="buster-cards">
+                  <div class="buster-cards-container">
+                    <buster-card
+                      v-for="card in rouletteBusterCards"
+                      :key="card.id"
+                      :cardId="card.id"
+                      :content="card.title"
+                      :cardData="{
+                        name: 'buster',
+                        group: 'company',
+                      }"
+                      :imgExt="'png'"
+                      :canPlay="false"
+                    />
+                  </div>
                 </div>
               </div>
             </template>
@@ -100,7 +104,7 @@
                   class="deck-card-layer"
                   :class="{ 'deck-card--top': stackIndex === deckItemCount(deck) }"
                   :style="deckCardStackStyle(stackIndex)"
-                  :content="stackIndex === deckItemCount(deck) ? deckItemCount(deck) : ''"
+                  :_content="stackIndex === deckItemCount(deck) ? deckItemCount(deck) : ''"
                   :cardData="{
                     name: deck.subtype,
                     group: 'company',
@@ -365,6 +369,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
+  justify-content: center;
   gap: 14px;
   pointer-events: none;
   z-index: 5;
@@ -390,15 +395,21 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 10px;
+  width: 212px;
   flex-shrink: 0;
   align-items: flex-end;
 
   padding-bottom: 0px;
 
-  .card-event {
-    width: 100px;
-    height: 140px;
-    margin-bottom: 0px;
+  .buster-cards-container {
+    display: flex;
+    gap: 14px;
+
+    .card-event {
+      width: 100px;
+      height: 140px;
+      margin-bottom: 0px;
+    }
   }
 }
 
