@@ -22,21 +22,6 @@
     </template>
     <template #additional>
       <slot name="additional" />
-
-      <div class="buster-cards">
-        <buster-card
-          v-for="card in rouletteBusterCards"
-          :key="card.id"
-          :cardId="card.id"
-          :content="card.title"
-          :cardData="{
-            name: 'buster',
-            group: 'company',
-          }"
-          :imgExt="'png'"
-          :canPlay="false"
-        />
-      </div>
     </template>
   </roulette>
 </template>
@@ -46,7 +31,6 @@ import { inject } from 'vue';
 
 import roulette from '~/lib/game/front/components/roulette.vue';
 import chip from './chip.vue';
-import busterCard from './buster.vue';
 import domainRouletteWheel from '../assets/roulette.png';
 import domainTrainingRouletteWheel from '../assets/roulette_training.png';
 
@@ -55,7 +39,6 @@ export default {
   components: {
     roulette,
     chip,
-    busterCard,
   },
   inheritAttrs: false,
   setup() {
@@ -99,12 +82,6 @@ export default {
       const deck = this.rouletteDecks.find((deck) => deck.subtype === 'selected');
       return Object.keys(deck?.itemMap || {})[0] || '';
     },
-    rouletteBusterCards() {
-      const deck = this.rouletteDecks.find((deck) => deck.subtype === 'buster');
-      return deck
-        ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
-        : [];
-    },
   },
   methods: {
     async useRouletteChip() {
@@ -128,9 +105,5 @@ export default {
     }
   }
 
-  .buster-cards {
-    flex-direction: row;
-    gap: 10px;
-  }
 }
 </style>

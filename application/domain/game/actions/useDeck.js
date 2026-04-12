@@ -11,7 +11,11 @@
     price = 0;
   if (deck.subtype === 'buster') {
     price = 10;
-    text = 'Хотите приобрести бустер за <a>10₽</a>?';
+    text = 'Хотите приобрести бустер?';
+    buttons = [
+      { text: 'Купить за <b><a>10₽</a></b>', code: 'USE_DECK' },
+      { text: 'Отказаться', code: 'DECLINE_DEAL' },
+    ];
   } else {
     if (triggerEventAction) {
       player.handleEventWithTriggerListener('TRIGGER', { targetId: deckId });

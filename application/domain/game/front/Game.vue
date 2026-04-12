@@ -6,13 +6,113 @@
       } = {}"
     >
       <div :class="['game-zones']">
-        <roulette :stop-outward-offset-ratio="0.22">
-          <template #additional>
-            <div class="dicecube-container">
-              <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
+        <div class="roulette-layout">
+          <roulette :stop-outward-offset-ratio="0.22">
+            <template #additional>
+              <div class="roulette-additional-tools">
+                <div v-if="busterDropDeck" class="deck-list deck-list--beside-dice">
+                  <div
+                    :class="{
+                      deck: true,
+                      drop: true,
+                      selectable: player.eventData.deck?.[busterDropDeck._id]?.selectable,
+                      empty: deckItemCount(busterDropDeck) === 0,
+                    }"
+                    :code="busterDropDeck.code"
+                  >
+                    <div class="deck-cards-stack" :style="deckSingleFaceStackStyle()">
+                      <company-card
+                        class="deck-card-layer deck-card--top"
+                        :content="deckItemCount(busterDropDeck)"
+                        :cardData="{
+                          name: busterDropDeck.subtype,
+                          group: 'company',
+                        }"
+                        :imgExt="'png'"
+                        :deckEvent="null"
+                        :deck="busterDropDeck"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div v-if="busterDeck" class="deck-list deck-list--beside-dice">
+                  <div
+                    :class="{
+                      deck: true,
+                      drop: busterDeck.code.includes('_drop'),
+                      selectable: player.eventData.deck?.[busterDeck._id]?.selectable,
+                      empty: deckItemCount(busterDeck) === 0,
+                    }"
+                    :code="busterDeck.code"
+                  >
+                    <div class="deck-cards-stack" :style="deckSingleFaceStackStyle()">
+                      <company-card
+                        class="deck-card-layer deck-card--top"
+                        :content="deckItemCount(busterDeck)"
+                        :cardData="{
+                          name: busterDeck.subtype,
+                          group: 'company',
+                        }"
+                        :imgExt="'png'"
+                        :deckEvent="deckItemCount(busterDeck) !== 0 ? useDeck : null"
+                        :deck="busterDeck"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="dicecube-container">
+                  <dicecube v-for="cubeId in dicecubesIds" :key="cubeId" :dicecubeId="cubeId" />
+                </div>
+                <div v-if="rouletteBusterCards.length" class="buster-cards">
+                  <buster-card
+                    v-for="card in rouletteBusterCards"
+                    :key="card.id"
+                    :cardId="card.id"
+                    :content="card.title"
+                    :cardData="{
+                      name: 'buster',
+                      group: 'company',
+                    }"
+                    :imgExt="'png'"
+                    :canPlay="false"
+                  />
+                </div>
+              </div>
+            </template>
+          </roulette>
+          <div class="deck-list deck-list--roulette-orbit">
+            <div
+              v-for="(deck, deckIndex) in deckListOrbit"
+              :key="deck._id"
+              :class="{
+                deck: true,
+                drop: deck.code.includes('_drop'),
+                selectable: player.eventData.deck?.[deck._id]?.selectable,
+                empty: deckItemCount(deck) === 0,
+              }"
+              :code="deck.code"
+              :style="deckOrbitStyle(deckIndex, deckListOrbit.length)"
+            >
+              <div class="deck-cards-stack" :style="deckCardsStackSizeStyle(deck)">
+                <company-card
+                  v-for="stackIndex in deckItemCount(deck)"
+                  :key="`${deck._id}-${stackIndex}`"
+                  class="deck-card-layer"
+                  :class="{ 'deck-card--top': stackIndex === deckItemCount(deck) }"
+                  :style="deckCardStackStyle(stackIndex)"
+                  :content="stackIndex === deckItemCount(deck) ? deckItemCount(deck) : ''"
+                  :cardData="{
+                    name: deck.subtype,
+                    group: 'company',
+                  }"
+                  :imgExt="'png'"
+                  :deckEvent="deckItemCount(deck) !== 0 ? useDeck : null"
+                  :deck="deck"
+                />
+              </div>
             </div>
-          </template>
-        </roulette>
+          </div>
+        </div>
       </div>
     </template>
 
@@ -21,30 +121,6 @@
         <div class="game-status-label">
           {{ game.statusLabel }}
           <small v-if="game.status === 'RESTORING_GAME'">{{ subStatusLabel }}</small>
-        </div>
-        <div class="deck-list">
-          <div
-            v-for="deck in deckList"
-            :key="deck._id"
-            :class="{
-              deck: true,
-              drop: deck.code.includes('_drop'),
-              selectable: player.eventData.deck?.[deck._id]?.selectable,
-              empty: deckItemCount(deck).length === 0,
-            }"
-            :code="deck.code"
-          >
-            <company-card
-              :content="deckItemCount(deck)"
-              :cardData="{
-                name: deck.subtype,
-                group: 'company',
-              }"
-              :imgExt="'png'"
-              :deckEvent="deckItemCount(deck).length !== 0 ? useDeck : null"
-              :deck="deck"
-            />
-          </div>
         </div>
       </div>
     </template>
@@ -86,6 +162,7 @@ import Game from '~/lib/game/front/Game.vue';
 import companyCard from './components/company.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
 import roulette from './components/roulette.vue';
+import busterCard from './components/buster.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
 
@@ -96,6 +173,7 @@ export default {
     companyCard,
     dicecube,
     roulette,
+    busterCard,
     tutorial,
   },
   props: {},
@@ -169,11 +247,84 @@ export default {
     deckList() {
       return Object.keys(this.game.deckMap).map((id) => this.store.deck?.[id]) || [];
     },
+    /** Колода бустеров рядом с кубиками, не на дуге вокруг рулетки. */
+    busterDeck() {
+      return (this.deckList || []).find((d) => d && d.subtype === 'buster') || null;
+    },
+    /** Сброс бустеров — слева от основной колоды buster. */
+    busterDropDeck() {
+      return (this.deckList || []).find((d) => d && d.subtype === 'buster_drop') || null;
+    },
+    /** Нижняя дуга без колод buster и buster_drop. */
+    deckListOrbit() {
+      return (this.deckList || []).filter((d) => d && d.subtype !== 'buster' && d.subtype !== 'buster_drop');
+    },
     dicecubesIds() {
       return Object.keys(this.game.dicecubeMap) || [];
     },
+    rouletteId() {
+      return Object.keys(this.game.rouletteMap || {})[0] || '';
+    },
+    rouletteTable() {
+      return this.game.store?.roulette?.[this.rouletteId] || {};
+    },
+    rouletteDecksFromTable() {
+      return Object.keys(this.rouletteTable.deckMap || {}).map((id) => this.store.deck?.[id] || {});
+    },
+    /** Карты бустеров из колоды рулетки — рядом с кубиками справа. */
+    rouletteBusterCards() {
+      const deck = this.rouletteDecksFromTable.find((d) => d.subtype === 'buster');
+      return deck
+        ? Object.entries(deck.itemMap || {}).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
+        : [];
+    },
   },
   methods: {
+    /** Нижний полукруг (0°…180°: справа через низ до слева); радиус в px; верх карты к центру (`angleDeg − 90`). */
+    deckOrbitStyle(index, total) {
+      const n = total || 1;
+      let angleDeg;
+      if (n === 1) {
+        angleDeg = 90;
+      } else {
+        angleDeg = (180 * index) / (n - 1);
+      }
+      const rad = (angleDeg * Math.PI) / 180;
+      const radiusPx = 520;
+      const x = Math.cos(rad) * radiusPx;
+      const y = Math.sin(rad) * radiusPx;
+      const rotateInwardDeg = angleDeg - 90;
+      return {
+        transform: `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${rotateInwardDeg}deg)`,
+      };
+    },
+    /** Одна лицевая карта с числом (бустеры): контейнер без «ступеней» стопки. */
+    deckSingleFaceStackStyle() {
+      return { width: '100px', height: '200px' };
+    },
+    /** Размер контейнера стопки: базовая карта 100×200 + шаги вниз/вправо (см. game.css .card-event). */
+    deckCardsStackSizeStyle(deck) {
+      const n = this.deckItemCount(deck);
+      const step = 6;
+      const extra = Math.max(0, n - 1) * step;
+      const w = 100;
+      const h = 200;
+      return {
+        width: `${w + extra}px`,
+        height: `${h + extra}px`,
+      };
+    },
+    /** Карты в одной точке (0,0), смещение только вниз и вправо. */
+    deckCardStackStyle(stackIndex) {
+      const step = 6;
+      const t = (stackIndex - 1) * step;
+      return {
+        position: 'absolute',
+        left: `${t}px`,
+        top: `${t}px`,
+        zIndex: stackIndex,
+      };
+    },
     deckItemCount(deck) {
       return Object.keys(deck.itemMap || {}).length;
     },
@@ -190,20 +341,64 @@ export default {
 
 #gamePlane {
   .game-zones {
+    position: relative;
     width: 100%;
     height: 100%;
+  }
+
+  .roulette-layout {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    .roulette {
+      pointer-events: auto;
+    }
+  }
+}
+
+.roulette-additional-tools {
+  position: absolute;
+  top: -200px;
+  left: calc(50% - 325px);
+  width: 650px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 14px;
+  pointer-events: none;
+  z-index: 5;
+
+  > * {
+    pointer-events: auto;
   }
 }
 
 .dicecube-container {
-  position: absolute;
-  top: -120px;
-  left: calc(50% - 60px);
+  position: relative;
   display: flex;
-  gap: 2px;
+  gap: 4px;
+  padding: 0px 40px;
 
   .dicecube[subtype='black'] {
     filter: invert(1);
+  }
+}
+
+.roulette-additional-tools .buster-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+  align-items: flex-end;
+
+  padding-bottom: 0px;
+
+  .card-event {
+    width: 100px;
+    height: 140px;
+    margin-bottom: 0px;
   }
 }
 

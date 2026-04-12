@@ -36,83 +36,116 @@
   }
 }
 
-#gameInfo {
-  .deck-list {
-    position: absolute;
-    top: 50px;
-    right: 10px;
-    scale: 0.5;
-    transform-origin: right top;
-    display: flex;
-    flex-wrap: wrap;
-    width: 80px;
+#gamePlane .game-zones .deck-list--roulette-orbit {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  z-index: 4;
+  width: 0;
+  height: 0;
+  scale: 1;
+  transform-origin: center center;
+  pointer-events: none;
+}
 
-    .deck {
-      margin-bottom: -160px;
-      cursor: default;
+#gamePlane .game-zones .deck-list--beside-dice {
+  flex-shrink: 0;
+  position: relative;
+}
 
-      .card-event .card-info-btn {
-        left: 35px;
-        top: 4px;
+#gamePlane .game-zones .deck-list--roulette-orbit .deck {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#gamePlane .game-zones .deck-list--roulette-orbit,
+#gamePlane .game-zones .deck-list--beside-dice {
+  .deck {
+    margin: 0;
+    cursor: default;
+    pointer-events: auto;
+
+    .deck-cards-stack {
+      position: relative;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+
+    &[code='Deck[card_buster]'], &[code='Deck[card_buster_drop]'] {
+      .deck-cards-stack {
+        height: 140px!important;
       }
+    }
 
-      &:not(.empty) .card-event {
+    .deck-card-layer.deck-card--top {
+      height: 140px;
+
+      .card-event {
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .deck-card-layer:not(.deck-card--top) .card-event:before {
+      display: none;
+    }
+
+    .card-event .card-info-btn {
+      left: 35px;
+      top: 4px;
+    }
+
+    &:not(.empty) .card-event {
+      &:hover {
+        cursor: pointer;
+        box-shadow: inset 0 0 0 4px #f4e205;
+        &:active {
+          box-shadow: inset 0 0 4px 8px #f4e205;
+        }
+      }
+    }
+
+    &[code='Deck[card_buster]'],
+    &[code='Deck[card_buster_drop]'] {
+      .company-card {
+        background-image: none;
+
+        .card-event {
+          &:before {
+            position: relative;
+            left: 4px;
+            font-size: 60px;
+            box-shadow: inset 0px -20px 20px 0px #111;
+            padding: 8px 10px 0px 0px;
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+
+    &[code='Deck[card_buster_drop]'] {
+      filter: grayscale(1);
+
+      .card-event {
+        &:before {
+          font-size: 30px;
+          color: white;
+          text-shadow: none;
+          font-weight: bold;
+        }
         &:hover {
-          cursor: pointer;
-          box-shadow: inset 0 0 0 4px #f4e205;
-          &:active {
-            box-shadow: inset 0 0 4px 8px #f4e205;
-          }
+          box-shadow: none;
+          cursor: default;
         }
       }
+    }
 
-      &[code='Deck[card_buster]'],
-      &[code='Deck[card_buster_drop]'] {
-        position: absolute;
-        top: 0px;
-        right: 100px;
+    &.selectable {
+      border-radius: 10px;
 
-        .company-card {
-          background-image: none;
-
-          .card-event {
-            &:before {
-              position: relative;
-              left: 4px;
-              font-size: 60px;
-              box-shadow: inset 0px -20px 20px 0px #111;
-              padding: 8px 10px 0px 0px;
-              border-radius: 50%;
-            }
-          }
-        }
-
-        &[code='Deck[card_buster_drop]'] {
-          top: 100px;
-          filter: grayscale(1);
-
-          .card-event {
-            &:before {
-              font-size: 30px;
-              color: white;
-              text-shadow: none;
-              font-weight: bold;
-            }
-            &:hover {
-              box-shadow: none;
-              cursor: default;
-            }
-          }
-        }
-      }
-
-      &.selectable {
+      .company-card-background {
+        box-shadow: inset 0 0 20px 8px lightgreen !important;
         border-radius: 10px;
-
-        .company-card-background {
-          box-shadow: inset 0 0 20px 8px lightgreen !important;
-          border-radius: 10px;
-        }
       }
     }
   }
