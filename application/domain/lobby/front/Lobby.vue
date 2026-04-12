@@ -2,6 +2,16 @@
   <lobby :gameServerTitle="gameServerTitle" :disableAvatarSelection="true">
     <template v-if="lobby.__gameServerConfig" #menu-item-game>
       <games class="menu-item-content" :gamesMap="gamesMap" :defaultGameCode="defaultGameCode">
+        <template #players-count-controls="{ minPlayersInGame, updateMinPlayersInGame }">
+          <div class="min-players">
+            <span class="controls">
+              <font-awesome-icon :icon="['fas', 'plus']" @click="updateMinPlayersInGame(1)" />
+              {{ minPlayersInGame.val }}
+              <font-awesome-icon :icon="['fas', 'minus']" @click="updateMinPlayersInGame(-1)" />
+            </span>
+            <span class="label"> минимум игроков</span>
+          </div>
+        </template>
         <template #tutorial-games>
           <tutorial-games class="tutorial-games" />
         </template>
@@ -45,7 +55,7 @@ export default {
   methods: {},
   created() {},
   mounted() {
-    if(this.lobby.code) {
+    if (this.lobby.code) {
       // дублирует логику из App.vue на случай, если страница была перезагружена в процессе игры
       this.$root.state.viewLoaded = true;
     }

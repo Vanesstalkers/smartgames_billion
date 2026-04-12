@@ -9,8 +9,12 @@
     for (const _id of Object.keys(data.deckMap)) data.deckList.push(store.deck[_id]);
   }
   for (const item of data.deckList || []) {
-    if (!item.access) item.access = { [player._id]: {} };
+    // if (!item.access) item.access = { [player._id]: {} };
     player.addDeck(item, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
+  }
+
+  for (const player of this.players({ readyOnly: false })) {
+    player.decks.company.set({ access: this.playerMap });
   }
 
   return player;

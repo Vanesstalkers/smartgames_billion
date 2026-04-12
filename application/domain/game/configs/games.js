@@ -62,27 +62,20 @@
       },
     },
     itemsDefault: {
+      maxPlayersInGame: '2-8',
       timer: 60,
       cardsToRemove: [],
       autoFinishAfterRoundsOverdue: 10,
       playerStartMoney: 6,
-      playerList: [
-        {
-          _code: 1,
-          active: true,
+      playerStartIncome: 6,
+      playerTemplates: {
+        default: {
           deckList: [
             { type: 'company', subtype: 'company', access: 'all' },
             { type: 'card', subtype: 'buster' },
           ],
         },
-        {
-          _code: 2,
-          deckList: [
-            { type: 'company', subtype: 'company', access: 'all' },
-            { type: 'card', subtype: 'buster' },
-          ],
-        },
-      ],
+      },
       dicecubeList: [
         { _code: 'white', subtype: 'white' },
         { _code: 'black', subtype: 'black' },

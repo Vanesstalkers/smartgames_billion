@@ -29,7 +29,7 @@
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
       const companyCount = player.decks.company.itemsCount();
-      const hasLightCompany = player.hasCompany('light');
+      const hasLightCompany = player.companyCount({ type: 'light' }) > 0;
 
       let income = player.income + incomeChange;
       if (income < 0) income = 0;

@@ -9,6 +9,8 @@
         const eventData = { company: {} };
         for (const deck of decks) {
           const card = deck.getRandomItem();
+          if(!card) continue;
+          
           card.set({ eventData: { activeEvents: [this], buttonText: 'Выбрать' } });
           card.moveToTarget(player.decks.company);
           eventData.company[card.id()] = { selectable: true };

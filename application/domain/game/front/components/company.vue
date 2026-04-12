@@ -110,11 +110,9 @@ export default {
     },
     cardDecks() {
       const deckIds = Object.keys(this.card.deckMap || {});
-      if(this.myCard) console.log(deckIds.map((id) => this.store.deck?.[id]));
       return deckIds.map((id) => this.store.deck?.[id]);
     },
     outedDeck() {
-      if(this.myCard) console.log(this.cardDecks.find((d) => d.subtype === 'outer'), "gameCustom.selectedChipId=", this.gameCustom.selectedChipId);
       return this.cardDecks.find((d) => d.subtype === 'outer');
     },
     isSelected() {
@@ -124,7 +122,6 @@ export default {
       return this.player.eventData.company?.[this.cardId]?.selectable;
     },
     outedDeckSelectable() {
-      if(this.myCard) console.log("outedDeckSelectable=", this.player.eventData.deck, this.outedDeck?._id);
       return this.player.eventData.deck?.[this.outedDeck?._id]?.selectable;
     },
     innerChipIds() {
@@ -265,8 +262,8 @@ export default {
 
     .chip:nth-child(4) {
       position: absolute;
-      bottom: -80px;
-      right: -72px;
+      bottom: -28px;
+      right: -35px;
     }
   }
   &.chip-lane-outer {

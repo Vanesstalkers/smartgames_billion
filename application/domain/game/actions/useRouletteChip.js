@@ -73,6 +73,7 @@
 
             const income = actionPlayer.income * 2;
             game.logs({ msg: `Игрок {{player}} продал ресурс за <a>${income}₽</a>.`, userId: actionPlayer.userId });
+            actionPlayer.processDistributionIncome();
             actionPlayer.earnMoney(income);
           } else {
             this.data.rouletteChip.moveToTarget(targetDeck, {

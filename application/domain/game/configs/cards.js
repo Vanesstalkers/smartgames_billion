@@ -1,4 +1,4 @@
-({ apiRequest, selectGroup, template, unique = false, ignoreBuster = true } = {}) => {
+({ apiRequest, selectGroup, template, unique = false, mapFormat = false, ignoreBuster = true } = {}) => {
   const list = [
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
     { group: 'light', name: 'light', title: 'Легкая промышленность' },
@@ -29,11 +29,11 @@
     { group: 'engineering', name: 'engineering', title: 'Машиностроение' },
     { group: 'chemistry', name: 'chemistry', title: 'Химия' },
     { group: 'chemistry', name: 'chemistry', title: 'Химия' },
-    // { group: 'chemistry', name: 'chemistry', title: 'Химия' },
+    { group: 'chemistry', name: 'chemistry', title: 'Химия' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
-    
+
     // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
     // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
     // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
@@ -78,5 +78,5 @@
     .filter((card, index, self) => !unique || self.findIndex((c) => c.group === card.group) === index)
     .map((card) => (apiRequest ? { path: `${template}/${card.group}/${card.name}.png` } : card));
 
-  return result;
+  return mapFormat ? result.reduce((acc, card) => ({ ...acc, [card.group]: card }), {}) : result;
 };

@@ -1,5 +1,7 @@
 (async function ({ code, dealId, eventData = {} } = {}, player) {
   const game = this;
+  const playerId = player.id();
+  const chip = game.roulettes.main.chip();
 
   switch (code) {
     case 'ACCEPT_DEAL': {
@@ -18,41 +20,75 @@
             case 'resource': {
               if (group) repay.group = group;
               if (repayChipId) repay.repayChipId = repayChipId;
-              acquired.chip = { [repayChipId]: { playerId: contractor.id() } };
-              game.get(repayChipId).set({ ownerId: player.id() });
+              const repayChip = game.get(repayChipId);
+
+              repayChip.set({ ownerId: playerId });
+              acquired.chip = { [repayChipId]: { playerId: contractorId } };
+
+              const acquiredChip = contractor.acquired?.chip?.[repayChipId];
+              if (acquiredChip) {
+                if (acquiredChip.playerId === playerId) {
+                  repayChip.set({ ownerId: null });
+                  acquired.chip = { [repayChipId]: null };
+                } else {
+                  acquired.chip = { [repayChipId]: acquiredChip };
+                }
+                contractor.set({ acquired: { chip: { [repayChipId]: null } } });
+              }
+
+              if (repayChip.value === group) {
+                player.processDistributionIncome();
+                contractor.processDistributionIncome();
+              }
               break;
             }
             case 'service': {
               if (group) repay.group = group;
               if (repayCompanyId) repay.repayCompanyId = repayCompanyId;
-              acquired.company = { [repayCompanyId]: { playerId: contractor.id() } };
-              game.get(repayCompanyId).set({ ownerId: player.id() });
+              acquired.company = { [repayCompanyId]: { playerId: contractorId } };
+              game.get(repayCompanyId).set({ ownerId: playerId });
+
+              if (chip.value === group) {
+                player.processDistributionIncome();
+                contractor.processDistributionIncome();
+              }
               break;
             }
           }
           contractor.set({
             money: contractor.money + amount,
-            dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id(), ...repay } },
+            dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId, ...repay } },
           });
           player.set({
             money: player.money - amount,
-            dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id(), ...repay } },
+            dealsMap: { [dealId]: { dealId, amount, contractorId, ...repay } },
             acquired: { ...acquired },
           });
 
-          logMessage = `Игрок <a>{{player}}</a> одолжил <a>${amount}₽</a> игроку <a>${contractor.userName}</a>.`;
+          logMessage = `Игрок <a>{{player}}</a> одолжил <a>${amount}₽</a> игроку <a>${contractor.userName}</a>`;
           break;
         }
 
         case 'buyResource': {
-          const chip = game.get(contractor.eventData.deal.contractorResources[group].chipId);
+          const chipId = contractor.eventData.deal.contractorResources[group].chipId;
+          const chip = game.get(chipId);
 
-          chip.set({ ownerId: contractor.id() });
-          contractor.set({ acquired: { chip: { [chip.id()]: { playerId: player.id() } } } });
+          chip.set({ ownerId: contractorId });
+          contractor.set({ acquired: { chip: { [chipId]: { playerId } } } });
+
+          const acquiredChip = player.acquired?.chip?.[chipId];
+          if (acquiredChip) {
+            if (acquiredChip.playerId === contractorId) {
+              chip.set({ ownerId: null });
+              contractor.set({ acquired: { chip: { [chipId]: null } } });
+            }
+            player.set({ acquired: { chip: { [chipId]: null } } });
+          }
+
           if (payType === 'deferred') {
             const dealId = db.mongo.ObjectID().toString();
-            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id() } } });
-            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id() } } });
+            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId } } });
+            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
           } else {
             contractor.set({ money: contractor.money - amount });
             player.set({ money: player.money + amount });
@@ -60,18 +96,23 @@
 
           logMessage = `Игрок <a>{{player}}</a> продал ресурс <a>${chip.getTitle()}</a> игроку <a>${
             contractor.userName
-          }</a> за <a>${amount}₽</a>.`;
+          }</a> за <a>${amount}₽</a>`;
+
+          if (chip.value === group) {
+            player.processDistributionIncome();
+            contractor.processDistributionIncome();
+          }
           break;
         }
 
         case 'useService': {
           const company = game.get(contractor.eventData.deal.contractorCompanies[group].companyId);
 
-          contractor.set({ acquired: { company: { [company.id()]: { playerId: player.id() } } } });
+          contractor.set({ acquired: { company: { [company.id()]: { playerId } } } });
           if (payType === 'deferred') {
             const dealId = db.mongo.ObjectID().toString();
-            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: player.id() } } });
-            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: contractor.id() } } });
+            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId } } });
+            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
           } else {
             contractor.set({ money: contractor.money - amount });
             player.set({ money: player.money + amount });
@@ -79,7 +120,12 @@
 
           logMessage = `Игрок <a>{{player}}</a> дал доступ к услуге <a>${company.getTitle()}</a> игроку <a>${
             contractor.userName
-          }</a> за <a>${amount}₽</a>.`;
+          }</a> за <a>${amount}₽</a>`;
+
+          if (chip.value === group) {
+            player.processDistributionIncome();
+            contractor.processDistributionIncome();
+          }
           break;
         }
       }
@@ -106,6 +152,12 @@
         });
       } else {
         deck.getRandomItem().moveToTarget(player.decks.company, { restoreResources: true });
+
+        const resources = domain.game.configs.cards({ mapFormat: true });
+        for (const company of player.decks.company.items()) {
+          if (company.decks.inner.items().length === 4) continue;
+          company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
+        }
       }
 
       player.set({ money: player.money - price, eventData: { deal: null } });
@@ -113,15 +165,15 @@
       game.logs({
         msg:
           deck.subtype === 'buster'
-            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>.`
-            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>.`,
+            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>`
+            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
         userId: player.userId,
       });
       player.notifyUser({
         message:
           deck.subtype === 'buster'
-            ? `Вы приобрели бустер за <a>${price}₽</a>.`
-            : `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>.`,
+            ? `Вы приобрели бустер за <a>${price}₽</a>`
+            : `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
       });
       break;
     }
@@ -129,7 +181,7 @@
       const contractor = game.get(player.eventData.deal.contractorId);
       if (contractor) {
         game.logs({
-          msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${contractor.userName}</a>.`,
+          msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${contractor.userName}</a>`,
           userId: player.userId,
         });
         contractor.set({ staticHelper: null });
@@ -147,7 +199,7 @@
         player.set({ money: player.money - deal.amount, dealsMap: { [deal.dealId]: null } });
 
         game.logs({
-          msg: `Игрок <a>{{player}}</a> вернул <a>${deal.amount}₽</a> игроку <a>${contractor.userName}</a>.`,
+          msg: `Игрок <a>{{player}}</a> вернул <a>${deal.amount}₽</a> игроку <a>${contractor.userName}</a>`,
           userId: player.userId,
         });
 

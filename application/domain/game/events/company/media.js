@@ -25,7 +25,7 @@
       const { game, player } = this.eventContext();
 
       const companyCount = target.decks.company.itemsCount();
-      const hasLightCompany = target.hasCompany('light');
+      const hasLightCompany = target.companyCount({ type: 'light' }) > 0;
       let income = 6;
       if (companyCount >= 3 || hasLightCompany) income = 10;
       else if (companyCount == 2) income = 8;

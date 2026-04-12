@@ -45,13 +45,11 @@
   restoreResources() {
     this._ensureCompanyDecks();
 
-    const resources = domain.game.configs
-      .cards({ unique: true })
-      .reduce((acc, card) => ({ ...acc, [card.group]: card }), {});
-
+    const player = this.findParent({ className: 'Player' });
+    const resources = domain.game.configs.cards({ mapFormat: true });
     const currentResourcesCount = this.decks.inner.items().length;
-    // for (let i = 0; i < 3 - currentResourcesCount; i++) {
-    for (let i = 0; i < 1; i++) {
+    const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
+    for (let i = 0; i < maxResourcesCount - currentResourcesCount; i++) {
       this.decks.inner.addItem({ value: this.subtype, title: resources[this.subtype].title });
     }
   }

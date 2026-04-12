@@ -10,6 +10,7 @@
 
     const eventData = { deck: {} };
     for (const deck of Object.values(game.decks)) {
+      if(deck.type !== 'company') continue;
       if (deck.items().length === 0) continue;
       eventData.deck[deck.id()] = { selectable: true };
     }

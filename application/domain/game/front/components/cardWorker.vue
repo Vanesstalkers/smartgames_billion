@@ -161,14 +161,10 @@ export default {
   },
   methods: {
     triggerSelectable() {
-      console.log('triggerSelectable', this.playerId);
       this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.playerId } } });
     },
     async controlAction(eventData = {}) {
-      console.log('controlAction this.controlBtn=', this.controlBtn, eventData);
       prettyAlertClear?.();
-
-      // if (this.selectable) return; // выбор игрока в контексте события карты
 
       if (this.showLeaveBtn) return await this.leaveGame();
 

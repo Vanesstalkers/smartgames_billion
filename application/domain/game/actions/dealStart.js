@@ -12,7 +12,7 @@
       for (const card of domain.game.configs.cards({ unique: true })) {
         const chip = player.getChipBySubtype(card.group);
         if (!chip) continue;
-        if (chip.ownerId) continue;
+        // if (chip.ownerId) continue;
         playerResources[card.group] = { title: card.title, chipId: chip.id() };
       }
 
@@ -20,7 +20,7 @@
       for (const card of domain.game.configs.cards({ unique: true })) {
         const chip = contractor.getChipBySubtype(card.group);
         if (!chip) continue;
-        if (chip.ownerId) continue;
+        // if (chip.ownerId) continue;
         contractorResources[card.group] = { title: card.title, chipId: chip.id() };
       }
 

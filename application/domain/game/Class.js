@@ -16,6 +16,18 @@
     });
   }
 
+  getFreePlayerSlot() {
+    const playerCount = this.players().length;
+    if (this.maxPlayersInGame && playerCount >= this.maxPlayersInGame) return null;
+
+    const player = this.run('addPlayer', {
+      ...lib.utils.structuredClone(this.settings.playerTemplates['default']),
+      _code: playerCount + 1,
+    });
+
+    return player;
+  }
+
   isTraining() {
     return this.gameConfig === 'training';
   }

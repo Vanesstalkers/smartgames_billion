@@ -53,7 +53,7 @@
         Действия с оппонентом: выбери, что хочешь сделать.
       `,
         buttons: [
-          { text: 'Одолжить денег', step: 'borrowRepayChoice', key: null },
+          { text: 'Взять деньги в долг', step: 'borrowRepayChoice', key: null },
           { text: 'Купить ресурс', step: 'buyResource' },
           { text: 'Воспользоваться услугой', step: 'useService' },
           { text: 'Отмена', action: 'exit', exit: true },

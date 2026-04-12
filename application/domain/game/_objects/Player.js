@@ -3,16 +3,14 @@
 
   constructor(data, { parent }) {
     super(data, { parent });
-    this.broadcastableFields(
-      //
-      this.broadcastableFields().concat(['income', 'money'])
-    );
+    this.broadcastableFields(['income', 'money']);
 
-    this.set({ money: data.money || 0, income: data.income || 6 });
+    const { money = 0, income = 0, acquired = {} } = data;
+    this.set({ money, income, acquired });
   }
 
-  hasCompany(value) {
-    return this.decks.company.items().some((company) => company.subtype === value);
+  companyCount({ type }) {
+    return this.decks.company.items().filter((company) => company.subtype === type).length;
   }
 
   getAvailableChipsByValue(value) {
@@ -52,6 +50,12 @@
         }
       }
     }
+    for (const chipId of Object.keys(this.acquired?.chip || {})) {
+      const chip = this.game().get(chipId);
+      if (!chip) continue;
+      if (chip.value !== subtype) continue;
+      return chip;
+    }
     return null;
   }
   earnMoney(amount) {
@@ -76,6 +80,19 @@
 
     this.set({
       staticHelper: { text: `Заключенные сделки:`, showList, buttons: [{ text: 'Отмена' }] },
+    });
+  }
+
+  processDistributionIncome() {
+    const count = this.companyCount({ type: 'distribution' });
+    if (count === 0) return;
+
+    const income = count === 1 ? 3 : count === 2 ? 6 : 12;
+    this.set({ money: this.money + income });
+
+    this.game().logs({
+      msg: `Игрок <a>{{player}}</a> получил дополнительный доход <a>${income}₽</a> от дистрибуции`,
+      userId: this.userId,
     });
   }
 });

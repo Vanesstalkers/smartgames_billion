@@ -331,6 +331,7 @@ export default {
   & > .card-event,
   & > .company-card {
     margin-left: -40px;
+    margin-bottom: 12px;
   }
 }
 
