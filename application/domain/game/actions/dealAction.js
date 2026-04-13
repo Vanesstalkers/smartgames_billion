@@ -153,10 +153,12 @@
       } else {
         deck.getRandomItem().moveToTarget(player.decks.company, { restoreResources: true });
 
-        const resources = domain.game.configs.cards({ mapFormat: true });
-        for (const company of player.decks.company.items()) {
-          if (company.decks.inner.items().length === 4) continue;
-          company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
+        if (player.companyCount({ type: 'chemistry' }) > 0) {
+          const resources = domain.game.configs.cards({ mapFormat: true });
+          for (const company of player.decks.company.items()) {
+            if (company.decks.inner.items().length === 4) continue;
+            company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
+          }
         }
       }
 

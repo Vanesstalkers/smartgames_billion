@@ -10,7 +10,7 @@
 
     const eventData = { deck: {} };
     for (const deck of Object.values(game.decks)) {
-      if(deck.type !== 'company') continue;
+      if (deck.type !== 'company') continue;
       if (deck.items().length === 0) continue;
       eventData.deck[deck.id()] = { selectable: true };
     }
@@ -46,13 +46,10 @@
     RESET({ success } = {}) {
       const { game, player, source } = this.eventContext();
 
-      player.set({
-        eventData: {
-          deck: null,
-          controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null },
-        },
-        staticHelper: null,
-      });
+      player.set(
+        { eventData: { deck: null, controlBtn: this.data.beforeEventControlBtn }, staticHelper: null },
+        { reset: ['eventData.controlBtn', 'staticHelper'] }
+      );
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

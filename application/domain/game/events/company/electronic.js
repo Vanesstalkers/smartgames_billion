@@ -32,10 +32,10 @@
     RESET({ success } = {}) {
       const { game, player } = this.eventContext();
 
-      player.set({
-        eventData: { company: null, controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null } },
-        staticHelper: null,
-      });
+      player.set(
+        { eventData: { company: null, controlBtn: this.data.beforeEventControlBtn }, staticHelper: null },
+        { reset: ['eventData.controlBtn', 'staticHelper'] }
+      );
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

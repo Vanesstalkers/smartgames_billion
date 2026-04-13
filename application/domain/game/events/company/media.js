@@ -6,7 +6,10 @@
   init: function () {
     const { game, player, source: card } = this.eventContext();
 
-    if (game.roundStep !== 'ROULETTE') throw new Error('Услуга может быть предоставлена только до вращения рулетки');
+    if (game.roundStep !== 'ROULETTE') {
+      player.notifyUser('Услуга может быть предоставлена только до вращения рулетки');
+      return { resetEvent: true };
+    }
 
     const eventData = { player: {} };
     for (const player of game.players()) {
@@ -37,10 +40,10 @@
     RESET({ success } = {}) {
       const { game, player } = this.eventContext();
 
-      player.set({
-        eventData: { player: null, controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null } },
-        staticHelper: null,
-      });
+      player.set(
+        { eventData: { player: null, controlBtn: this.data.beforeEventControlBtn }, staticHelper: null },
+        { reset: ['eventData.controlBtn', 'staticHelper'] }
+      );
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

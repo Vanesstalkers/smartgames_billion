@@ -1,4 +1,6 @@
 (function ({ timerOverdue = false } = {}, initPlayer) {
+  if (initPlayer && initPlayer.gameMaster) initPlayer = this.roundActivePlayer(); // при forcedEndRound из roundSteps не будет initPlayer
+
   this.updateTimerOverdueCounter(timerOverdue);
 
   if (initPlayer) initPlayer.deactivate();

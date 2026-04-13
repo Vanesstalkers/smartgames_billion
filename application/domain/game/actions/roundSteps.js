@@ -4,7 +4,7 @@
     round: roundNumber,
     roulettes: { main: roulette },
   } = this;
-  const round = rounds[roundNumber];
+  const gameMaster = this.gameMaster();
   const roundActivePlayer = this.roundActivePlayer();
   const result = { newRoundLogEvents: [], newRoundNumber: roundNumber };
 
@@ -21,10 +21,9 @@
 
       const player = this.selectNextActivePlayer();
 
-      player.activate({
-        notifyUser: 'Твой ход',
-        setData: { eventData: { playDisabled: true, controlBtn: { label: 'Крутить рулетку' } } },
-      });
+      const eventData = { playDisabled: true, controlBtn: { label: 'Крутить рулетку' } };
+      player.activate({ notifyUser: 'Твой ход', setData: { eventData } });
+      if (gameMaster) gameMaster.set({ eventData });
 
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
@@ -70,15 +69,13 @@
     case 'ROULETTE': {
       roulette.spin();
 
-      roundActivePlayer.activate({
-        setData: {
-          eventData: {
-            playDisabled: true,
-            controlBtn: { label: 'Завершить раунд' },
-            chip: { [roulette.chip().id()]: { selectable: true } },
-          },
-        },
-      });
+      const eventData = {
+        playDisabled: true,
+        controlBtn: { label: 'Завершить раунд' },
+        chip: { [roulette.chip().id()]: { selectable: true } },
+      };
+      roundActivePlayer.activate({ setData: { eventData } });
+      if (gameMaster) gameMaster.set({ eventData });
 
       const [card] = this.select({
         ...{ className: 'Card', directParent: false },

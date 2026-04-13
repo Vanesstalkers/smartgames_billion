@@ -86,7 +86,8 @@ export default {
   methods: {
     async useRouletteChip() {
       if (!this.sessionPlayerIsActive()) return;
-      await this.handleGameApi({ name: 'useRouletteChip', data: { chipId: this.rouletteChipId } }).then(() => {
+      const gmPrefix = this.isGameMaster() ? 'gm-' : '';
+      await this.handleGameApi({ name: `${gmPrefix}useRouletteChip`, data: { chipId: this.rouletteChipId } }).then(() => {
         this.$set(this.gameCustom, 'selectedChipId', this.rouletteChipId);
       });
     },

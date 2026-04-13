@@ -169,7 +169,8 @@ export default {
           data: { eventData: { targetId: chipId } },
         });
       } else {
-        await this.handleGameApi({ name: 'useChip', data: { chipId } });
+        const gmPrefix = this.isGameMaster() ? 'gm-' : '';
+        await this.handleGameApi({ name: `${gmPrefix}useChip`, data: { chipId } });
       }
     },
     getChipIdsBySubtype(subtype) {

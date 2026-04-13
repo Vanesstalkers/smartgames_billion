@@ -47,7 +47,7 @@
       </div>
       <div class="workers">
         <slot name="worker" :playerId="playerId" :viewerId="viewerId" :iam="iam">
-          <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam">
+          <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam" :playerSelected="selected">
             <template #money="{ money } = {}">
               <div class="money">{{ money + '₽' }}</div>
             </template>
@@ -56,17 +56,13 @@
       </div>
       <div
         v-if="iam"
-        :class="[
-          'player-helper',
-          player.staticHelper?.text ? 'new-tutorial' : '',
-          helperChecked ? 'helper-checked' : '',
-        ]"
+        :class="['player-helper', staticHelper?.text ? 'new-tutorial' : '', helperChecked ? 'helper-checked' : '']"
       >
         <dialog-helper
-          v-if="iam && (player.staticHelper?.text || player.staticHelper?.html)"
+          v-if="iam && (staticHelper?.text || staticHelper?.html)"
           style="display: block"
           :dialogStyle="{}"
-          :customData="player.staticHelper"
+          :customData="staticHelper"
           :action="action"
         />
       </div>
@@ -101,10 +97,10 @@ export default {
     return { helperVisible: false, helperChecked: false, selected: false, hovered: false };
   },
   watch: {
-    'player.staticHelper.text': function (val) {
+    'staticHelper.text': function (val) {
       if (val) this.helperChecked = false;
     },
-    'player.staticHelper': function (val) {
+    staticHelper: function (val) {
       if (val) this.helperChecked = false;
     },
   },
@@ -127,6 +123,9 @@ export default {
     },
     viewer() {
       return this.store.viewer?.[this.viewerId] || {};
+    },
+    staticHelper() {
+      return this.player.staticHelper || this.viewer.staticHelper;
     },
     busterCards() {
       const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
@@ -170,7 +169,9 @@ export default {
       this.hovered = false;
     },
     async action(button) {
-      if (button.triggerEvent) {
+      if (this.isGameMaster()) {
+        await this.handleGameApi({ name: 'gm-dealAction', data: { ...button } });
+      } else if (button.triggerEvent) {
         await this.handleGameApi({ name: 'eventTrigger', data: { eventData: { button } } });
       } else if (button.resetEvent) {
         await this.handleGameApi({ name: 'eventReset' });
@@ -423,7 +424,7 @@ export default {
       bottom: 0px;
       height: auto;
       line-height: 32px;
-      display: none;
+      // display: none;
     }
     .handshake-action {
       width: 40px;

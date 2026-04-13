@@ -11,7 +11,7 @@
       showControlBtn || showLeaveBtn ? 'has-action' : '',
     ]"
     :style="customStyle"
-    @click="selectable ? triggerSelectable() : null"
+    @click="selectable ? triggerSelectable($event) : null"
   >
     <slot v-if="!viewerId" name="money" :money="player.money">
       <div class="money">{{ player.money || 0 }}</div>
@@ -55,6 +55,7 @@ export default {
     playerId: String,
     viewerId: String,
     iam: Boolean,
+    playerSelected: Boolean,
   },
   data() {
     return {
@@ -131,7 +132,7 @@ export default {
       return { backgroundColor };
     },
     controlBtn() {
-      return this.player.eventData?.controlBtn;
+      return this.player.eventData?.controlBtn || this.viewer.eventData?.controlBtn;
     },
     highlight() {
       return this.sessionPlayer().eventData.player?.[this.playerId]?.highlight;
@@ -141,8 +142,7 @@ export default {
     },
     showControlBtn() {
       return (
-        this.iam &&
-        this.sessionPlayerIsActive() &&
+        ((this.iam && this.sessionPlayerIsActive()) || this.isGameMaster()) &&
         (this.controlBtn?.label || this.controlBtn?.triggerEvent) &&
         !this.controlBtn?.leaveGame
       );
@@ -156,18 +156,18 @@ export default {
       );
     },
     showLeaveBtn() {
-      return (this.iam && this.controlBtn?.leaveGame) || this.viewerId;
+      return (this.iam && this.controlBtn?.leaveGame) || (this.viewerId && !this.isGameMaster());
     },
   },
   methods: {
-    triggerSelectable() {
+    triggerSelectable(event) {
+      if(this.playerSelected) event.stopPropagation();
       this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.playerId } } });
     },
     async controlAction(eventData = {}) {
       prettyAlertClear?.();
 
       if (this.showLeaveBtn) return await this.leaveGame();
-
       if (this.showControlBtn) {
         if (this.controlBtn.triggerEvent) await this.handleGameApi({ name: 'eventTrigger', data: { eventData } });
         else if (this.controlBtn.resetEvent) await this.handleGameApi({ name: 'eventReset' });

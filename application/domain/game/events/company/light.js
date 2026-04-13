@@ -62,15 +62,18 @@
     RESET({ success } = {}) {
       const { game, player } = this.eventContext();
 
-      player.set({
-        eventData: {
-          deck: null,
-          company: null,
-          controlBtn: { ...this.data.beforeEventControlBtn, resetEvent: null },
-          deal: null, // замена предприятия из useDeck
+      player.set(
+        {
+          eventData: {
+            deck: null,
+            company: null,
+            deal: null, // замена предприятия из useDeck
+            controlBtn: this.data.beforeEventControlBtn,
+          },
+          staticHelper: null,
         },
-        staticHelper: null,
-      });
+        { reset: ['eventData.controlBtn', 'staticHelper'] }
+      );
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
