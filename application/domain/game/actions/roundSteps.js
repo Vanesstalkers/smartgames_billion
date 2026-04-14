@@ -75,7 +75,10 @@
         chip: { [roulette.chip().id()]: { selectable: true } },
       };
       roundActivePlayer.activate({ setData: { eventData } });
-      if (gameMaster) gameMaster.set({ eventData });
+      if (gameMaster) {
+        gameMaster.set({ eventData });
+        roundActivePlayer.set({ eventData: { chip: null } });
+      }
 
       const [card] = this.select({
         ...{ className: 'Card', directParent: false },

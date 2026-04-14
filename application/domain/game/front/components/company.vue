@@ -151,7 +151,12 @@ export default {
         return;
       }
 
-      if (!this.isSelectable) return;
+      if (!this.isSelectable) {
+        if (this.isGameMaster()) {
+          await this.handleGameApi({ name: `gm-useCard`, data: { cardId: this.cardId } });
+        }
+        return;
+      }
       this.gameCustom.selectedCard = null;
 
       await this.handleGameApi({

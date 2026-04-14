@@ -5,11 +5,6 @@
     name: 'useChipEvent',
     data: {
       chip: game.get(chipId),
-      selectable: {
-        company: [],
-        player: [],
-      },
-      beforeEventControlBtn: lib.utils.clone(player.eventData.controlBtn),
     },
     init: function () {
       const { game, player } = this.eventContext();
@@ -40,9 +35,6 @@
         player.notifyUser('Нет доступных предприятий для выполнения действия');
         return { resetEvent: true };
       }
-
-      this.data.selectable.company = Object.keys(eventData.company);
-      this.data.selectable.player = Object.keys(eventData.player);
 
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
       player.set({ eventData });
@@ -75,21 +67,14 @@
         this.emit('RESET');
 
         const event = target.play({ player });
-        if(event) event.setHandler('SUCCESS', () => this.data.chip.delete());
+        if (event) event.setHandler('SUCCESS', () => this.data.chip.delete());
       },
       RESET() {
-        const { game, player } = this.eventContext();
+        const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
 
         player.set(
-          {
-            staticHelper: null,
-            eventData: {
-              company: Object.fromEntries(this.data.selectable.company.map((companyId) => [companyId, null])),
-              player: Object.fromEntries(this.data.selectable.player.map((playerId) => [playerId, null])),
-              controlBtn: this.data.beforeEventControlBtn,
-            },
-          },
-          { reset: ['eventData.controlBtn', 'staticHelper'] }
+          { eventData: { controlBtn, company: null, player: null }, staticHelper: null },
+          { reset: ['eventData.controlBtn', 'staticHelper', 'eventData.company', 'eventData.player'] }
         );
 
         this.destroy();

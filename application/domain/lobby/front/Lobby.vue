@@ -63,19 +63,17 @@ export default {
   async beforeDestroy() {},
 };
 </script>
-<style lang="scss" scoped>
-.big-controls {
-  height: 100%;
-  width: 100%;
-
-  .select-btn {
-    height: 50px;
-    width: 80% !important;
-    margin: auto !important;
-    margin-top: 20px !important;
-    font-size: 24px;
-    text-align: center !important;
-    line-height: 48px;
+<style lang="scss">
+.viewer-container.group-buster {
+  .viewer-canvas {
+    img {
+      border-radius: 28px;
+    }
+  }
+  .viewer-navbar {
+    img {
+      border-radius: 4px;
+    }
   }
 }
 </style>

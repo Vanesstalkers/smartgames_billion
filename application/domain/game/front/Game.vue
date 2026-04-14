@@ -12,7 +12,7 @@
               <div class="roulette-additional-tools">
                 <div class="deck-list deck-list--beside-dice">
                   <div
-                  v-if="busterDropDeck" 
+                    v-if="busterDropDeck"
                     :class="{
                       deck: true,
                       drop: true,
@@ -38,7 +38,7 @@
                 </div>
                 <div class="deck-list deck-list--beside-dice">
                   <div
-                  v-if="busterDeck" 
+                    v-if="busterDeck"
                     :class="{
                       deck: true,
                       drop: busterDeck.code.includes('_drop'),
@@ -333,9 +333,9 @@ export default {
       return Object.keys(deck.itemMap || {}).length;
     },
     async useDeck(deck) {
-      console.log('useDeck', deck);
       if (deck.subtype === 'buster_drop') return;
-      await this.handleGameApi({ name: 'useDeck', data: { deckId: deck._id } });
+      const gmPrefix = this.isGameMaster() ? 'gm-' : '';
+      await this.handleGameApi({ name: `${gmPrefix}useDeck`, data: { deckId: deck._id } });
     },
   },
 };

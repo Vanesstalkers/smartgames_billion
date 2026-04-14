@@ -16,7 +16,6 @@
       eventData.player[player.id()] = { selectable: true };
     }
 
-    this.data.beforeEventControlBtn = lib.utils.clone(player.eventData.controlBtn);
     eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
     player.set({
       eventData,
@@ -38,10 +37,10 @@
       return this.emit('RESET', { success: true });
     },
     RESET({ success } = {}) {
-      const { game, player } = this.eventContext();
+      const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
 
       player.set(
-        { eventData: { player: null, controlBtn: this.data.beforeEventControlBtn }, staticHelper: null },
+        { eventData: { controlBtn, player: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
 

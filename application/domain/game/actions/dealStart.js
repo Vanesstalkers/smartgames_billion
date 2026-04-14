@@ -6,8 +6,6 @@
       const { game, player } = this.eventContext();
       const contractor = game.get(this.data.contractorId);
 
-      this.data.prevControlBtn = JSON.stringify(player.eventData.controlBtn);
-
       const playerResources = {};
       for (const card of domain.game.configs.cards({ unique: true })) {
         const chip = player.getChipBySubtype(card.group);
@@ -52,8 +50,12 @@
     },
     handlers: {
       async TRIGGER({ dealType, amount, payType, group, initPlayer, target, repayType }) {
-        const { game, player } = this.eventContext();
-        const contractor = game.get(this.data.contractorId);
+        const {
+          game,
+          player,
+          data: { contractorId },
+        } = this.eventContext();
+        const contractor = game.get(contractorId);
 
         player.set({
           staticHelper: {
@@ -108,13 +110,6 @@
             }</b> просит воспользоваться услугой: <a>${company.getTitle()}</a> за <a>${amount}₽</a> на условии <a>${
               payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
             }</a>. Согласны продать на этих условиях?`;
-
-            // text = `Игрок <b>${
-            //   player.userName
-            // }</b> предлагает купить ресурс: <a>${chip.getTitle()}</a> за <a>${amount}₽</a> на условии <a>${
-            //   payType === 'deferred' ? 'с отсрочкой оплаты' : 'с оплатой сразу'
-            // }</a>. Согласны продать на этих условиях?`;
-
             break;
           }
         }
@@ -158,12 +153,9 @@
         this.emit('RESET');
       },
       RESET() {
-        const { player, game } = this.eventContext();
+        const { player, beforeEventControlBtn: controlBtn } = this.eventContext();
 
-        const controlBtn = this.data.prevControlBtn
-          ? { ...JSON.parse(this.data.prevControlBtn), resetEvent: null }
-          : null;
-        player.set({ eventData: { controlBtn } });
+        player.set({ eventData: { controlBtn }, staticHelper: null }, { reset: ['eventData.controlBtn'] });
 
         this.destroy();
       },

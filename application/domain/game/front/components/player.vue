@@ -169,7 +169,7 @@ export default {
       this.hovered = false;
     },
     async action(button) {
-      if (this.isGameMaster()) {
+      if (button.gameMasterAction) {
         await this.handleGameApi({ name: 'gm-dealAction', data: { ...button } });
       } else if (button.triggerEvent) {
         await this.handleGameApi({ name: 'eventTrigger', data: { eventData: { button } } });

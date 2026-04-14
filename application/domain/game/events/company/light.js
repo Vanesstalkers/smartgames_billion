@@ -4,9 +4,11 @@
   },
   data: {
     sourceDeck: null,
+    gameMasterAction: null,
   },
-  init: function ({ sourceDeck } = {}) {
+  init: function ({ sourceDeck, gameMasterAction } = {}) {
     const { game, player } = this.eventContext();
+    this.data.gameMasterAction = gameMasterAction;
 
     const eventData = { deck: {} };
     for (const deck of Object.values(game.decks)) {
@@ -14,7 +16,6 @@
       eventData.deck[deck.id()] = { selectable: true };
     }
 
-    this.data.beforeEventControlBtn = lib.utils.clone(player.eventData.controlBtn);
     eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
     player.set({
       eventData,
@@ -22,19 +23,21 @@
     });
 
     if (sourceDeck) {
-      player.set({ staticHelper: { text: 'Какую организацию нужно заменить?', buttons: null } });
+      // player.set({ staticHelper: { text: 'Какую организацию нужно заменить?', buttons: null } });
       this.emit('TRIGGER', { target: sourceDeck });
     }
   },
   handlers: {
     TRIGGER({ target }) {
       const { game, player } = this.eventContext();
+      let { targetPlayer, price } = this.data.gameMasterAction || {};
+      if (!targetPlayer) targetPlayer = player; // логика для gameMaster
 
       if (!this.data.sourceDeck) {
         this.data.sourceDeck = target;
 
         const eventData = { deck: null, company: {} };
-        for (const company of player.decks.company.items()) {
+        for (const company of targetPlayer.decks.company.items()) {
           if (this.data.sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
           if (company.foreignResources().length > 0) continue; // нельзя менять на предприятие с чужими ресурсами
 
@@ -45,33 +48,26 @@
         return { preventListenerRemove: true };
       } else {
         const oldCompany = target;
+        const outerChip = oldCompany.decks.outer.items()[0];
         const newCompany = this.data.sourceDeck.getRandomItem();
 
-        const outerChip = oldCompany.decks.outer.items()[0];
+        oldCompany.moveToTarget(game.decks[oldCompany.subtype]);
+        newCompany.moveToTarget(targetPlayer.decks.company, { restoreResources: true });
+
         if (outerChip) outerChip.moveToTarget(newCompany.decks.outer);
 
-        oldCompany.moveToTarget(game.decks[oldCompany.subtype]);
-        newCompany.moveToTarget(player.decks.company, { restoreResources: true });
-
         // замена предприятия из useDeck
-        if (player.eventData.deal) player.set({ money: player.money - player.eventData.deal.price });
+        if (!price) price = targetPlayer.eventData.deal.price;
+        if (price) targetPlayer.set({ money: targetPlayer.money - price });
 
         return this.emit('RESET', { success: true });
       }
     },
     RESET({ success } = {}) {
-      const { game, player } = this.eventContext();
+      const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
 
       player.set(
-        {
-          eventData: {
-            deck: null,
-            company: null,
-            deal: null, // замена предприятия из useDeck
-            controlBtn: this.data.beforeEventControlBtn,
-          },
-          staticHelper: null,
-        },
+        { eventData: { controlBtn, deck: null, company: null, deal: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
 

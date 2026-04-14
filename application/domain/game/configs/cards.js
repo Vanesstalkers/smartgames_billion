@@ -34,49 +34,56 @@
     { group: 'construction', name: 'construction', title: 'Строительство' },
     { group: 'construction', name: 'construction', title: 'Строительство' },
 
-    // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
-    // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
-    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
-    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
-    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
-    // { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
-    // { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
-    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
-    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
-    // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' },
-    // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' },
-    // { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
-    // { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
+    { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
+    { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
+    { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
+    { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
+    { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
+    { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
+    { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
+    { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
+    { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
+    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' },
+    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' },
+    { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
+    { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
     { group: 'buster', name: 'embargo', title: 'ЭМБАРГО' },
     { group: 'buster', name: 'embargo', title: 'ЭМБАРГО' },
     { group: 'buster', name: 'embargo', title: 'ЭМБАРГО' },
-    // { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
-    // { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
-    // { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
-    // { group: 'buster', name: 'achiever', title: 'ДОСТИГАТОР' },
-    // { group: 'buster', name: 'achiever', title: 'ДОСТИГАТОР' },
-    // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' },
-    // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' },
-    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
-    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
-    // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
-    // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
-    // { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' },
-    // { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' },
+    { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
+    { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
+    { group: 'buster', name: 'blowout', title: 'ВЫБРОС' },
+    { group: 'buster', name: 'achiever', title: 'ДОСТИГАТОР' },
+    { group: 'buster', name: 'achiever', title: 'ДОСТИГАТОР' },
+    { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' },
+    { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' },
+    { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
+    { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
+    { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
+    { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
+    { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' },
+    { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' },
   ];
 
   const result = list
-    .filter((card) => !selectGroup || card.group === selectGroup)
-    .filter((card) => !ignoreBuster || card.group !== 'buster')
-    .filter((card, index, self) => !unique || self.findIndex((c) => c.group === card.group) === index)
-    .map((card) => (apiRequest ? { path: `${template}/${card.group}/${card.name}.png` } : card));
+    .filter(
+      (card) =>
+        !selectGroup ||
+        (selectGroup === 'company' && card.group !== 'buster') ||
+        (selectGroup === 'buster' && card.group === 'buster')
+    )
+    .filter((card) => !ignoreBuster || selectGroup === 'buster' || card.group !== 'buster')
+    .filter(
+      (card, index, self) => !unique || self.findIndex((c) => c.group === card.group && c.name === card.name) === index
+    )
+    .map((card) => (apiRequest ? { path: `${template}/${selectGroup}/${card.name}.png` } : card));
 
   return mapFormat ? result.reduce((acc, card) => ({ ...acc, [card.group]: card }), {}) : result;
 };

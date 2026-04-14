@@ -8,7 +8,6 @@
     name: 'rouletteChipEvent',
     data: {
       rouletteChip: game.get(chipId),
-      beforeEventControlBtn: lib.utils.clone(player.eventData.controlBtn),
     },
     init() {
       const { game, player } = this.eventContext();
@@ -103,10 +102,10 @@
         this.emit('RESET', { success: true });
       },
       RESET({ success = false } = {}) {
-        const { game, player } = this.eventContext();
+        const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
         const rouletteChipId = this.data.rouletteChip.id();
 
-        const eventData = { deck: null, chip: null, player: null, controlBtn: this.data.beforeEventControlBtn };
+        const eventData = { controlBtn, deck: null, chip: null, player: null };
         if (!success) eventData.chip = { [rouletteChipId]: { selectable: true } };
 
         player.set({ eventData }, { reset: ['eventData.controlBtn', 'eventData.chip'] });

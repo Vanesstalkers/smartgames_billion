@@ -13,6 +13,7 @@
     :style="customStyle"
     @click="selectable ? triggerSelectable($event) : null"
   >
+    <div v-if="!iam" class="user-name">{{ player.userName }}</div>
     <slot v-if="!viewerId" name="money" :money="player.money">
       <div class="money">{{ player.money || 0 }}</div>
     </slot>
@@ -27,7 +28,7 @@
         <div class="income-plane" />
         <div class="income-value" :style="incomeValueStyle">{{ displayIncome }}</div>
       </div>
-      <div v-if="!iam" class="handshake-action" title="Действия с оппонентом" @click.stop="onWorkerHandshakeClick" />
+      <div v-if="!iam" class="handshake-action" @click.stop="onWorkerHandshakeClick" />
     </slot>
     <slot name="control" :controlAction="controlAction">
       <div
@@ -161,7 +162,7 @@ export default {
   },
   methods: {
     triggerSelectable(event) {
-      if(this.playerSelected) event.stopPropagation();
+      if (this.playerSelected) event.stopPropagation();
       this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.playerId } } });
     },
     async controlAction(eventData = {}) {
@@ -187,7 +188,9 @@ export default {
     },
     async onWorkerHandshakeClick() {
       prettyAlertClear?.();
-      await this.handleGameApi({ name: 'dealStart', data: { targetId: this.playerId } }).catch(prettyAlert);
+
+      const gmPrefix = this.isGameMaster() ? 'gm-' : '';
+      await this.handleGameApi({ name: `${gmPrefix}dealStart`, data: { targetId: this.playerId } }).catch(prettyAlert);
     },
     syncDisplayIncomeFromPlayer() {
       const v = (this.player?.income || 0) * 2;
@@ -231,6 +234,17 @@ export default {
 
   &.active {
     outline: 4px solid green;
+  }
+
+  .user-name {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    width: 100%;
+    overflow: hidden;
   }
 
   .money {

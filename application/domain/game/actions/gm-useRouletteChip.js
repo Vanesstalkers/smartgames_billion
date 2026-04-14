@@ -8,25 +8,24 @@
     name: 'rouletteChipEvent',
     data: {
       rouletteChip: game.get(chipId),
-      beforeEventControlBtn: lib.utils.clone(player.eventData.controlBtn),
     },
     init() {
-      const { game, player } = this.eventContext();
-      const eventData = { chip: {}, deck: {} };
+      const { game, player, data: { rouletteChip } = {} } = this.eventContext();
+      const eventData = { chip: {}, deck: {}, player: {} };
 
       for (const player of game.players()) {
-        for (const chip of player.getAvailableChipsByValue(this.data.rouletteChip.value)) {
+        for (const chip of player.getAvailableChipsByValue(rouletteChip.value)) {
           eventData.chip[chip.id()] = { selectable: true };
         }
 
-        if (Object.keys(eventData.chip).length === 0) {
+        // if (Object.keys(eventData.chip).length === 0) {
           eventData.player = {};
-          for (const p of game.players().filter((p) => p !== player)) {
-            if (p.getAvailableChipsByValue(this.data.rouletteChip.value).length > 0)
-              eventData.player[p.id()] = { highlight: true };
+          
+          if (player.getAvailableChipsByValue(rouletteChip.value).length > 0) {
+            eventData.player[player.id()] = { highlight: true };
           }
 
-          if (Object.keys(eventData.player).length === 0) {
+          // if (Object.keys(eventData.player).length === 0) {
             const outer = { chip: {}, deck: {} };
             for (const company of player.decks.company.items() || []) {
               const outerDeck = company.decks.outer;
@@ -36,11 +35,11 @@
             }
             if (Object.keys(outer.chip).length > 0) Object.assign(eventData.chip, outer.chip);
             else Object.assign(eventData.deck, outer.deck);
-          }
-        }
+          // }
+        // }
       }
 
-      eventData.chip[this.data.rouletteChip.id()] = { selectable: null };
+      eventData.chip[rouletteChip.id()] = { selectable: null };
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
       player.set({
         eventData,
@@ -49,12 +48,12 @@
     },
     handlers: {
       TRIGGER({ target, initPlayer: triggerPlayer }) {
-        const { game, player } = this.eventContext();
+        const { game, player, data: { rouletteChip } = {} } = this.eventContext();
         const actionPlayer = game.roundActivePlayer();
 
         if (target.matches?.({ className: 'Deck' })) {
-          this.data.rouletteChip.moveToTarget(target, { setData: { disabled: true, eventData: { selectable: null } } });
-          game.roulettes.main.set({ eventData: { roundChipId: this.data.rouletteChip.id() } });
+          rouletteChip.moveToTarget(target, { setData: { disabled: true, eventData: { selectable: null } } });
+          game.roulettes.main.set({ eventData: { roundChipId: rouletteChip.id() } });
 
           game.logs({
             msg: `Игрок {{player}} разместил ресурс с рулетки на предприятии <a>${target.parent().getTitle()}</a>.`,
@@ -68,7 +67,7 @@
           const targetDeck = target.parent();
           targetDeck.removeItem(target, { forceDelete: true });
 
-          if (this.data.rouletteChip.value === target.value) {
+          if (rouletteChip.value === target.value) {
             const eventData = { player: {} };
             for (const player of game.players()) eventData.player[player.id()] = { selectable: true, highlight: null };
 
@@ -76,10 +75,10 @@
 
             return { preventListenerRemove: true };
           } else {
-            this.data.rouletteChip.moveToTarget(targetDeck, {
+            rouletteChip.moveToTarget(targetDeck, {
               setData: { disabled: true, eventData: { selectable: null } },
             });
-            game.roulettes.main.set({ eventData: { roundChipId: this.data.rouletteChip.id() } });
+            game.roulettes.main.set({ eventData: { roundChipId: rouletteChip.id() } });
 
             game.logs({
               msg: `Игрок {{player}} разместил ресурс с рулетки на предприятии <a>${targetDeck
@@ -95,7 +94,7 @@
         if (target.matches?.({ className: 'Player' })) {
           const actionPlayer = target;
 
-          this.data.rouletteChip.parent().removeItem(this.data.rouletteChip, { forceDelete: true });
+          rouletteChip.parent().removeItem(rouletteChip, { forceDelete: true });
 
           actionPlayer.processDistributionIncome();
 
@@ -113,11 +112,10 @@
         this.emit('RESET', { success: true });
       },
       RESET({ success = false } = {}) {
-        const { game, player } = this.eventContext();
-        const rouletteChipId = this.data.rouletteChip.id();
+        const { game, player, data: { rouletteChip } = {}, beforeEventControlBtn: controlBtn } = this.eventContext();
 
-        const eventData = { deck: null, chip: null, player: null, controlBtn: this.data.beforeEventControlBtn };
-        if (!success) eventData.chip = { [rouletteChipId]: { selectable: true } };
+        const eventData = { controlBtn, deck: null, chip: null, player: null };
+        if (!success) eventData.chip = { [rouletteChip.id()]: { selectable: true } };
 
         player.set({ eventData, staticHelper: null }, { reset: ['eventData.controlBtn', 'eventData.chip'] });
 
