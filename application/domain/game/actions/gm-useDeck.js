@@ -72,7 +72,15 @@
             });
           }
 
-          deck.getRandomItem().moveToTarget(targetPlayer.decks.company, { restoreResources: true });
+          const company = deck.getRandomItem();
+
+          let artCompanyCount = targetPlayer.decks.company.items().filter((c) => c.subtype === 'art').length;
+          if (company.subtype === 'art') artCompanyCount++;
+          if (artCompanyCount > 0) {
+            game.decks.buster.moveRandomItems({ count: artCompanyCount, target: targetPlayer.decks.buster });
+          }
+
+          company.moveToTarget(targetPlayer.decks.company, { restoreResources: true });
 
           if (targetPlayer.companyCount({ type: 'chemistry' }) > 0) {
             const resources = domain.game.configs.cards({ mapFormat: true });

@@ -150,6 +150,30 @@
         border-radius: 10px;
       }
     }
+
+    .chip {
+      position: absolute;
+      top: -40px;
+      left: calc(50% - 13px);
+    }
+    &.selectable-chip .chip {
+      &:hover {
+        cursor: pointer;
+        margin-left: -3px !important;
+        margin-top: -3px !important;
+        width: 32px !important;
+        height: 32px !important;
+
+        .chip-face {
+          box-shadow: none !important;
+        }
+      }
+
+      .chip-face {
+        box-shadow: inset 0 0 8px 4px yellow;
+        border-radius: 12px;
+      }
+    }
   }
 }
 

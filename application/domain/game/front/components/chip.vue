@@ -76,7 +76,6 @@ export default {
     player() {
       return this.sessionPlayer();
     },
-    /** Данные фишки из стора при `chipId` (значение сектора рулетки — строка). */
     chip() {
       return this.store.chip?.[this.chipId] || {};
     },
@@ -91,6 +90,7 @@ export default {
         ((this.inMyHand && !this.chip.ownerId) ||
           this.chip.ownerId === this.gameState.sessionPlayerId ||
           this.isSelectable ||
+          (this.chipId === 'fake' && this.onClick !== null) ||
           this.chipId === this.gameCustom.selectedChipId) // тут будет roulette-chip
       );
     },
@@ -109,12 +109,10 @@ export default {
 <style scoped lang="scss">
 .chip:not(.canPlay),
 .chip[ownerId]:not(.selectable):not(.canPlay),
-.chip.disabled 
-{
+.chip.disabled {
   filter: brightness(0.5);
 }
-#game.viewer-mode .chip[ownerId]
-{
+#game.viewer-mode .chip[ownerId] {
   filter: contrast(0.5);
 }
 </style>

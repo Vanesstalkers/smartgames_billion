@@ -1,5 +1,9 @@
-(function ({ chipId } = {}, player) {
+(function ({ chipId, subtype } = {}, player) {
   const game = this;
+
+  if (subtype) {
+    return player.handleEventWithTriggerListener('TRIGGER', { subtype });
+  }
 
   player.initEvent({
     name: 'useChipEvent',
@@ -66,8 +70,7 @@
 
         this.emit('RESET');
 
-        const event = target.play({ player });
-        if (event) event.setHandler('SUCCESS', () => this.data.chip.delete());
+        target.play({ player, onSuccess: () => this.data.chip.delete() });
       },
       RESET() {
         const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();

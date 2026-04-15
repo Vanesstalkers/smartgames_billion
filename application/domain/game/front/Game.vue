@@ -91,7 +91,8 @@
               :class="{
                 deck: true,
                 drop: deck.code.includes('_drop'),
-                selectable: player.eventData.deck?.[deck._id]?.selectable,
+                selectable: player.eventData.deck?.[deck._id]?.selectable === true,
+                'selectable-chip': player.eventData.deck?.[deck._id]?.selectable === 'chip',
                 empty: deckItemCount(deck) === 0,
               }"
               :code="deck.code"
@@ -114,6 +115,7 @@
                   :deck="deck"
                 />
               </div>
+              <chip :chipId="'fake'" :value="deck.subtype" :size="26" :on-click="() => useDeckChip(deck)" />
             </div>
           </div>
         </div>
@@ -167,6 +169,7 @@ import companyCard from './components/company.vue';
 import dicecube from '~/lib/game/front/components/dicecube.vue';
 import roulette from './components/roulette.vue';
 import busterCard from './components/buster.vue';
+import chip from './components/chip.vue';
 import player from './components/player.vue';
 import tutorial from '~/lib/helper/front/helper.vue';
 
@@ -178,6 +181,7 @@ export default {
     dicecube,
     roulette,
     busterCard,
+    chip,
     tutorial,
   },
   props: {},
@@ -341,6 +345,12 @@ export default {
       if (deck.subtype === 'buster_drop') return;
       const gmPrefix = this.isGameMaster() ? 'gm-' : '';
       await this.handleGameApi({ name: `${gmPrefix}useDeck`, data: { deckId: deck._id } });
+    },
+    async useDeckChip(deck) {
+      if (this.player.eventData.deck?.[deck._id]?.selectable !== 'chip') return;
+
+      const gmPrefix = this.isGameMaster() ? 'gm-' : '';
+      await this.handleGameApi({ name: `${gmPrefix}useChip`, data: { subtype: deck.subtype } });
     },
   },
 };

@@ -21,7 +21,7 @@
       for (const player of game.players()) {
         eventData.player[player.id()] = { selectable: true };
       }
-      gameMaster.set({ eventData, staticHelper: { text: 'Выбор нового владельца фишки' } });
+      gameMaster.set({ eventData, staticHelper: { text: 'Выбор нового владельца ресурса' } });
       return;
     }
     case 'RESTORE_CHIPS': {

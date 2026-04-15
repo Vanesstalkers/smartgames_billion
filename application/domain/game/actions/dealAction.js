@@ -150,8 +150,25 @@
         deck.getRandomItem().moveToTarget(player.decks.buster, {
           restoreResources: true,
         });
+
+        const price = 10;
+        player.set({ money: player.money - price, staticHelper: null, eventData: { deal: null } });
+
+        game.logs({
+          msg: `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>`,
+          userId: player.userId,
+        });
+        player.notifyUser({ message: `Вы приобрели бустер за <a>${price}₽</a>` });
       } else {
-        deck.getRandomItem().moveToTarget(player.decks.company, { restoreResources: true });
+        const company = deck.getRandomItem();
+
+        let artCompanyCount = player.decks.company.items().filter((c) => c.subtype === 'art').length;
+        if (company.subtype === 'art') artCompanyCount++;
+        if (artCompanyCount > 0) {
+          game.decks.buster.moveRandomItems({ count: artCompanyCount, target: player.decks.buster });
+        }
+
+        company.moveToTarget(player.decks.company, { restoreResources: true });
 
         if (player.companyCount({ type: 'chemistry' }) > 0) {
           const resources = domain.game.configs.cards({ mapFormat: true });
@@ -160,24 +177,21 @@
             company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
           }
         }
+
+        player.set({ money: player.money - price, eventData: { deal: null } });
+
+        game.logs({
+          msg: `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
+          userId: player.userId,
+        });
+        player.notifyUser({ message: `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>` });
+
+        if (company.subtype === 'construction') {
+          game.run('takeChip', { companyCardId: company.id() }, player);
+        }
       }
 
-      player.set({ money: player.money - price, eventData: { deal: null } });
-
-      game.logs({
-        msg:
-          deck.subtype === 'buster'
-            ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>`
-            : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
-        userId: player.userId,
-      });
-      player.notifyUser({
-        message:
-          deck.subtype === 'buster'
-            ? `Вы приобрели бустер за <a>${price}₽</a>`
-            : `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
-      });
-      break;
+      return;
     }
     case 'DECLINE_DEAL': {
       const contractor = game.get(player.eventData.deal.contractorId);

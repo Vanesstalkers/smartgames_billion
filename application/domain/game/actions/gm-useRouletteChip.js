@@ -43,7 +43,7 @@
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
       player.set({
         eventData,
-        staticHelper: { text: 'Выбор действия с фишкой (разместить на предприятии или продать)' },
+        staticHelper: { text: 'Выбор действия с ресурсом (разместить на предприятии или продать)' },
       });
     },
     handlers: {

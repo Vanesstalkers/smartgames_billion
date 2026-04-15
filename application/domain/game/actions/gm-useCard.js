@@ -15,7 +15,7 @@
           text: `Особые действия с предприятием`,
           buttons: [
             {
-              text: 'Восстановить фишки',
+              text: 'Восстановить ресурсы',
               code: 'RESTORE_CHIPS',
               gameMasterAction: true,
               eventData: { cardId: card.id() },

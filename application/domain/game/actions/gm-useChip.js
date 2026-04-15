@@ -38,7 +38,7 @@
       player.set({
         eventData,
         staticHelper: {
-          text: `Особые действия с фишкой${chip.ownerId ? `( владелец: ${game.get(chip.ownerId).userName})` : ''}`,
+          text: `Особые действия с ресурсом${chip.ownerId ? `( владелец: ${game.get(chip.ownerId).userName})` : ''}`,
           buttons: [
             {
               text: 'Удалить',

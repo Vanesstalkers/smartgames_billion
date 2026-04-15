@@ -26,16 +26,16 @@
       init() {
         const { game } = this.eventContext();
 
-        for (const player of game.players()) {
-          const decks = Object.values(game.decks).filter((d) => d.type === 'company');
-          for (const deck of decks) {
-            const card = deck.getRandomItem();
-            card.moveToTarget(player.decks.company, { restoreResources: true });
-          }
-        }
+        // for (const player of game.players()) {
+        //   const decks = Object.values(game.decks).filter((d) => d.type === 'company');
+        //   for (const deck of decks) {
+        //     const card = deck.getRandomItem();
+        //     card.moveToTarget(player.decks.company, { restoreResources: true });
+        //   }
+        // }
 
-        game.run('startGame');
-        return { resetEvent: true };
+        // game.run('startGame');
+        // return { resetEvent: true };
 
         game.set({ statusLabel: 'Подготовка к игре', status: 'PREPARE_START' });
         this.initPrepareStep(game.selectNextActivePlayer());
@@ -57,6 +57,10 @@
           });
 
           selectedCompany.restoreResources();
+
+          if(selectedCompany.subtype === 'art') {
+            game.decks.buster.moveRandomItems({ count: 2, target: player.decks.buster });
+          }
 
           game.logs({
             msg: `Игрок {{player}} выбрал стартовую карту "${selectedCompany.getTitle()}"${

@@ -1,8 +1,6 @@
 (function ({ chipId } = {}, initPlayer) {
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
-  // let player = initPlayer;
-  // if (!player || player.gameMaster) player = game.getActivePlayer();
 
   player.initEvent({
     name: 'rouletteChipEvent',
@@ -61,10 +59,10 @@
 
         if (target.matches?.({ className: 'Chip' })) {
           if (target.ownerId && target.ownerId !== actionPlayer.id()) {
-            throw new Error('Эта фишка принадлежит другому игроку.');
+            throw new Error('Этот ресурс принадлежит другому игроку.');
           }
 
-          if (!player.eventData.chip?.[target.id()]?.selectable) throw new Error('Данная фишка не может быть выбрана.');
+          if (!player.eventData.chip?.[target.id()]?.selectable) throw new Error('Данный ресурс не может быть выбран.');
 
           const targetDeck = target.parent();
           targetDeck.removeItem(target, { forceDelete: true });
