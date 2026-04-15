@@ -333,6 +333,11 @@ export default {
       return Object.keys(deck.itemMap || {}).length;
     },
     async useDeck(deck) {
+      if (this.player.eventData.deck?.[deck._id]?.selectable) {
+        this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: deck._id } } });
+        return;
+      }
+
       if (deck.subtype === 'buster_drop') return;
       const gmPrefix = this.isGameMaster() ? 'gm-' : '';
       await this.handleGameApi({ name: `${gmPrefix}useDeck`, data: { deckId: deck._id } });

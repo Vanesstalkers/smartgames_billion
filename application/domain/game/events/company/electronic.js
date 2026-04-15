@@ -9,9 +9,19 @@
     const { game, player, source: card } = this.eventContext();
 
     const eventData = { company: {} };
-    for (const company of player.decks.company.items()) {
-      if (company === card) continue;
-      eventData.company[company.id()] = { selectable: true };
+
+    if (player.gameMaster) {
+      for(const player of game.players()) {
+        for (const company of player.decks.company.items()) {
+          if (company === card) continue;
+          eventData.company[company.id()] = { selectable: true };
+        }
+      }
+    } else {
+      for (const company of player.decks.company.items()) {
+        if (company === card) continue;
+        eventData.company[company.id()] = { selectable: true };
+      }
     }
 
     eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };

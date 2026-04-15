@@ -398,6 +398,14 @@ export default {
   color: #ff5900;
   text-shadow: 4px 4px 0 #fff;
 }
+.player:not(.iam) {
+  .end-round-timer {
+    font-size: 32px;
+    bottom: 10px;
+    height: auto;
+    line-height: 32px;
+  }
+}
 
 .leave-game-btn {
   position: absolute;

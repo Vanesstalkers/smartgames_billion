@@ -4,16 +4,23 @@
   },
   data: {
     sourceDeck: null,
-    gameMasterAction: null,
+    targetPlayerId: null,
+    price: null,
   },
-  init: function ({ sourceDeck, gameMasterAction } = {}) {
+  init: function ({ sourceDeck, targetPlayerId, price } = {}) {
     const { game, player } = this.eventContext();
-    this.data.gameMasterAction = gameMasterAction;
+
+    this.data.targetPlayerId = targetPlayerId;
+    this.data.price = price;
 
     const eventData = { deck: {} };
     for (const deck of Object.values(game.decks)) {
       if (deck.items().length === 0) continue;
       eventData.deck[deck.id()] = { selectable: true };
+    }
+
+    if (!player.gameMaster) {
+      this.data.targetPlayerId = player.id();
     }
 
     eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
@@ -30,24 +37,26 @@
   handlers: {
     TRIGGER({ target }) {
       const { game, player } = this.eventContext();
-      let { targetPlayer, price } = this.data.gameMasterAction || {};
-      if (!targetPlayer) targetPlayer = player; // логика для gameMaster
 
       if (!this.data.sourceDeck) {
         this.data.sourceDeck = target;
 
         const eventData = { deck: null, company: {} };
-        for (const company of targetPlayer.decks.company.items()) {
-          if (this.data.sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
-          if (company.foreignResources().length > 0) continue; // нельзя менять на предприятие с чужими ресурсами
+        const players = this.data.targetPlayerId ? [game.get(this.data.targetPlayerId)] : game.players();
+        for (const player of players) {
+          for (const company of player.decks.company.items()) {
+            if (this.data.sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
+            if (company.foreignResources().length > 0) continue; // нельзя менять на предприятие с чужими ресурсами
 
-          eventData.company[company.id()] = { selectable: true };
+            eventData.company[company.id()] = { selectable: true };
+          }
         }
         player.set({ eventData, staticHelper: { text: 'Какую организацию нужно заменить?', buttons: null } });
 
         return { preventListenerRemove: true };
       } else {
         const oldCompany = target;
+        const targetPlayer = oldCompany.findParent({ className: 'Player' });
         const outerChip = oldCompany.decks.outer.items()[0];
         const newCompany = this.data.sourceDeck.getRandomItem();
 
@@ -57,8 +66,8 @@
         if (outerChip) outerChip.moveToTarget(newCompany.decks.outer);
 
         // замена предприятия из useDeck
-        if (!price) price = targetPlayer.eventData.deal.price;
-        if (price) targetPlayer.set({ money: targetPlayer.money - price });
+        if (!this.data.price) this.data.price = targetPlayer.eventData.deal?.price;
+        if (this.data.price) targetPlayer.set({ money: targetPlayer.money - this.data.price });
 
         return this.emit('RESET', { success: true });
       }

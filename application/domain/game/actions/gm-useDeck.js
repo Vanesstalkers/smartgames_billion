@@ -1,4 +1,6 @@
 (function ({ deckId } = {}, player) {
+  const triggerEventAction = player.eventData.deck?.[deckId]?.selectable;
+
   player.initEvent({
     name: 'useDeckEvent',
     data: {
@@ -66,7 +68,7 @@
             this.emit('RESET');
 
             return player.initEvent(domain.game.events.company.light(), {
-              initData: { sourceDeck: deck, gameMasterAction: { targetPlayer, price: 10 } },
+              initData: { sourceDeck: deck, targetPlayerId: targetPlayer.id(), price: 10 },
             });
           }
 

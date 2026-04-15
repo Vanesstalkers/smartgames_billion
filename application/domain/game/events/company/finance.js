@@ -4,6 +4,8 @@
   },
   data: {
     price: null,
+    targetPlayerId: null,
+    companyDeckId: null,
   },
   init: function () {
     const { game, player } = this.eventContext();
@@ -15,30 +17,62 @@
       eventData.deck[deck.id()] = { selectable: true };
     }
 
-    switch (player.decks.company.items().length) {
-      case 1:
-        this.data.price = 15;
-        break;
-      case 2:
-        this.data.price = 28;
-        break;
+    if (!player.gameMaster) {
+      this.data.targetPlayerId = player.id();
+
+      switch (player.decks.company.items().length) {
+        case 1:
+          this.data.price = 15;
+          break;
+        case 2:
+          this.data.price = 28;
+          break;
+      }
     }
 
     eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
-    player.set({
-      eventData,
-      staticHelper: {
-        text: `Необходимо выбрать новое предприятие (из колоды). Оно будет куплено за <b><a>${this.data.price}₽</a></b>`,
-        buttons: null,
-      },
-    });
+    const staticHelper = {
+      text:
+        `Необходимо выбрать новое предприятие (из колоды)` + player.gameMaster
+          ? ``
+          : `. Оно будет куплено за <b><a>${this.data.price}₽</a></b>`,
+      buttons: null,
+    };
+    player.set({ eventData, staticHelper });
   },
   handlers: {
     TRIGGER({ target }) {
       const { game, player } = this.eventContext();
 
-      player.set({ money: player.money - this.data.price });
-      target.getRandomItem().moveToTarget(player.decks.company, { restoreResources: true });
+      if (!this.data.companyDeckId) this.data.companyDeckId = target.id();
+      else if (!this.data.targetPlayerId) this.data.targetPlayerId = target.id();
+
+      const targetPlayer = game.get(this.data.targetPlayerId);
+      if (!targetPlayer) {
+        const eventData = { player: {} };
+        for (const player of game.players()) {
+          eventData.player[player.id()] = { selectable: true };
+        }
+        player.set({ eventData });
+        return { preventListenerRemove: true };
+      }
+
+      if (!this.data.price) {
+        switch (targetPlayer.decks.company.items().length) {
+          case 1:
+            this.data.price = 15;
+            break;
+          case 2:
+            this.data.price = 28;
+            break;
+          default:
+            this.data.price = 100;
+        }
+      }
+
+      const companyDeck = game.get(this.data.companyDeckId);
+      companyDeck.getRandomItem().moveToTarget(targetPlayer.decks.company, { restoreResources: true });
+      targetPlayer.set({ money: targetPlayer.money - this.data.price });
 
       return this.emit('RESET', { success: true });
     },
@@ -46,7 +80,7 @@
       const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
 
       player.set(
-        { eventData: { controlBtn, deck: null }, staticHelper: null },
+        { eventData: { controlBtn, player: null, deck: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
 

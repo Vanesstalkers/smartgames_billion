@@ -419,13 +419,6 @@ export default {
   .card-worker {
     width: 72px;
     height: 108px;
-    .end-round-timer {
-      font-size: 32px;
-      bottom: 0px;
-      height: auto;
-      line-height: 32px;
-      // display: none;
-    }
     .handshake-action {
       width: 40px;
       height: 40px;

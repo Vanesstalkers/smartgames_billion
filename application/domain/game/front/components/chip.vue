@@ -109,7 +109,12 @@ export default {
 <style scoped lang="scss">
 .chip:not(.canPlay),
 .chip[ownerId]:not(.selectable):not(.canPlay),
-.chip.disabled {
+.chip.disabled 
+{
   filter: brightness(0.5);
+}
+#game.viewer-mode .chip[ownerId]
+{
+  filter: contrast(0.5);
 }
 </style>
