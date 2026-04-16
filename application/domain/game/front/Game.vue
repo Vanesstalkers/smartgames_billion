@@ -347,10 +347,15 @@ export default {
       await this.handleGameApi({ name: `${gmPrefix}useDeck`, data: { deckId: deck._id } });
     },
     async useDeckChip(deck) {
-      if (this.player.eventData.deck?.[deck._id]?.selectable !== 'chip') return;
+      if (this.player.eventData.deck?.[deck._id]?.selectable !== 'chip') {
+        if (this.isGameMaster()) {
+          await this.handleGameApi({ name: `takeChip`, data: { selectedChipSubtype: deck.subtype } });
+        }
+        return;
+      }
 
       const gmPrefix = this.isGameMaster() ? 'gm-' : '';
-      await this.handleGameApi({ name: `${gmPrefix}useChip`, data: { subtype: deck.subtype } });
+      await this.handleGameApi({ name: `${gmPrefix}useChip`, data: { selectedChipSubtype: deck.subtype } });
     },
   },
 };

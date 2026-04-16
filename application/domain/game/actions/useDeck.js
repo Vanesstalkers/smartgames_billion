@@ -1,7 +1,6 @@
 (function ({ deckId } = {}, player) {
   const game = this;
   const deck = game.get(deckId);
-  const triggerEventAction = player.eventData.deck?.[deckId]?.selectable;
 
   if (game.status !== 'IN_PROCESS') throw new Error('Действие доступно только после начала игры');
   if (deck.items().length === 0) throw new Error('В колоде нет доступных предприятий');
@@ -17,7 +16,7 @@
       { text: 'Отказаться', code: 'DECLINE_DEAL' },
     ];
   } else {
-    if (triggerEventAction) {
+    if (player.eventData.deck?.[deckId]?.selectable) { // finance-card event
       player.handleEventWithTriggerListener('TRIGGER', { targetId: deckId });
       player.set({ eventData: { deal: null } });
       return;

@@ -3,8 +3,8 @@
     name: 'deal',
     data: { contractorId: targetId },
     init() {
-      const { game, player } = this.eventContext();
-      const contractor = game.get(this.data.contractorId);
+      const { game, player, data: { contractorId } = {} } = this.eventContext();
+      const contractor = game.get(contractorId);
 
       const playerResources = {};
       for (const card of domain.game.configs.cards({ unique: true })) {
@@ -37,7 +37,7 @@
       player.set({
         eventData: {
           deal: {
-            contractorId: contractor.id(),
+            contractorId,
             contractorResources,
             contractorCompanies,
             playerResources,

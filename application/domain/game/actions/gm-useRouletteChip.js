@@ -1,16 +1,15 @@
 (function ({ chipId } = {}, initPlayer) {
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
-  // let player = initPlayer;
-  // if (!player || player.gameMaster) player = game.getActivePlayer();
 
   player.initEvent({
     name: 'rouletteChipEvent',
     data: {
-      rouletteChip: game.get(chipId),
+      rouletteChipId: chipId,
     },
     init() {
-      const { game, player, data: { rouletteChip } = {} } = this.eventContext();
+      const { game, player, data: { rouletteChipId } = {} } = this.eventContext();
+      const rouletteChip = game.get(rouletteChipId);
       const eventData = { chip: {}, deck: {}, player: {} };
 
       for (const player of game.players()) {
@@ -18,28 +17,34 @@
           eventData.chip[chip.id()] = { selectable: true };
         }
 
-        // if (Object.keys(eventData.chip).length === 0) {
-          eventData.player = {};
-          
-          if (player.getAvailableChipsByValue(rouletteChip.value).length > 0) {
-            eventData.player[player.id()] = { highlight: true };
-          }
+        eventData.player = {};
 
-          // if (Object.keys(eventData.player).length === 0) {
-            const outer = { chip: {}, deck: {} };
-            for (const company of player.decks.company.items() || []) {
-              const outerDeck = company.decks.outer;
-              const outerChip = outerDeck.items()[0];
-              if (outerChip) outer.chip[outerChip.id()] = { selectable: true };
-              else outer.deck[outerDeck.id()] = { selectable: true };
-            }
-            if (Object.keys(outer.chip).length > 0) Object.assign(eventData.chip, outer.chip);
-            else Object.assign(eventData.deck, outer.deck);
-          // }
-        // }
+        if (player.getAvailableChipsByValue(rouletteChip.value).length > 0) {
+          eventData.player[player.id()] = { highlight: true };
+        }
+
+        const outer = { chip: {}, deck: {} };
+        let hasConstruction = false;
+        for (const company of player.decks.company.items() || []) {
+          if (company.is('construction')) hasConstruction = true;
+          const outerDeck = company.decks.outer;
+          const outerChip = outerDeck.items()[0];
+          if (outerChip) outer.chip[outerChip.id()] = { selectable: true };
+          else outer.deck[outerDeck.id()] = { selectable: true };
+        }
+        if (hasConstruction) {
+          if (Object.keys(outer.chip).length > 1) Object.assign(eventData.chip, outer.chip);
+          else {
+            Object.assign(eventData.deck, outer.deck);
+            Object.assign(eventData.chip, outer.chip);
+          }
+        } else {
+          if (Object.keys(outer.chip).length > 0) Object.assign(eventData.chip, outer.chip);
+          else Object.assign(eventData.deck, outer.deck);
+        }
       }
 
-      eventData.chip[rouletteChip.id()] = { selectable: null };
+      eventData.chip[rouletteChipId] = { selectable: null };
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
       player.set({
         eventData,
@@ -48,12 +53,13 @@
     },
     handlers: {
       TRIGGER({ target, initPlayer: triggerPlayer }) {
-        const { game, player, data: { rouletteChip } = {} } = this.eventContext();
+        const { game, player, data: { rouletteChipId } = {} } = this.eventContext();
+        const rouletteChip = game.get(rouletteChipId);
         const actionPlayer = game.roundActivePlayer();
 
         if (target.matches?.({ className: 'Deck' })) {
           rouletteChip.moveToTarget(target, { setData: { disabled: true, eventData: { selectable: null } } });
-          game.roulettes.main.set({ eventData: { roundChipId: rouletteChip.id() } });
+          game.roulettes.main.set({ eventData: { roundChipId: rouletteChipId } });
 
           game.logs({
             msg: `Игрок {{player}} разместил ресурс с рулетки на предприятии <a>${target.parent().getTitle()}</a>.`,
@@ -78,7 +84,7 @@
             rouletteChip.moveToTarget(targetDeck, {
               setData: { disabled: true, eventData: { selectable: null } },
             });
-            game.roulettes.main.set({ eventData: { roundChipId: rouletteChip.id() } });
+            game.roulettes.main.set({ eventData: { roundChipId: rouletteChipId } });
 
             game.logs({
               msg: `Игрок {{player}} разместил ресурс с рулетки на предприятии <a>${targetDeck
@@ -112,10 +118,10 @@
         this.emit('RESET', { success: true });
       },
       RESET({ success = false } = {}) {
-        const { game, player, data: { rouletteChip } = {}, beforeEventControlBtn: controlBtn } = this.eventContext();
+        const { game, player, data: { rouletteChipId } = {}, beforeEventControlBtn: controlBtn } = this.eventContext();
 
         const eventData = { controlBtn, deck: null, chip: null, player: null };
-        if (!success) eventData.chip = { [rouletteChip.id()]: { selectable: true } };
+        if (!success) eventData.chip = { [rouletteChipId]: { selectable: true } };
 
         player.set({ eventData, staticHelper: null }, { reset: ['eventData.controlBtn', 'eventData.chip'] });
 

@@ -1,14 +1,15 @@
 (async function ({ targetId } = {}, player) {
   const event = player.initEvent({
     name: 'deal',
-    data: { targetPlayer: this.get(targetId) },
+    data: { targetPlayerId: targetId },
     handlers: {
       async TRIGGER({ dealType, amount, payType, group, initPlayer, target, repayType }) {
         const {
           game,
           player,
-          data: { targetPlayer },
+          data: { targetPlayerId },
         } = this.eventContext();
+        const targetPlayer = game.get(targetPlayerId);
 
         switch (dealType) {
           case 'addMoney': {

@@ -4,10 +4,10 @@
   player.initEvent({
     name: 'useCardEvent',
     data: {
-      card: game.get(cardId),
+      cardId,
     },
     init: function () {
-      const { game, player, data: { card } = {} } = this.eventContext();
+      const { game, player, data: { cardId } = {} } = this.eventContext();
 
       player.set({
         eventData: { label: 'Отменить действие', resetEvent: true },
@@ -18,7 +18,7 @@
               text: 'Восстановить ресурсы',
               code: 'RESTORE_CHIPS',
               gameMasterAction: true,
-              eventData: { cardId: card.id() },
+              eventData: { cardId },
             },
             {
               text: 'Отменить действие',

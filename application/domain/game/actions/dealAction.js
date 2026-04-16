@@ -160,35 +160,8 @@
         });
         player.notifyUser({ message: `Вы приобрели бустер за <a>${price}₽</a>` });
       } else {
-        const company = deck.getRandomItem();
-
-        let artCompanyCount = player.decks.company.items().filter((c) => c.subtype === 'art').length;
-        if (company.subtype === 'art') artCompanyCount++;
-        if (artCompanyCount > 0) {
-          game.decks.buster.moveRandomItems({ count: artCompanyCount, target: player.decks.buster });
-        }
-
-        company.moveToTarget(player.decks.company, { restoreResources: true });
-
-        if (player.companyCount({ type: 'chemistry' }) > 0) {
-          const resources = domain.game.configs.cards({ mapFormat: true });
-          for (const company of player.decks.company.items()) {
-            if (company.decks.inner.items().length === 4) continue;
-            company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
-          }
-        }
-
-        player.set({ money: player.money - price, eventData: { deal: null } });
-
-        game.logs({
-          msg: `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
-          userId: player.userId,
-        });
-        player.notifyUser({ message: `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>` });
-
-        if (company.subtype === 'construction') {
-          game.run('takeChip', { companyCardId: company.id() }, player);
-        }
+        this.run('buyCompany', { player, deck, price }, player);
+        player.set({ staticHelper: null, eventData: { deal: null } });
       }
 
       return;

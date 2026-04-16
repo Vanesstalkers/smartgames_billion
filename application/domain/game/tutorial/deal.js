@@ -51,13 +51,19 @@
         bigControls: true,
         text: `
         Действия с оппонентом: выбери, что хочешь сделать.
-      `,
+        `,
         buttons: [
           { text: 'Взять деньги в долг', step: 'borrowRepayChoice', key: null },
           { text: 'Купить ресурс', step: 'buyResource' },
           { text: 'Воспользоваться услугой', step: 'useService' },
-          { text: 'Отмена', action: 'exit', exit: true },
+          { text: 'Отмена', action: 'RESET', exit: true },
         ],
+        actions: {
+          RESET: async () => {
+            await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
+            return { exit: true };
+          },
+        },
       },
       borrowRepayChoice: {
         superPos: true,

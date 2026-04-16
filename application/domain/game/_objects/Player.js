@@ -58,6 +58,14 @@
     }
     return null;
   }
+
+  getOuterDecksChips() {
+    return this.decks.company
+      .items()
+      .map((company) => company.decks.outer.items()[0])
+      .filter(Boolean);
+  }
+
   earnMoney(amount) {
     this.set({ money: this.money + amount });
     this.showDealsHelper();

@@ -29,8 +29,14 @@
           { text: 'Добавить деньги', step: 'addMoney', key: null },
           { text: 'Удалить деньги', step: 'removeMoney', key: null },
           { text: 'Установить доход', step: 'setIncome', key: null },
-          { text: 'Выход из меню', action: 'exit', exit: true },
+          { text: 'Выход из меню', action: 'RESET', exit: true },
         ],
+        actions: {
+          RESET: async () => {
+            await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
+            return { exit: true };
+          },
+        },
       },
       addMoney: {
         superPos: true,

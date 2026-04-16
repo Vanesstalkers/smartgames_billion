@@ -2,6 +2,7 @@
   this.initEvent(
     {
       name: 'initPrepareGameEvents',
+      data: {},
       initPrepareStep(player) {
         const { game } = this.eventContext();
         const decks = Object.values(game.decks).filter((d) => d.type === 'company');
@@ -41,24 +42,58 @@
         this.initPrepareStep(game.selectNextActivePlayer());
       },
       handlers: {
-        TRIGGER({ target: selectedCompany, timerAutoPick }) {
-          const { game, player } = this.eventContext();
+        TRIGGER({ target, selectedChipSubtype, timerAutoPick }) {
+          const { game, player, data } = this.eventContext();
+          let selectedCompany = game.get(data.selectedCompanyId);
 
-          if (!selectedCompany) selectedCompany = player.decks.company.getRandomItem();
+          if (!selectedCompany) {
+            selectedCompany = target || player.decks.company.getRandomItem();
+            this.data.selectedCompanyId = selectedCompany.id();
 
-          for (const company of player.decks.company.items()) {
-            company.set({ eventData: { activeEvents: [], cardClass: null, buttonText: null } });
-            if (selectedCompany && company.id() === selectedCompany.id()) continue;
-            company.moveToDeck();
+            for (const company of player.decks.company.items()) {
+              company.set({ eventData: { activeEvents: [], cardClass: null, buttonText: null } });
+              if (company === selectedCompany) continue;
+              company.moveToDeck();
+            }
+
+            if (selectedCompany.is('construction')) {
+              const eventData = { deck: {}, company: null };
+              for (const deck of Object.values(game.decks)) {
+                if (deck.type !== 'company') continue;
+                eventData.deck[deck.id()] = { selectable: 'chip' };
+              }
+
+              eventData.controlBtn = { label: 'Помочь выбрать', triggerEvent: true };
+              const staticHelper = {
+                text: `Необходимо выбрать ресурс для добавления на предприятие`,
+                buttons: null,
+              };
+              player.set({ eventData, staticHelper });
+
+              return { preventListenerRemove: true };
+            }
           }
+
           player.deactivate({
-            setData: { eventData: { company: null, controlBtn: null, playDisabled: null } },
-            setDataConfig: { reset: ['eventData.controlBtn'] },
+            setData: {
+              staticHelper: null,
+              eventData: { deck: null, company: null, controlBtn: null, playDisabled: null },
+            },
+            setDataConfig: { reset: ['eventData.controlBtn', 'staticHelper'] },
           });
 
           selectedCompany.restoreResources();
 
-          if(selectedCompany.subtype === 'art') {
+          if (selectedCompany.is('construction')) {
+            if (!selectedChipSubtype) {
+              const resources = Object.keys(game.resources());
+              selectedChipSubtype = resources[Math.floor(Math.random() * resources.length)];
+            }
+            const chip = { value: selectedChipSubtype, title: game.resources(selectedChipSubtype).title };
+            selectedCompany.decks.outer.addItem(chip);
+          }
+
+          if (selectedCompany.is('art')) {
             game.decks.buster.moveRandomItems({ count: 2, target: player.decks.buster });
           }
 
@@ -76,6 +111,7 @@
             return;
           }
 
+          this.data.selectedCompanyId = null;
           this.initPrepareStep(game.selectNextActivePlayer());
           return { preventListenerRemove: true };
         },

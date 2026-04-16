@@ -1,17 +1,12 @@
 (function ({ deckId } = {}, player) {
-  const triggerEventAction = player.eventData.deck?.[deckId]?.selectable;
-
   player.initEvent({
     name: 'useDeckEvent',
     data: {
-      deck: this.get(deckId),
+      deckId,
     },
     init: function () {
-      const {
-        game,
-        player,
-        data: { deck },
-      } = this.eventContext();
+      const { game, player, data: { deckId } = {} } = this.eventContext();
+      const deck = game.get(deckId);
 
       if (game.status !== 'IN_PROCESS') throw new Error('Действие доступно только после начала игры');
       if (deck.items().length === 0) throw new Error('В колоде нет доступных предприятий');
@@ -26,6 +21,7 @@
         ];
       } else {
         if (player.eventData.deck?.[deckId]?.selectable) {
+          // finance-card event
           player.handleEventWithTriggerListener('TRIGGER', { targetId: deckId });
           return;
         } else {
@@ -44,8 +40,9 @@
         const {
           game,
           player,
-          data: { deck },
+          data: { deckId },
         } = this.eventContext();
+        const deck = game.get(deckId);
 
         if (!targetPlayer) {
           if (changeCompanyEvent) this.data.changeCompanyEvent = true;
@@ -63,6 +60,17 @@
           deck.getRandomItem().moveToTarget(targetPlayer.decks.buster, {
             restoreResources: true,
           });
+
+          const price = 10;
+          targetPlayer.set({ money: targetPlayer.money - price });
+
+          game.logs({
+            msg: `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>`,
+            userId: targetPlayer.userId,
+          });
+          targetPlayer.notifyUser(`Вы приобрели бустер за <a>${price}₽</a>`);
+
+          return this.emit('RESET', { success: true });
         } else {
           if (this.data.changeCompanyEvent) {
             this.emit('RESET');
@@ -72,43 +80,10 @@
             });
           }
 
-          const company = deck.getRandomItem();
+          this.emit('RESET', { success: true });
 
-          let artCompanyCount = targetPlayer.decks.company.items().filter((c) => c.subtype === 'art').length;
-          if (company.subtype === 'art') artCompanyCount++;
-          if (artCompanyCount > 0) {
-            game.decks.buster.moveRandomItems({ count: artCompanyCount, target: targetPlayer.decks.buster });
-          }
-
-          company.moveToTarget(targetPlayer.decks.company, { restoreResources: true });
-
-          if (targetPlayer.companyCount({ type: 'chemistry' }) > 0) {
-            const resources = domain.game.configs.cards({ mapFormat: true });
-            for (const company of targetPlayer.decks.company.items()) {
-              if (company.decks.inner.items().length === 4) continue;
-              company.decks.inner.addItem({ value: company.subtype, title: resources[company.subtype].title });
-            }
-          }
+          game.run('buyCompany', { player: targetPlayer, deck, price: 25 }, player);
         }
-
-        const price = 25;
-        targetPlayer.set({ money: targetPlayer.money - price });
-
-        game.logs({
-          msg:
-            deck.subtype === 'buster'
-              ? `Игрок <a>{{player}}</a> приобрел бустер за <a>${price}₽</a>`
-              : `Игрок <a>{{player}}</a> приобрел предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
-          userId: targetPlayer.userId,
-        });
-        targetPlayer.notifyUser({
-          message:
-            deck.subtype === 'buster'
-              ? `Вы приобрели бустер за <a>${price}₽</a>`
-              : `Вы приобрели предприятие <a>${deck.title}</a> за <a>${price}₽</a>`,
-        });
-
-        return this.emit('RESET', { success: true });
       },
       RESET({ success }) {
         const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();

@@ -1,4 +1,6 @@
 (class Game extends lib.game.Class() {
+  #resources = domain.game.configs.cards({ mapFormat: true });
+
   constructor(...args) {
     super(...args);
 
@@ -14,6 +16,11 @@
       // Deck: domain.game._objects.Deck,
       // Card: domain.game._objects.Card,
     });
+  }
+
+  resources(type) {
+    if (!type) return this.#resources;
+    return this.#resources[type];
   }
 
   getFreePlayerSlot() {

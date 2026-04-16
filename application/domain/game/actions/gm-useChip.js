@@ -4,15 +4,16 @@
   player.initEvent({
     name: 'useChipEvent',
     data: {
-      chip: game.get(chipId),
+      chipId,
     },
     init: function () {
-      const { game, player, data: { chip } = {} } = this.eventContext();
+      const { game, player, data: { chipId } = {} } = this.eventContext();
+      const chip = game.get(chipId);
 
       const eventData = { company: {}, player: {}, deck: {}, chip: {} };
       for (const player of game.players()) {
         for (const company of player.decks.company.items() || []) {
-          if (company.played || company.subtype !== chip.value) continue;
+          if (!company.is('construction') && (company.played || company.subtype !== chip.value)) continue;
 
           eventData.company[company.id()] = { selectable: true };
         }
@@ -24,14 +25,24 @@
         }
 
         const outer = { chip: {}, deck: {} };
+        let hasConstruction = false;
         for (const company of player.decks.company.items() || []) {
+          if (company.is('construction')) hasConstruction = true;
           const outerDeck = company.decks.outer;
           const outerChip = outerDeck.items()[0];
           if (outerChip) outer.chip[outerChip.id()] = { selectable: true };
           else outer.deck[outerDeck.id()] = { selectable: true };
         }
-        if (Object.keys(outer.chip).length === 0) Object.assign(eventData.deck, outer.deck);
-        else Object.assign(eventData.chip, outer.chip);
+        if (hasConstruction) {
+          if (Object.keys(outer.chip).length > 1) Object.assign(eventData.chip, outer.chip);
+          else {
+            Object.assign(eventData.deck, outer.deck);
+            Object.assign(eventData.chip, outer.chip);
+          }
+        } else {
+          if (Object.keys(outer.chip).length > 0) Object.assign(eventData.chip, outer.chip);
+          else Object.assign(eventData.deck, outer.deck);
+        }
       }
 
       eventData.controlBtn = { label: 'Отменить действие', resetEvent: true };
@@ -44,13 +55,13 @@
               text: 'Удалить',
               code: 'DELETE_CHIP',
               gameMasterAction: true,
-              eventData: { chipId: chip.id() },
+              eventData: { chipId },
             },
             {
               text: 'Зарезервировать',
               code: 'RESERVE_CHIP',
               gameMasterAction: true,
-              eventData: { chipId: chip.id() },
+              eventData: { chipId },
             },
           ],
         },
@@ -58,7 +69,8 @@
     },
     handlers: {
       TRIGGER({ target }) {
-        const { game, player, data: { chip } = {} } = this.eventContext();
+        const { game, player, data: { chipId } = {} } = this.eventContext();
+        const chip = game.get(chipId);
 
         if (target) {
           if (target.matches?.({ className: 'Deck' })) {
@@ -75,7 +87,6 @@
             return this.emit('RESET', { success: true });
           }
           if (target.matches?.({ className: 'Player' })) {
-            const chipId = chip.id();
             const deckPlayerId = chip.findParent({ className: 'Player' }).id();
 
             if (chip.ownerId) game.get(chip.ownerId).set({ acquired: { chip: { [chipId]: null } } });
@@ -89,7 +100,7 @@
             return this.emit('RESET', { success: true });
           }
 
-          this.data.target = target;
+          this.data.targetId = target.id();
 
           player.set({
             staticHelper: {
@@ -103,7 +114,7 @@
 
           return { preventListenerRemove: true };
         }
-        target = this.data.target;
+        target = game.get(this.data.targetId);
 
         if (player !== target.getPlayer()) {
           player.set({ acquired: { company: { [target.id()]: null } } });
@@ -111,8 +122,22 @@
 
         this.emit('RESET');
 
-        const event = target.play({ player });
-        if (event) event.setHandler('SUCCESS', () => chip.delete());
+        if (target.is('construction')) {
+          if (!target.getEvent(chip.value)) {
+            player.notifyUser(`Событие карты <a>${target.title}</a> не найдено`, { displayForced: true });
+            return;
+          }
+
+          const event = target.initEvent(chip.value, {
+            ...{ game, player, allowedPlayers: [player] },
+            onSuccess: () => chip.delete(),
+          });
+
+          if (event) {
+            event.name = this.title;
+            if (player) player.addEvent(event);
+          }
+        } else target.play({ player, onSuccess: () => chip.delete() });
       },
       RESET() {
         const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();

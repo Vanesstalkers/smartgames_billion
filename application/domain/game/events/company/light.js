@@ -3,7 +3,7 @@
     // text: 'Игрок делает еще один ход вне очереди',
   },
   data: {
-    sourceDeck: null,
+    sourceDeckId: null,
     targetPlayerId: null,
     price: null,
   },
@@ -36,16 +36,17 @@
   },
   handlers: {
     TRIGGER({ target }) {
-      const { game, player } = this.eventContext();
+      const { game, player, data: { sourceDeckId, targetPlayerId } = {} } = this.eventContext();
+      const sourceDeck = game.get(sourceDeckId);
 
-      if (!this.data.sourceDeck) {
-        this.data.sourceDeck = target;
+      if (!sourceDeckId) {
+        this.data.sourceDeckId = target.id();
 
         const eventData = { deck: null, company: {} };
-        const players = this.data.targetPlayerId ? [game.get(this.data.targetPlayerId)] : game.players();
+        const players = targetPlayerId ? [game.get(targetPlayerId)] : game.players();
         for (const player of players) {
           for (const company of player.decks.company.items()) {
-            if (this.data.sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
+            if (sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
             if (company.foreignResources().length > 0) continue; // нельзя менять на предприятие с чужими ресурсами
 
             eventData.company[company.id()] = { selectable: true };
@@ -58,7 +59,7 @@
         const oldCompany = target;
         const targetPlayer = oldCompany.findParent({ className: 'Player' });
         const outerChip = oldCompany.decks.outer.items()[0];
-        const newCompany = this.data.sourceDeck.getRandomItem();
+        const newCompany = sourceDeck.getRandomItem();
 
         oldCompany.moveToTarget(game.decks[oldCompany.subtype]);
         newCompany.moveToTarget(targetPlayer.decks.company, { restoreResources: true });

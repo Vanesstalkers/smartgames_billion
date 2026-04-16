@@ -46,11 +46,13 @@
     this._ensureCompanyDecks();
 
     const player = this.findParent({ className: 'Player' });
-    const resources = domain.game.configs.cards({ mapFormat: true });
     const currentResourcesCount = this.decks.inner.items().length;
     const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
     for (let i = 0; i < maxResourcesCount - currentResourcesCount; i++) {
-      this.decks.inner.addItem({ value: this.subtype, title: resources[this.subtype].title });
+      this.decks.inner.addItem({
+        value: this.subtype,
+        title: this.game().resources(this.subtype).title,
+      });
     }
   }
 
@@ -59,5 +61,9 @@
       .items()
       .filter((item) => item.ownerId)
       .concat(this.decks.outer.items().filter((item) => item.ownerId));
+  }
+
+  is(subtype) {
+    return this.subtype === subtype;
   }
 });

@@ -1,19 +1,20 @@
-(function ({ chipId, subtype } = {}, player) {
+(function ({ chipId, selectedChipSubtype } = {}, player) {
   const game = this;
 
-  if (subtype) {
-    return player.handleEventWithTriggerListener('TRIGGER', { subtype });
+  if (selectedChipSubtype) {
+    return player.handleEventWithTriggerListener('TRIGGER', { selectedChipSubtype });
   }
 
   player.initEvent({
     name: 'useChipEvent',
     data: {
-      chip: game.get(chipId),
+      chipId,
     },
     init: function () {
-      const { game, player } = this.eventContext();
+      const { game, player, data: { chipId } = {} } = this.eventContext();
+      const chip = game.get(chipId);
 
-      if (this.data.chip.value === 'mining') {
+      if (chip.value === 'mining') {
         if (game.isTraining()) {
           player.notifyUser({ message: 'В режиме тренировочной игры эта услуга не доступна' });
           return { resetEvent: true };
@@ -24,13 +25,13 @@
 
       const eventData = { company: {}, player: {} };
       for (const company of player.decks.company.items() || []) {
-        if (company.played || company.subtype !== this.data.chip.value) continue;
+        if (!company.is('construction') && (company.played || company.value !== chip.value)) continue;
 
         eventData.company[company.id()] = { selectable: true };
       }
       for (const [companyId, { playerId }] of Object.entries(player.acquired?.company || {})) {
         const company = game.get(companyId);
-        if (company.played || company.subtype !== this.data.chip.value) continue;
+        if (company.played || company.subtype !== chip.value) continue;
         eventData.player[playerId] = { selectable: true };
         eventData.company[companyId] = { selectable: true };
       }
@@ -45,10 +46,11 @@
     },
     handlers: {
       TRIGGER({ target }) {
-        const { game, player } = this.eventContext();
+        const { game, player, data: { targetId, chipId } = {} } = this.eventContext();
+        const chip = game.get(chipId);
 
         if (target) {
-          this.data.target = target;
+          this.data.targetId = target.id();
 
           player.set({
             staticHelper: {
@@ -62,7 +64,7 @@
 
           return { preventListenerRemove: true };
         }
-        target = this.data.target;
+        target = game.get(targetId);
 
         if (player !== target.getPlayer()) {
           player.set({ acquired: { company: { [target.id()]: null } } });
@@ -70,7 +72,22 @@
 
         this.emit('RESET');
 
-        target.play({ player, onSuccess: () => this.data.chip.delete() });
+        if (target.is('construction')) {
+          if (!this.getEvent(chip.value)) {
+            player.notifyUser(`Событие карты <a>${this.title}</a> не найдено`, { displayForced: true });
+            return;
+          }
+
+          const event = target.initEvent(chip.value, {
+            ...{ game, player, allowedPlayers: [player] },
+            onSuccess: () => chip.delete(),
+          });
+
+          if (event) {
+            event.name = this.title;
+            if (player) player.addEvent(event);
+          }
+        } else target.play({ player, onSuccess: () => chip.delete() });
       },
       RESET() {
         const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
