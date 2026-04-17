@@ -97,7 +97,7 @@
       top: 4px;
     }
 
-    &:not(.empty) .card-event {
+    &:not(.empty) .card-event:not(.disabled) {
       &:hover {
         cursor: pointer;
         box-shadow: inset 0 0 0 4px #f4e205;

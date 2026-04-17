@@ -1,12 +1,13 @@
-(function ({ companyCardId, player } = {}, initPlayer) {
+(function ({ companyCardId, targetPlayerId } = {}, initPlayer) {
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
+  if(!targetPlayerId) targetPlayerId = player.id();
 
   player.initEvent({
     name: 'takeChipEvent',
     data: {
       companyCardId,
-      targetPlayerId: player.id() || initPlayer.id(),
+      targetPlayerId,
     },
     init: function () {
       const { game, player } = this.eventContext();

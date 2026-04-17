@@ -17,7 +17,6 @@
           eventData.company[card.id()] = { selectable: true };
         }
 
-        eventData.playDisabled = true;
         eventData.controlBtn = { label: 'Помочь выбрать', triggerEvent: true };
         player.activate({ setData: { eventData } });
         player.setEventWithTriggerListener(this);
@@ -77,7 +76,7 @@
           player.deactivate({
             setData: {
               staticHelper: null,
-              eventData: { deck: null, company: null, controlBtn: null, playDisabled: null },
+              eventData: { deck: null, company: null, controlBtn: null, playDisabled: true },
             },
             setDataConfig: { reset: ['eventData.controlBtn', 'staticHelper'] },
           });

@@ -8,7 +8,7 @@
       v-bind="baseCardBindings"
       v-on="$listeners"
       @click.native.stop="triggerCardEvent"
-      :class="{ selectable: isSelectable }"
+      :class="{ selectable: isSelectable, disabled: isDisabled }"
     >
       <template #additional>
         <div class="chips-overlay">
@@ -131,6 +131,9 @@ export default {
     isSelectable() {
       return this.player.eventData.company?.[this.cardId]?.selectable;
     },
+    isDisabled() {
+      return this.card.disabled || this.sessionPlayer().eventData.playDisabled;
+    },
     outedDeckSelectable() {
       return this.player.eventData.deck?.[this.outedDeck?._id]?.selectable;
     },
@@ -146,6 +149,8 @@ export default {
   },
   methods: {
     async triggerCardEvent() {
+      if (this.isDisabled) return;
+
       if (this.deckEvent) {
         await this.deckEvent(this.deck);
         return;
@@ -168,6 +173,8 @@ export default {
       return this.player.eventData.chip?.[chipId]?.selectable;
     },
     async triggerChipEvent(chipId) {
+      if (this.isDisabled) return;
+
       if (this.isChipSelectable(chipId)) {
         await this.handleGameApi({
           name: 'eventTrigger',
@@ -186,6 +193,7 @@ export default {
         .map(([id]) => id);
     },
     async triggerOutedDeckEvent() {
+      if (this.isDisabled) return;
       if (!this.outedDeckSelectable) return;
 
       await this.handleGameApi({

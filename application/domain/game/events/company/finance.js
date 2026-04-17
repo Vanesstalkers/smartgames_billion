@@ -70,11 +70,13 @@
         }
       }
 
-      const companyDeck = game.get(this.data.companyDeckId);
-      companyDeck.getRandomItem().moveToTarget(targetPlayer.decks.company, { restoreResources: true });
-      targetPlayer.set({ money: targetPlayer.money - this.data.price });
+      this.emit('RESET', { success: true });
 
-      return this.emit('RESET', { success: true });
+      game.run(
+        'buyCompany',
+        { player: targetPlayer, deck: game.get(this.data.companyDeckId), price: this.data.price },
+        player
+      );
     },
     RESET({ success } = {}) {
       const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();

@@ -1,5 +1,10 @@
 <template>
-  <game :debug="false" :gamePlaneFillWidth="0.2" :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]">
+  <game
+    :debug="false"
+    :gamePlaneFillWidth="0.2"
+    :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]"
+    :roulette="rouletteTable.value?.split('-')[0] || ''"
+  >
     <template
       #gameplane="{
         /* game = {}, gamePlaneScale */

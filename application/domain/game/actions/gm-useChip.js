@@ -1,5 +1,9 @@
-(function ({ chipId } = {}, player) {
+(function ({ chipId, selectedChipSubtype } = {}, player) {
   const game = this;
+
+  if (selectedChipSubtype) {
+    return player.handleEventWithTriggerListener('TRIGGER', { selectedChipSubtype });
+  }
 
   player.initEvent({
     name: 'useChipEvent',
@@ -101,10 +105,11 @@
           }
 
           this.data.targetId = target.id();
-
+          
           player.set({
+            eventData: { company: null, player: null, deck: null, chip: null },
             staticHelper: {
-              text: `Подтверждаете использование услуги <a>${target.getTitle()}</a>?`,
+              text: `Подтверждаете использование услуги <a>${chip.title}</a>?`,
               buttons: [
                 { text: 'Подтвердить', triggerEvent: true },
                 { text: 'Отменить', resetEvent: true },
@@ -123,8 +128,8 @@
         this.emit('RESET');
 
         if (target.is('construction')) {
-          if (!target.getEvent(chip.value)) {
-            player.notifyUser(`Событие карты <a>${target.title}</a> не найдено`, { displayForced: true });
+          if (!domain.game.events?.company?.[chip.value]) {
+            player.notifyUser(`Событие предприятия <a>${chip.title}</a> не найдено`, { displayForced: true });
             return;
           }
 

@@ -5,7 +5,7 @@
   player.initEvent({
     name: 'rouletteChipEvent',
     data: {
-      rouletteChipId,
+      rouletteChipId: chipId,
     },
     init() {
       const { game, player, data: { rouletteChipId } = {} } = this.eventContext();
@@ -19,8 +19,7 @@
       if (Object.keys(eventData.chip).length === 0) {
         eventData.player = {};
         for (const p of game.players().filter((p) => p !== player)) {
-          if (p.getAvailableChipsByValue(rouletteChip.value).length > 0)
-            eventData.player[p.id()] = { highlight: true };
+          if (p.getAvailableChipsByValue(rouletteChip.value).length > 0) eventData.player[p.id()] = { highlight: true };
         }
 
         if (Object.keys(eventData.player).length === 0) {

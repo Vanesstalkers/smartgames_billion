@@ -1,5 +1,10 @@
 <template>
-  <base-card v-bind="baseCardBindings" v-on="$listeners" :class="{ 'buster-card': true, selectable: isSelectable }">
+  <base-card
+    :canPlay="!isDisabled"
+    v-bind="baseCardBindings"
+    v-on="$listeners"
+    :class="{ 'buster-card': true, selectable: isSelectable }"
+  >
     <template #additional v-if="chip._id">
       <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
     </template>
@@ -48,6 +53,9 @@ export default {
     },
     isSelectable() {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
+    },
+    isDisabled() {
+      return this.card.disabled || this.sessionPlayer().eventData.playDisabled;
     },
     baseCardBindings() {
       return {

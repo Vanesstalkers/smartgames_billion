@@ -14,21 +14,21 @@
       const { game, player, data: { chipId } = {} } = this.eventContext();
       const chip = game.get(chipId);
 
-      if (chip.value === 'mining') {
-        if (game.isTraining()) {
-          player.notifyUser({ message: 'В режиме тренировочной игры эта услуга не доступна' });
-          return { resetEvent: true };
-        }
-        player.notifyUser({ message: 'Услуга временно недоступна' });
-        return { resetEvent: true };
-      }
-
       const eventData = { company: {}, player: {} };
+      let constructionCompany;
       for (const company of player.decks.company.items() || []) {
-        if (!company.is('construction') && (company.played || company.value !== chip.value)) continue;
+        if (company.is('construction')) {
+          constructionCompany = company;
+          continue;
+        }
+        if (company.played || company.subtype !== chip.value) continue;
 
         eventData.company[company.id()] = { selectable: true };
       }
+      if (Object.keys(eventData.company).length == 0 && constructionCompany) {
+        eventData.company[constructionCompany.id()] = { selectable: true };
+      }
+
       for (const [companyId, { playerId }] of Object.entries(player.acquired?.company || {})) {
         const company = game.get(companyId);
         if (company.played || company.subtype !== chip.value) continue;
@@ -73,8 +73,8 @@
         this.emit('RESET');
 
         if (target.is('construction')) {
-          if (!this.getEvent(chip.value)) {
-            player.notifyUser(`Событие карты <a>${this.title}</a> не найдено`, { displayForced: true });
+          if (!domain.game.events?.company?.[chip.value]) {
+            player.notifyUser(`Событие предприятия <a>${chip.title}</a> не найдено`, { displayForced: true });
             return;
           }
 

@@ -21,31 +21,43 @@
 
       const player = this.selectNextActivePlayer();
 
-      const eventData = { playDisabled: true, controlBtn: { label: 'Крутить рулетку' } };
+      const eventData = { playDisabled: null, controlBtn: { label: 'Крутить рулетку' } };
+      if (gameMaster) {
+        gameMaster.set({ eventData });
+        eventData.playDisabled = true;
+      }
       player.activate({ notifyUser: 'Твой ход', setData: { eventData } });
-      if (gameMaster) gameMaster.set({ eventData });
 
       this.rollAllDicecubes();
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
-      const companyCount = player.decks.company.itemsCount();
-      const hasLightCompany = player.companyCount({ type: 'light' }) > 0;
+      if (player.companyCount({ type: 'light' }) > 0) incomeChange++;
 
       let income = player.income + incomeChange;
       if (income < 0) income = 0;
+      const maxIncome = player.maxIncome();
+      if (income > maxIncome) income = maxIncome;
 
-      if (hasLightCompany) {
-        income++;
-        if (income > 10) income = 10;
-      } else {
-        if (companyCount == 1 && income > 6) income = 6;
-        if (companyCount == 2 && income > 8) income = 8;
-        if (companyCount >= 3 && income > 10) income = 10;
-      }
       player.set({ income });
 
       result.newRoundLogEvents.push(
-        `На кубиках выпали значения: <a>${this.dicecubes.white.value} (белый)</a> и <a>${this.dicecubes.black.value} (чёрный)</a>`
+        `На кубиках выпали значения: <a style="color:white">${this.dicecubes.white.value}</a> и <a style="color:dimgray">${this.dicecubes.black.value}</a>`
       );
+
+      const needRestoreResources = player.needRestoreResources();
+      const needRestoreIncome = player.income < player.maxIncome();
+      if (needRestoreResources || needRestoreIncome) {
+        player.set({
+          eventData: { deal: { skipRound: true } },
+          staticHelper: {
+            text: `Доступные действия:`,
+            buttons: [
+              needRestoreResources ? { text: 'Восстановить ресурсы', code: 'RESTORE_RESOURCES' } : null,
+              needRestoreIncome ? { text: 'Восстановить доход', code: 'RESTORE_INCOME' } : null,
+              { text: 'Закрыть', code: 'DO_NOTHING', exit: true },
+            ],
+          },
+        });
+      }
 
       for (const player of this.players({ ai: true })) {
         if (!player.active) continue;
@@ -70,22 +82,16 @@
       roulette.spin();
 
       const eventData = {
-        playDisabled: true,
         controlBtn: { label: 'Завершить раунд' },
         chip: { [roulette.chip().id()]: { selectable: true } },
       };
-      roundActivePlayer.activate({ setData: { eventData } });
       if (gameMaster) {
         gameMaster.set({ eventData });
-        roundActivePlayer.set({ eventData: { chip: null } });
+        eventData.playDisabled = true;
       }
+      roundActivePlayer.activate({ setData: { eventData } });
 
-      const [card] = this.select({
-        ...{ className: 'Card', directParent: false },
-        attr: { name: roulette.chip().value },
-      });
-
-      result.newRoundLogEvents.push(`На рулетке выпало значение <a>${card?.title}</a>`);
+      result.newRoundLogEvents.push(`На рулетке выпало значение <a>${roulette.chip().title}</a>`);
 
       result.roundStep = 'ROUND_END';
       return result;

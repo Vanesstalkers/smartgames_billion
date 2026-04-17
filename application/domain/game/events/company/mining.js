@@ -5,6 +5,15 @@
   init: function () {
     const { game, player } = this.eventContext();
 
+    if (game.isTraining()) {
+      player.notifyUser({ message: 'В режиме тренировочной игры эта услуга не доступна' });
+      return { resetEvent: true };
+    }
+    if(game.roulettes.main.chip()?.value !== 'mining') {
+      player.notifyUser({ message: 'Услуга не активна при текущем значении рулетки' });
+      return { resetEvent: true };
+    }
+
     if (player.gameMaster) {
       const eventData = { player: {} };
       for (const player of game.players()) {
@@ -15,7 +24,7 @@
     }
 
     game.decks.buster.moveRandomItems({ count: 1, target: player.decks.buster });
-    
+
     return { resetEvent: { success: true } };
   },
   handlers: {

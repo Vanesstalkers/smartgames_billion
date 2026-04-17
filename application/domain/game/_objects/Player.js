@@ -103,4 +103,16 @@
       userId: this.userId,
     });
   }
+
+  needRestoreResources() {
+    for (const company of this.decks.company.items()) {
+      if (company.needRestoreResources()) return true;
+    }
+    return false;
+  }
+  maxIncome() {
+    const hasLightCompany = this.companyCount({ type: 'light' }) > 0;
+    const companyCount = this.decks.company.itemsCount();
+    return hasLightCompany ? 10 : companyCount == 1 ? 6 : companyCount == 2 ? 8 : 10;
+  }
 });

@@ -22,7 +22,6 @@
               :key="card.id"
               :cardId="card.id"
               :cardGroup="'company'"
-              :canPlay="canPlay(card)"
               :myCard="iam"
               :imgExt="'png'"
               :class="{ 'acquired-company': card.acquired }"
@@ -179,13 +178,6 @@ export default {
         await this.handleGameApi({ name: 'dealAction', data: { ...button } });
       }
     },
-    canPlay(card) {
-      const playerAvailable =
-        (this.sessionPlayerIsActive() || this.player.eventData.canPlay) && !this.player.eventData.playDisabled;
-      const deckAvailable = !card.deck.eventData.playDisabled;
-
-      return this.iam && playerAvailable && deckAvailable;
-    },
     async playBusterCard() {
       console.log('playBusterCard');
     },
@@ -262,7 +254,7 @@ export default {
 .player-helper {
   position: absolute;
   right: 0px;
-  bottom: 170px;
+  bottom: 240px;
 
   .static-helper.helper-link {
     position: absolute;

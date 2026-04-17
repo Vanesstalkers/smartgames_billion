@@ -161,7 +161,7 @@
         player.notifyUser({ message: `Вы приобрели бустер за <a>${price}₽</a>` });
       } else {
         this.run('buyCompany', { player, deck, price }, player);
-        player.set({ staticHelper: null, eventData: { deal: null } });
+        player.set({ eventData: { deal: null } });
       }
 
       return;
@@ -196,6 +196,26 @@
       }
       break;
     }
+    case 'RESTORE_RESOURCES': {
+      player.initEvent(domain.game.events.restoreResources(), { game, player });
+      return;
+    }
+    case 'RESTORE_INCOME': {
+      player.set({ income: player.maxIncome() });
+
+      game.set({ roundStep: 'ROUND_END' });
+      player.set(
+        {
+          staticHelper: { text: `Ход завершен по причине восстановления дохода` },
+          eventData: { playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+        },
+        { reset: ['staticHelper'] }
+      );
+      return;
+    }
+    case 'DO_NOTHING':
+      player.set({ eventData: { deal: null } });
+      break;
   }
 
   player.set({ staticHelper: null });

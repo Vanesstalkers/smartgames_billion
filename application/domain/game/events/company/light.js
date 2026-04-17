@@ -15,6 +15,7 @@
 
     const eventData = { deck: {} };
     for (const deck of Object.values(game.decks)) {
+      if (deck.type !== 'company') continue;
       if (deck.items().length === 0) continue;
       eventData.deck[deck.id()] = { selectable: true };
     }
@@ -46,7 +47,7 @@
         const players = targetPlayerId ? [game.get(targetPlayerId)] : game.players();
         for (const player of players) {
           for (const company of player.decks.company.items()) {
-            if (sourceDeck.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
+            if (target.subtype === company.subtype) continue; // нельзя менять на такое же предприятие
             if (company.foreignResources().length > 0) continue; // нельзя менять на предприятие с чужими ресурсами
 
             eventData.company[company.id()] = { selectable: true };
@@ -80,6 +81,17 @@
         { eventData: { controlBtn, deck: null, company: null, deal: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
+
+      if (success && this.data.price) {
+        game.set({ roundStep: 'ROUND_END' });
+        player.set(
+          {
+            staticHelper: { text: `Ход завершен по причине замены предприятия` },
+            eventData: { playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+          },
+          { reset: ['staticHelper'] }
+        );
+      }
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
