@@ -27,15 +27,14 @@
                     :code="busterDropDeck.code"
                   >
                     <div class="deck-cards-stack" :style="deckSingleFaceStackStyle()">
-                      <company-card
+                      <buster-card
                         class="deck-card-layer deck-card--top"
                         :content="deckItemCount(busterDropDeck)"
                         :cardData="{
-                          name: busterDropDeck.subtype,
-                          group: 'company',
+                          played: true,
+                          group: 'buster',
                         }"
                         :imgExt="'png'"
-                        :deckEvent="null"
                         :deck="busterDropDeck"
                       />
                     </div>
@@ -53,12 +52,12 @@
                     :code="busterDeck.code"
                   >
                     <div class="deck-cards-stack" :style="deckSingleFaceStackStyle()">
-                      <company-card
+                      <buster-card
                         class="deck-card-layer deck-card--top"
                         :content="deckItemCount(busterDeck)"
                         :cardData="{
-                          name: busterDeck.subtype,
-                          group: 'company',
+                          disabled: true,
+                          group: 'buster',
                         }"
                         :imgExt="'png'"
                         :deckEvent="deckItemCount(busterDeck) !== 0 ? useDeck : null"
@@ -76,11 +75,8 @@
                       v-for="card in rouletteBusterCards"
                       :key="card.id"
                       :cardId="card.id"
+                      :cardGroup="'buster'"
                       :content="card.title"
-                      :cardData="{
-                        name: 'buster',
-                        group: 'company',
-                      }"
                       :imgExt="'png'"
                     />
                   </div>
@@ -265,7 +261,7 @@ export default {
       );
     },
     deckList() {
-      return Object.keys(this.game.deckMap).map((id) => this.store.deck?.[id]) || [];
+      return Object.keys(this.game?.deckMap || {}).map((id) => this.store.deck?.[id]) || [];
     },
     /** Колода бустеров рядом с кубиками, не на дуге вокруг рулетки. */
     busterDeck() {
@@ -441,6 +437,10 @@ export default {
       width: 100px;
       height: 140px;
       margin-bottom: 0px;
+
+      &.played {
+        filter: none;
+      }
     }
   }
 }

@@ -1,14 +1,11 @@
 <template>
-  <base-card
-    :canPlay="!isDisabled"
-    v-bind="baseCardBindings"
-    v-on="$listeners"
-    :class="{ 'buster-card': true, selectable: isSelectable }"
-  >
-    <template #additional v-if="chip._id">
-      <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
-    </template>
-  </base-card>
+  <div :class="{ 'buster-card': true, selectable: isSelectable }">
+    <base-card :canPlay="!isDisabled" v-bind="baseCardBindings" v-on="$listeners" @click.native.stop="triggerCardEvent">
+      <template #additional v-if="chip._id">
+        <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
+      </template>
+    </base-card>
+  </div>
 </template>
 
 <script>
@@ -25,8 +22,11 @@ export default {
   },
   props: {
     cardId: String,
+    cardData: Object,
     canPlay: Boolean,
     myCard: Boolean,
+    deckEvent: Function,
+    deck: Object,
   },
   setup() {
     return inject('gameGlobals');
@@ -45,6 +45,10 @@ export default {
       return this.sessionPlayer();
     },
     card() {
+      if (this.cardData) {
+        if (!this.cardData.eventData) this.cardData.eventData = {};
+        return this.cardData;
+      }
       const card = this.store.card?.[this.cardId];
       return card?._id ? card : { _id: this.cardId };
     },
@@ -55,7 +59,6 @@ export default {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
     },
     isDisabled() {
-      console.log("this.card", this.card)
       return this.card.played || this.card.disabled || this.sessionPlayer().eventData.playDisabled;
     },
     baseCardBindings() {
@@ -68,24 +71,12 @@ export default {
     },
   },
   methods: {
-    async playCard() {
-      await this.handleGameApi(
-        {
-          name: 'playCard',
-          data: {
-            cardId: this.cardId,
-            targetPlayerId: this.$parent.playerId,
-          },
-        },
-        {
-          onSuccess: () => {
-            this.preventDoubleClick = false;
-          },
-          onError: () => {
-            this.preventDoubleClick = false;
-          },
-        }
-      );
+    async triggerCardEvent() {
+      console.log('triggerCardEvent', this.deckEvent);
+      if (this.deckEvent) {
+        await this.deckEvent(this.deck);
+        return;
+      }
     },
   },
 };
@@ -98,18 +89,23 @@ export default {
   background-size: contain;
   background-repeat: no-repeat;
 
-  &:before {
-    box-shadow: inset 0px 10px 20px 0px #111;
-    padding: 4px 0px 0px 0px;
-    font-size: 10px;
-    text-shadow: none;
-    color: white;
-    top: 0px;
-    position: absolute;
+  .card-event {
     width: 100%;
-    text-align: center;
-    height: 20px;
-    border-radius: 10px;
+    height: 100%;
+    &:before {
+      display: none;
+      box-shadow: inset 0px 10px 20px 0px #111;
+      padding: 4px 0px 0px 0px;
+      font-size: 10px;
+      text-shadow: none;
+      color: white;
+      top: 0px;
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      height: 20px;
+      border-radius: 10px;
+    }
   }
 
   .chip {

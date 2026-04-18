@@ -32,11 +32,8 @@
               v-for="card in busterCards"
               :key="card.id"
               :cardId="card.id"
+              :cardGroup="'buster'"
               :content="card.title"
-              :cardData="{
-                name: 'buster',
-                group: 'company',
-              }"
               :imgExt="'png'"
               :canPlay="iam && sessionPlayerIsActive()"
               :_playCard="playBusterCard"
@@ -129,7 +126,7 @@ export default {
     busterCards() {
       const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
       const cards = deck
-        ? Object.entries(deck.itemMap).map(([id, { group }]) => ({ id, group, deck, ...this.store.card?.[id] }))
+        ? Object.keys(deck.itemMap).map((id) => ({ id, deck, ...this.store.card?.[id] }))
         : [];
       return cards;
     },
@@ -142,8 +139,8 @@ export default {
         .filter(({ placement }) => placement !== 'table')
         .reduce((arr, deck) => {
           return arr.concat(
-            Object.entries(deck.itemMap).map(([id, { group }]) => {
-              return { id, group, deck, acquired: this.sessionPlayer().acquired?.company?.[id] };
+            Object.keys(deck.itemMap).map((id) => {
+              return { id, deck, acquired: this.sessionPlayer().acquired?.company?.[id] };
             })
           );
         }, [])

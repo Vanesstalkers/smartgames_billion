@@ -21,18 +21,12 @@
     border-radius: 50%;
   }
 
-  &[name='buster'],
-  &[name='buster_drop'] {
+  &[name='buster'] {
     width: 94px;
     height: 130px;
     font-size: 60px;
     background-size: contain;
     background-repeat: no-repeat;
-
-    &[name='buster_drop'] {
-      width: 47px;
-      height: 65px;
-    }
   }
 }
 
@@ -84,8 +78,41 @@
         .card-event {
           height: 100%;
           width: 100%;
+
+          &:before {
+            display: block;
+            font-size: 60px;
+            box-shadow: inset 0px -20px 20px 0px #111;
+            border-radius: 50%;
+            color: #ff5900;
+            text-shadow: 4px 4px 0 #fff;
+            position: absolute;
+            top: 24px;
+            left: 0px;
+            height: 60px;
+            width: 70px;
+            left: 8px;
+            padding-right: 8px;
+          }
         }
       }
+
+      /* &[code='Deck[card_buster_drop]'] {
+        filter: grayscale(1);
+
+        .card-event {
+          &:before {
+            font-size: 30px;
+            color: white;
+            text-shadow: none;
+            font-weight: bold;
+          }
+          &:hover {
+            box-shadow: none;
+            cursor: default;
+          }
+        }
+      } */
     }
 
     .deck-card-layer:not(.deck-card--top) .card-event:before {
@@ -107,41 +134,6 @@
       }
     }
 
-    &[code='Deck[card_buster]'],
-    &[code='Deck[card_buster_drop]'] {
-      .company-card {
-        background-image: none;
-
-        .card-event {
-          &:before {
-            position: relative;
-            left: 4px;
-            font-size: 60px;
-            box-shadow: inset 0px -20px 20px 0px #111;
-            padding: 8px 10px 0px 0px;
-            border-radius: 50%;
-          }
-        }
-      }
-    }
-
-    &[code='Deck[card_buster_drop]'] {
-      filter: grayscale(1);
-
-      .card-event {
-        &:before {
-          font-size: 30px;
-          color: white;
-          text-shadow: none;
-          font-weight: bold;
-        }
-        &:hover {
-          box-shadow: none;
-          cursor: default;
-        }
-      }
-    }
-
     &.selectable {
       border-radius: 10px;
 
@@ -155,6 +147,10 @@
       position: absolute;
       top: -40px;
       left: calc(50% - 13px);
+
+      &.selectable .chip-face {
+        box-shadow: 0 0 10px 6px yellow;
+      }
     }
   }
 }

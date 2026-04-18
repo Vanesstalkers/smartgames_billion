@@ -67,7 +67,7 @@ export default {
       return this.game.gameConfig === 'training';
     },
     rouletteId() {
-      return Object.keys(this.game.rouletteMap)[0] || '';
+      return Object.keys(this.game.rouletteMap || {})[0] || '';
     },
     roulette() {
       return this.game.store.roulette[this.rouletteId] || {};
