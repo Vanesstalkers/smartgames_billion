@@ -23,7 +23,7 @@
     deck.removeAllItems({ markDelete: true });
 
     const value = this.value.split('-')[0];
-    const title = domain.game.configs.cards().find((card) => card.name === value).title;
+    const title = this.resources(value).title;
     deck.addItem({ value, title });
   }
 

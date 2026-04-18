@@ -21,7 +21,7 @@
             break;
           }
           case 'setIncome': {
-            targetPlayer.set({ income: amount });
+            targetPlayer.updateIncome(amount);
             break;
           }
         }

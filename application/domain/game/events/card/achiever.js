@@ -5,7 +5,8 @@
     superPos: true,
   },
   init: function () {
-    const { game, player } = this.eventContext();
+    const { game, player, source: card } = this.eventContext();
+    this.emit('FAILED');
     return { resetEvent: true };
   },
   handlers: {

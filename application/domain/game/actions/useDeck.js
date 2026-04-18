@@ -5,6 +5,15 @@
   if (game.status !== 'IN_PROCESS') throw new Error('Действие доступно только после начала игры');
   if (deck.items().length === 0) throw new Error('В колоде нет доступных предприятий');
 
+  const { blockedByStrategist: blocked } = deck.eventData;
+  if (blocked && !blocked[player.id()] && !player.gameMaster) {
+    const owners = Object.keys(blocked)
+      .map((id) => `<a>${game.get(id).userName}</a>`)
+      .join(', ');
+    const ownersText = Object.keys(blocked).length > 1 ? 'владельцы' : 'владелец';
+    throw new Error(`Это предприятие заблокировано бустером СТРАТЕГ (${ownersText}: ${owners})`);
+  }
+
   let text = '',
     buttons = [],
     price = 0;
@@ -16,7 +25,8 @@
       { text: 'Отказаться', code: 'DECLINE_DEAL' },
     ];
   } else {
-    if (player.eventData.deck?.[deckId]?.selectable) { // finance-card event
+    if (player.eventData.deck?.[deckId]?.selectable) {
+      // finance-card event
       player.handleEventWithTriggerListener('TRIGGER', { targetId: deckId });
       player.set({ eventData: { deal: null } });
       return;

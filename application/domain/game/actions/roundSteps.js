@@ -37,7 +37,7 @@
       const maxIncome = player.maxIncome();
       if (income > maxIncome) income = maxIncome;
 
-      player.set({ income });
+      player.updateIncome(income);
 
       result.newRoundLogEvents.push(
         `На кубиках выпали значения: <a style="color:white">${this.dicecubes.white.value}</a> и <a style="color:dimgray">${this.dicecubes.black.value}</a>`
@@ -46,17 +46,24 @@
       const needRestoreResources = player.needRestoreResources();
       const needRestoreIncome = player.income < player.maxIncome();
       if (needRestoreResources || needRestoreIncome) {
-        player.set({
-          eventData: { deal: { skipRound: true } },
-          staticHelper: {
-            text: `Доступные действия:`,
-            buttons: [
-              needRestoreResources ? { text: 'Восстановить ресурсы', code: 'RESTORE_RESOURCES' } : null,
-              needRestoreIncome ? { text: 'Восстановить доход', code: 'RESTORE_INCOME' } : null,
-              { text: 'Закрыть', code: 'DO_NOTHING', exit: true },
-            ],
-          },
-        });
+        const staticHelper = {
+          text: `Доступные действия при моментальном завершении хода:`,
+          buttons: [
+            needRestoreResources ? { text: 'Восстановить ресурсы', code: 'RESTORE_RESOURCES' } : null,
+            needRestoreIncome ? { text: 'Восстановить доход', code: 'RESTORE_INCOME' } : null,
+            { text: 'Закрыть', code: 'DO_NOTHING', exit: true },
+          ],
+        };
+        const eventData = { deal: { skipRound: true } };
+
+        if (player.income === 0) {
+          eventData.bankrupt = true;
+          eventData.controlBtn = null;
+          staticHelper.text = `Вы банкрот, для продолжения хода необходимо восстановить доход. ` + staticHelper.text;
+          staticHelper.buttons = staticHelper.buttons.filter((b) => b && b.code !== 'DO_NOTHING');
+        }
+
+        player.set({ eventData, staticHelper });
       }
 
       for (const player of this.players({ ai: true })) {

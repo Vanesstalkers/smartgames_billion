@@ -30,10 +30,6 @@
   });
   player.notifyUser({ message: `Вы приобрели предприятие <a>${company.title}</a> за <a>${price}₽</a>` });
 
-  if (company.is('construction') && player.getOuterDecksChips().length < 2) {
-    game.run('takeChip', { companyCardId: company.id(), targetPlayerId: player.id() }, initPlayer);
-  }
-
   game.set({ roundStep: 'ROUND_END' });
   player.set(
     {
@@ -42,4 +38,8 @@
     },
     { reset: ['staticHelper'] }
   );
+
+  if (company.is('construction') && player.getOuterDecksChips().length < 2) {
+    game.run('takeChip', { companyCardId: company.id(), targetPlayerId: player.id() }, initPlayer);
+  }
 });

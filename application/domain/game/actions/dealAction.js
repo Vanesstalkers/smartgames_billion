@@ -201,7 +201,7 @@
       return;
     }
     case 'RESTORE_INCOME': {
-      player.set({ income: player.maxIncome() });
+      player.updateIncome(player.maxIncome());
 
       game.set({ roundStep: 'ROUND_END' });
       player.set(

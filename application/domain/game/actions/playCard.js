@@ -5,9 +5,7 @@
   const card = this.get(cardId);
 
   try {
-    // throw new Error('not implemented');
     card.play({ player, logMsg: `Игрок <b>{{player}}<b/> активировал услугу <a>${card.getTitle()}</a>.` });
-    // card.moveToTarget(this.decks.active);
   } catch (error) {
     this.logs(error.message);
     player.notifyUser(error.message);

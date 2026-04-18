@@ -55,7 +55,8 @@ export default {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
     },
     isDisabled() {
-      return this.card.disabled || this.sessionPlayer().eventData.playDisabled;
+      console.log("this.card", this.card)
+      return this.card.played || this.card.disabled || this.sessionPlayer().eventData.playDisabled;
     },
     baseCardBindings() {
       return {

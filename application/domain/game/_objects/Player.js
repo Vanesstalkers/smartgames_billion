@@ -115,4 +115,14 @@
     const companyCount = this.decks.company.itemsCount();
     return hasLightCompany ? 10 : companyCount == 1 ? 6 : companyCount == 2 ? 8 : 10;
   }
+  updateIncome(income) {
+    this.set({ income });
+
+    if (income > 0 && this.eventData.bankrupt) {
+      this.set(
+        { eventData: { bankrupt: null, playDisabled: null, controlBtn: { label: 'Крутить рулетку' } } },
+        { reset: ['eventData.controlBtn'] }
+      );
+    }
+  }
 });

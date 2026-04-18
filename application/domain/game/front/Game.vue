@@ -82,7 +82,6 @@
                         group: 'company',
                       }"
                       :imgExt="'png'"
-                      :canPlay="false"
                     />
                   </div>
                 </div>
@@ -97,7 +96,6 @@
                 deck: true,
                 drop: deck.code.includes('_drop'),
                 selectable: player.eventData.deck?.[deck._id]?.selectable === true,
-                'selectable-chip': player.eventData.deck?.[deck._id]?.selectable === 'chip',
                 empty: deckItemCount(deck) === 0,
               }"
               :code="deck.code"
@@ -120,7 +118,16 @@
                   :deck="deck"
                 />
               </div>
-              <chip :chipId="'fake'" :value="deck.subtype" :size="26" :on-click="() => useDeckChip(deck)" />
+              <chip
+                :chipData="{
+                  _id: 'fake',
+                  selectable: player.eventData.deck?.[deck._id]?.selectable === 'chip',
+                  eventData: { playEnabled: player.eventData.deck?.[deck._id]?.selectable === 'chip' },
+                }"
+                :value="deck.subtype"
+                :size="26"
+                :on-click="() => useDeckChip(deck)"
+              />
             </div>
           </div>
         </div>
@@ -270,7 +277,7 @@ export default {
     },
     /** Нижняя дуга без колод buster и buster_drop. */
     deckListOrbit() {
-      return (this.deckList || []).filter((d) => d && d.subtype !== 'buster' && d.subtype !== 'buster_drop');
+      return (this.deckList || []).filter((d) => d && d.type === 'company');
     },
     dicecubesIds() {
       return Object.keys(this.game.dicecubeMap) || [];

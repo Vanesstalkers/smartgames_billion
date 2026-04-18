@@ -57,6 +57,7 @@
           { type: 'company', subtype: 'it', title: 'Информационные технологии' },
           { type: 'company', subtype: 'construction', title: 'Строительство' },
           { type: 'card', subtype: 'buster', title: 'Бустеры', hasDrop: true },
+          { type: 'chipBank', subtype: 'chipBank', itemType: 'chip', access: 'all' },
         ],
       },
     },

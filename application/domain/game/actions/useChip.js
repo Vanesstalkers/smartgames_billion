@@ -54,7 +54,7 @@
 
           player.set({
             staticHelper: {
-              text: `Подтверждаете использование услуги <a>${target.getTitle()}</a>?`,
+              text: `Подтверждаете использование услуги <a>${chip.title}</a>?`,
               buttons: [
                 { text: 'Подтвердить', triggerEvent: true },
                 { text: 'Отменить', resetEvent: true },

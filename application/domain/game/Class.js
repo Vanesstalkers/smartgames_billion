@@ -57,4 +57,14 @@
       player.returnTableCardsToHand();
     }
   }
+
+  addNewChip(subtype) {
+    const chip = { value: subtype, title: this.resources(subtype).title };
+    return this.decks.chipBank.addItem(chip);
+  }
+  addRandomChip() {
+    const resources = Object.keys(this.resources());
+    const subtype = resources[Math.floor(Math.random() * resources.length)];
+    return this.addNewChip(subtype);
+  }
 });

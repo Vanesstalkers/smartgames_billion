@@ -1,20 +1,23 @@
 (function (data) {
-  const store = this.getStore();
-  const { Player: playerClass, Card: deckItemClass, CompanyCard } = this.defaultClasses();
-  const player = new playerClass(data, { parent: this });
-  this.set({ playerMap: { [player._id]: {} } });
+  const game = this;
+  const store = game.getStore();
+  const { Player: playerClass, Card: deckItemClass, CompanyCard } = game.defaultClasses();
+
+  const player = new playerClass(data, { parent: game });
+  game.set({ playerMap: { [player._id]: {} } });
 
   if (data.deckMap) {
     data.deckList = [];
     for (const _id of Object.keys(data.deckMap)) data.deckList.push(store.deck[_id]);
   }
   for (const item of data.deckList || []) {
-    // if (!item.access) item.access = { [player._id]: {} };
     player.addDeck(item, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
   }
 
-  for (const player of this.players({ readyOnly: false })) {
-    player.decks.company.set({ access: this.playerMap });
+  game.decks.chipBank.set({ access: game.playerMap });
+  
+  for (const player of game.players({ readyOnly: false })) {
+    player.decks.company.set({ access: game.playerMap });
   }
 
   return player;

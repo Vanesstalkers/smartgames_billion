@@ -32,7 +32,7 @@
       if (companyCount >= 3 || hasLightCompany) income = 10;
       else if (companyCount == 2) income = 8;
 
-      target.set({ income });
+      target.updateIncome(income);
 
       return this.emit('RESET', { success: true });
     },

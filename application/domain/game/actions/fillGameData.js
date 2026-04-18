@@ -36,6 +36,8 @@
     data.playerList = data.settings.playerList;
   }
   for (const item of data.playerList || []) this.run('addPlayer', item);
+
+  // не работает, так как игроки добавляются динамически
   for (const player of this.players({ readyOnly: false })) {
     for (const deck of player.select({ className: 'Deck' })) {
       if (deck.access === 'all') {
@@ -51,8 +53,10 @@
     data.deckList = data.settings.deckList;
   }
   for (const item of data.deckList || []) {
-    if (item.access === 'all') item.access = this.playerMap;
-    const deck = this.addDeck(item, { deckItemClass: item.type === 'company' ? CompanyCard : deckItemClass });
+    if (item.access === 'all') item.access = this.playerMap; // не работает, так как игроки добавляются динамически
+    const deck = this.addDeck(item, {
+      deckItemClass: item.type === 'company' ? CompanyCard : item.itemType === 'chip' ? Chip : deckItemClass,
+    });
 
     if (newGame) {
       const cardsToRemove = this.settings.cardsToRemove || [];
