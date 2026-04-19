@@ -11,7 +11,9 @@
       .map((id) => `<a>${game.get(id).userName}</a>`)
       .join(', ');
     const ownersText = Object.keys(blocked).length > 1 ? 'владельцы' : 'владелец';
-    throw new Error(`Это предприятие заблокировано бустером СТРАТЕГ (${ownersText}: ${owners})`);
+    const notifyText = `Это предприятие заблокировано бустером <a>СТРАТЕГ</a> (${ownersText}: ${owners})`;
+    player.notifyUser(notifyText, { displayForced: true });
+    return;
   }
 
   let text = '',

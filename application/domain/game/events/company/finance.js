@@ -14,7 +14,8 @@
     for (const deck of Object.values(game.decks)) {
       if (deck.type !== 'company') continue;
       if (deck.items().length === 0) continue;
-      if (deck.blocked && !deck.blocked[player.id()] && !player.gameMaster) continue;
+      if (deck.eventData.blockedByStrategist && !deck.eventData.blockedByStrategist[player.id()] && !player.gameMaster)
+        continue;
 
       eventData.deck[deck.id()] = { selectable: true };
     }

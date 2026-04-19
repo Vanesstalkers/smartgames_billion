@@ -22,8 +22,8 @@
   }
 
   &[name='buster'] {
-    width: 94px;
-    height: 130px;
+    width: 100px;
+    height: 140px;
     font-size: 60px;
     background-size: contain;
     background-repeat: no-repeat;
@@ -69,12 +69,12 @@
 
     &[code='Deck[card_buster]'],
     &[code='Deck[card_buster_drop]'] {
+      margin-bottom: -10px;
+
       .deck-cards-stack {
         height: 140px !important;
       }
       .deck-card-layer.deck-card--top {
-        height: 140px;
-
         .card-event {
           height: 100%;
           width: 100%;
@@ -96,23 +96,11 @@
           }
         }
       }
-
-      /* &[code='Deck[card_buster_drop]'] {
-        filter: grayscale(1);
-
-        .card-event {
-          &:before {
-            font-size: 30px;
-            color: white;
-            text-shadow: none;
-            font-weight: bold;
-          }
-          &:hover {
-            box-shadow: none;
-            cursor: default;
-          }
+      &[code='Deck[card_buster]'] {
+        .card-event.played {
+          filter: none;
         }
-      } */
+      }
     }
 
     .deck-card-layer:not(.deck-card--top) .card-event:before {

@@ -31,7 +31,7 @@
                         class="deck-card-layer deck-card--top"
                         :content="deckItemCount(busterDropDeck)"
                         :cardData="{
-                          played: true,
+                          disabled: true,
                           group: 'buster',
                         }"
                         :imgExt="'png'"
@@ -56,12 +56,13 @@
                         class="deck-card-layer deck-card--top"
                         :content="deckItemCount(busterDeck)"
                         :cardData="{
-                          disabled: true,
+                          played: true,
                           group: 'buster',
                         }"
                         :imgExt="'png'"
                         :deckEvent="deckItemCount(busterDeck) !== 0 ? useDeck : null"
                         :deck="busterDeck"
+                        :myCard="true"
                       />
                     </div>
                   </div>
@@ -136,13 +137,6 @@
           {{ game.statusLabel }}
           <small v-if="game.status === 'RESTORING_GAME'">{{ subStatusLabel }}</small>
         </div>
-      </div>
-    </template>
-
-    <template #shown-card="{ closeCardInfo } = {}">
-      <div class="shown-card scroll-off" v-on:click.stop="closeCardInfo">
-        <div class="close" v-on:click.stop="closeCardInfo" />
-        <img class="img" :name="state.shownCard.code" />
       </div>
     </template>
 
@@ -433,13 +427,13 @@ export default {
     display: flex;
     gap: 14px;
 
-    .card-event {
-      width: 100px;
-      height: 140px;
-      margin-bottom: 0px;
+    .buster-card {
+      .card-event {
+        margin-bottom: 0px;
 
-      &.played {
-        filter: none;
+        &.played {
+          filter: none;
+        }
       }
     }
   }
@@ -475,5 +469,9 @@ export default {
     margin-top: -2px;
     margin-bottom: 2px;
   }
+}
+
+.shown-card.group-buster {
+  border-radius: 10px;
 }
 </style>

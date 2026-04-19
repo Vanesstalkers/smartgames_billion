@@ -4,6 +4,7 @@
     round: roundNumber,
     roulettes: { main: roulette },
   } = this;
+  const round = rounds[roundNumber];
   const gameMaster = this.gameMaster();
   const roundActivePlayer = this.roundActivePlayer();
   const result = { newRoundLogEvents: [], newRoundNumber: roundNumber };
@@ -29,6 +30,7 @@
       player.activate({ notifyUser: 'Твой ход', setData: { eventData } });
 
       this.rollAllDicecubes();
+
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
       if (player.companyCount({ type: 'light' }) > 0) incomeChange++;
 
@@ -42,6 +44,28 @@
       result.newRoundLogEvents.push(
         `На кубиках выпали значения: <a style="color:white">${this.dicecubes.white.value}</a> и <a style="color:dimgray">${this.dicecubes.black.value}</a>`
       );
+
+      for (const player of this.players()) {
+        if (player.active) continue;
+
+        const busters = player.decks.buster.items().filter((b) => b.name === 'activist');
+        if (busters.length > 0) {
+          if (!round.playersWithActiveBusters) round.playersWithActiveBusters = [];
+          round.playersWithActiveBusters.push(player.id());
+
+          player.activate({
+            notifyUser: 'Ты можешь воспользоваться картой <a>ДЕЯТЕЛЬ</a>',
+            setData: {
+              eventData: {
+                playDisabled: true,
+                enableControlBtn: true,
+                controlBtn: { label: 'Завершить действие' },
+                playEnabledObjects: Object.fromEntries(busters.map((b) => [b.id(), true])),
+              },
+            },
+          });
+        }
+      }
 
       const needRestoreResources = player.needRestoreResources();
       const needRestoreIncome = player.income < player.maxIncome();
@@ -86,7 +110,16 @@
     }
 
     case 'ROULETTE': {
-      roulette.spin();
+      for (const player of this.players()) {
+        for (const company of player.decks.company.items() || []) {
+          company.set({ played: null });
+        }
+        if (round.playersWithActiveBusters?.includes(player.id())) {
+          player.deactivate({ setData: { eventData: { playDisabled: true, playEnabledObjects: null } } });
+        }
+      }
+
+      roulette.spin({ player: roundActivePlayer });
 
       const eventData = {
         controlBtn: { label: 'Завершить раунд' },
@@ -114,12 +147,10 @@
         roulette.set({ eventData: { roundChipId: null } });
       }
 
-      for (const player of this.players()) {
-        for (const company of player.decks.company.items() || []) {
-          company.set({ played: null });
-        }
-      }
-      roundActivePlayer.set({ eventData: { deal: null }, staticHelper: null });
+      roundActivePlayer.set({
+        eventData: { playDisabled: true, enableControlBtn: null, deal: null },
+        staticHelper: null,
+      });
 
       return { ...result, forcedEndRound: true };
     }

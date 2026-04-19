@@ -1,6 +1,12 @@
 <template>
   <div :class="{ 'buster-card': true, selectable: isSelectable }">
-    <base-card :canPlay="!isDisabled" v-bind="baseCardBindings" v-on="$listeners" @click.native.stop="triggerCardEvent">
+    <base-card
+      :canPlay="!isDisabled && !card.played"
+      v-bind="baseCardBindings"
+      v-on="$listeners"
+      @click.native.stop="triggerCardEvent"
+      :class="{ disabled: isDisabled }"
+    >
       <template #additional v-if="chip._id">
         <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
       </template>
@@ -59,7 +65,12 @@ export default {
       return this.player.eventData.buster?.[this.cardId]?.selectable;
     },
     isDisabled() {
-      return this.card.played || this.card.disabled || this.sessionPlayer().eventData.playDisabled;
+      return (
+        !this.myCard ||
+        this.card.disabled ||
+        (this.sessionPlayer().eventData.playDisabled &&
+          !this.sessionPlayer().eventData.playEnabledObjects?.[this.cardId])
+      );
     },
     baseCardBindings() {
       return {
@@ -72,7 +83,8 @@ export default {
   },
   methods: {
     async triggerCardEvent() {
-      console.log('triggerCardEvent', this.deckEvent);
+      if (this.isDisabled) return;
+
       if (this.deckEvent) {
         await this.deckEvent(this.deck);
         return;
@@ -92,6 +104,11 @@ export default {
   .card-event {
     width: 100%;
     height: 100%;
+
+    &.disabled {
+      filter: grayscale(1);
+    }
+
     &:before {
       display: none;
       box-shadow: inset 0px 10px 20px 0px #111;

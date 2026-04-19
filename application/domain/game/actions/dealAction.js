@@ -204,10 +204,17 @@
       player.updateIncome(player.maxIncome());
 
       game.set({ roundStep: 'ROUND_END' });
+      
+      const gameMaster = game.gameMaster();
+      if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
       player.set(
         {
           staticHelper: { text: `Ход завершен по причине восстановления дохода` },
-          eventData: { playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+          eventData: {
+            playDisabled: true,
+            enableControlBtn: gameMaster ? false : true,
+            controlBtn: { label: 'Завершить раунд' },
+          },
         },
         { reset: ['staticHelper'] }
       );

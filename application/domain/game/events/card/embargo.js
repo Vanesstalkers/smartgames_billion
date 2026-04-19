@@ -7,23 +7,53 @@
   init: function () {
     const { game, player, source: card } = this.eventContext();
 
-    card.moveToTarget(game.roulettes.main.decks.buster, { markDelete: true });
+    const eventData = { deck: {} };
+    for (const deck of Object.values(game.decks)) {
+      if (deck.type !== 'company') continue;
+      eventData.deck[deck.id()] = { selectable: 'chip' };
+    }
 
-    const { Chip } = game.defaultClasses();
-    const chip = new Chip({ value: 'art' }, { parent: card });
-    card.set({ eventData: { chipId: chip.id() } });
-    chip.markNew();
-
-    return { resetEvent: true };
+    eventData.controlBtn = { label: 'Помочь выбрать', resetEvent: true };
+    const staticHelper = {
+      text: `Необходимо выбрать тип индустрии, доход которой будет заблокирован`,
+      buttons: null,
+    };
+    player.set({ eventData, staticHelper });
   },
   handlers: {
-    TRIGGER({ target }) {
-      const { game, player } = this.eventContext();
-      this.emit('RESET');
-    },
-    RESET() {
+    TRIGGER({ selectedChipSubtype }) {
       const { game, player, source: card } = this.eventContext();
-      card.set({ played: null });
+      const cardPlayer = card.findParent({ className: 'Player' }); // в player может быть gameMaster
+      const roulette = game.roulettes.main;
+
+      const chip = game.addNewChip(selectedChipSubtype);
+      card.set({ eventData: { chipId: chip.id() } });
+      card.moveToTarget(roulette.decks.buster);
+
+      game.decks[chip.value].set({ eventData: { blockedByStrategist: { [cardPlayer.id()]: true } } });
+
+      this.emit('RESET', { success: true });
+    },
+    RESET({ success = false } = {}) {
+      const { game, player, source: card, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const roulette = game.roulettes.main;
+
+      if (!success) {
+        const chip = game.addRandomChip();
+        card.set({ eventData: { ownerId: player.id(), chipId: chip.id() } });
+        card.moveToTarget(roulette.decks.buster);
+
+        game.decks[chip.value].set({ eventData: { blockedByStrategist: { [player.id()]: true } } });
+
+        success = true;
+      }
+
+      player.set(
+        { eventData: { controlBtn, deck: null }, staticHelper: null },
+        { reset: ['eventData.controlBtn', 'staticHelper'] }
+      );
+
+      this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },
   },

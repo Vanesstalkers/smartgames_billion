@@ -31,10 +31,17 @@
   player.notifyUser({ message: `Вы приобрели предприятие <a>${company.title}</a> за <a>${price}₽</a>` });
 
   game.set({ roundStep: 'ROUND_END' });
+
+  const gameMaster = game.gameMaster();
+  if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
   player.set(
     {
       staticHelper: { text: `Ход завершен по причине покупки предприятия` },
-      eventData: { playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+      eventData: {
+        playDisabled: true,
+        enableControlBtn: gameMaster ? false : true,
+        controlBtn: { label: 'Завершить раунд' },
+      },
     },
     { reset: ['staticHelper'] }
   );

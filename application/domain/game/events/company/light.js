@@ -17,7 +17,8 @@
     for (const deck of Object.values(game.decks)) {
       if (deck.type !== 'company') continue;
       if (deck.items().length === 0) continue;
-      if (deck.blocked && !deck.blocked[player.id()] && !player.gameMaster) continue;
+      if (deck.eventData.blockedByStrategist && !deck.eventData.blockedByStrategist[player.id()] && !player.gameMaster)
+        continue;
 
       eventData.deck[deck.id()] = { selectable: true };
     }
@@ -78,6 +79,7 @@
     },
     RESET({ success } = {}) {
       const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const targetPlayer = game.get(this.data.targetPlayerId);
 
       player.set(
         { eventData: { controlBtn, deck: null, company: null, deal: null }, staticHelper: null },
@@ -86,10 +88,17 @@
 
       if (success && this.data.price) {
         game.set({ roundStep: 'ROUND_END' });
-        player.set(
+
+        const gameMaster = game.gameMaster();
+        if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
+        targetPlayer.set(
           {
             staticHelper: { text: `Ход завершен по причине замены предприятия` },
-            eventData: { playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+            eventData: {
+              playDisabled: true,
+              enableControlBtn: gameMaster ? false : true,
+              controlBtn: { label: 'Завершить раунд' },
+            },
           },
           { reset: ['staticHelper'] }
         );

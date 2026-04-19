@@ -29,23 +29,6 @@
   if (!data.templates) data.templates = { card: 'default' };
   this.templates = data.templates || { card: domain.game.configs.cardTemplates.random() };
 
-  if (data.playerMap) {
-    data.playerList = [];
-    for (const _id of Object.keys(data.playerMap)) data.playerList.push(this.store.player[_id]);
-  } else {
-    data.playerList = data.settings.playerList;
-  }
-  for (const item of data.playerList || []) this.run('addPlayer', item);
-
-  // не работает, так как игроки добавляются динамически
-  for (const player of this.players({ readyOnly: false })) {
-    for (const deck of player.select({ className: 'Deck' })) {
-      if (deck.access === 'all') {
-        deck.access = this.playerMap;
-      }
-    }
-  }
-
   if (data.deckMap) {
     data.deckList = [];
     for (const _id of Object.keys(data.deckMap)) data.deckList.push(this.store.deck[_id]);
@@ -105,6 +88,24 @@
 
     for (const deck of Object.values(this.decks)) {
       roulette.sectorTitle(deck.subtype, deck.title);
+    }
+  }
+
+  // делаем в самом конце, так как в addPlayer идет обращение к game.decks.chipBank, а access === 'all' все равно не работает из-за динамического добавления игроков
+  if (data.playerMap) {
+    data.playerList = [];
+    for (const _id of Object.keys(data.playerMap)) data.playerList.push(this.store.player[_id]);
+  } else {
+    data.playerList = data.settings.playerList;
+  }
+  for (const item of data.playerList || []) this.run('addPlayer', item);
+
+  // не работает, так как игроки добавляются динамически
+  for (const player of this.players({ readyOnly: false })) {
+    for (const deck of player.select({ className: 'Deck' })) {
+      if (deck.access === 'all') {
+        deck.access = this.playerMap;
+      }
     }
   }
 

@@ -15,7 +15,7 @@
       for (const company of player.decks.company.items()) {
         if (company === card) continue;
         if (!company.needRestoreResources()) continue;
-        
+
         eventData.company[company.id()] = { selectable: true };
       }
     }
@@ -48,12 +48,19 @@
 
       if (skipRound) {
         game.set({ roundStep: 'ROUND_END' });
+
+        const gameMaster = game.gameMaster();
+        if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
         player.set(
           {
             staticHelper: { text: `Ход завершен по причине восстановления ресурсов` },
             eventData: {
               deal: null,
-              ...{ playDisabled: true, enableControlBtn: true, controlBtn: { label: 'Завершить раунд' } },
+              ...{
+                playDisabled: true,
+                enableControlBtn: gameMaster ? false : true,
+                controlBtn: { label: 'Завершить раунд' },
+              },
             },
           },
           { reset: ['eventData.deal'] }

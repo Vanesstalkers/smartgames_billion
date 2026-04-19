@@ -33,6 +33,7 @@
               :key="card.id"
               :cardId="card.id"
               :cardGroup="'buster'"
+              :myCard="iam || isGameMaster()"
               :content="card.title"
               :imgExt="'png'"
               :canPlay="iam && sessionPlayerIsActive()"
@@ -52,7 +53,12 @@
       </div>
       <div
         v-if="iam"
-        :class="['player-helper', staticHelper?.text ? 'new-tutorial' : '', helperChecked ? 'helper-checked' : '']"
+        :class="[
+          'player-helper',
+          staticHelper?.text ? 'new-tutorial' : '',
+          helperChecked ? 'helper-checked' : '',
+          `scale-${state.guiScale}`,
+        ]"
       >
         <dialog-helper
           v-if="iam && (staticHelper?.text || staticHelper?.html)"
@@ -125,9 +131,7 @@ export default {
     },
     busterCards() {
       const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
-      const cards = deck
-        ? Object.keys(deck.itemMap).map((id) => ({ id, deck, ...this.store.card?.[id] }))
-        : [];
+      const cards = deck ? Object.keys(deck.itemMap).map((id) => ({ id, deck, ...this.store.card?.[id] })) : [];
       return cards;
     },
     cardDecks() {
@@ -252,6 +256,7 @@ export default {
   position: absolute;
   right: 0px;
   bottom: 240px;
+  transform-origin: bottom right;
 
   .static-helper.helper-link {
     position: absolute;
@@ -268,7 +273,36 @@ export default {
 
     .content {
       width: auto;
+      margin: 0px;
+
+      .controls {
+        bottom: -24px;
+      }
     }
+
+    &.scale-1, &.scale-2, &.scale-3, &.scale-4, &.scale-5 {
+      scale: 1;
+    }
+  }
+
+  &.scale-1 {
+    scale: 0.6;
+  }
+
+  &.scale-2 {
+    scale: 0.8;
+  }
+
+  &.scale-3 {
+    scale: 0.6;
+  }
+
+  &.scale-4 {
+    scale: 0.8;
+  }
+
+  &.scale-5 {
+    scale: 1;
   }
 }
 
@@ -330,19 +364,35 @@ export default {
   }
 }
 
-.hand-cards {
-  display: flex;
-  flex-wrap: nowrap;
-  margin-left: 50px;
+.player-hands {
+  .hand-cards {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-left: 50px;
 
-  &[cardcount='0'] {
-    margin-left: 0px;
+    &[cardcount='0'] {
+      margin-left: 0px;
+    }
+
+    & > .card-event,
+    & > .company-card {
+      margin-left: -40px;
+      margin-bottom: 12px;
+    }
   }
+  .buster-cards {
+    display: flex;
+    padding-bottom: 60px;
+    height: 120px;
+    width: 212px;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: end;
+    gap: 4px;
 
-  & > .card-event,
-  & > .company-card {
-    margin-left: -40px;
-    margin-bottom: 12px;
+    .buster-card {
+      margin-bottom: -80px;
+    }
   }
 }
 
@@ -368,20 +418,6 @@ export default {
 
 .deck-counters b {
   font-size: 42px;
-}
-
-.buster-cards {
-  display: flex;
-  padding-bottom: 60px;
-  height: 120px;
-  width: 212px;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-content: end;
-
-  .buster-card {
-    margin-bottom: -80px;
-  }
 }
 
 .acquired-company {
