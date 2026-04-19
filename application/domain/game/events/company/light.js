@@ -61,7 +61,7 @@
         return { preventListenerRemove: true };
       } else {
         const oldCompany = target;
-        const targetPlayer = oldCompany.findParent({ className: 'Player' });
+        const targetPlayer = oldCompany.getPlayer();
         const outerChip = oldCompany.decks.outer.items()[0];
         const newCompany = sourceDeck.getRandomItem();
 

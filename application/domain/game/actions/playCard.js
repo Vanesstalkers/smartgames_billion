@@ -5,7 +5,8 @@
   const card = this.get(cardId);
 
   try {
-    card.play({ player, logMsg: `Игрок <b>{{player}}<b/> активировал услугу <a>${card.getTitle()}</a>.` });
+    const logMsg = `Игрок <a>${card.getPlayer().userName}</a> активировал услугу <a>${card.getTitle()}</a>.`;
+    card.play({ player, logMsg });
   } catch (error) {
     this.logs(error.message);
     player.notifyUser(error.message);

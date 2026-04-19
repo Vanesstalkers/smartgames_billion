@@ -91,7 +91,7 @@
             return this.emit('RESET', { success: true });
           }
           if (target.matches?.({ className: 'Player' })) {
-            const deckPlayerId = chip.findParent({ className: 'Player' }).id();
+            const deckPlayerId = chip.getPlayer().id();
 
             if (chip.ownerId) game.get(chip.ownerId).set({ acquired: { chip: { [chipId]: null } } });
             chip.set({ ownerId: null });

@@ -11,16 +11,18 @@
 
   switch (this.roundStep) {
     case 'ROUND_START': {
+      const player = this.selectNextActivePlayer();
+
       result.newRoundNumber++;
-      result.newRoundLogEvents.push(`<a>Начало раунда №${result.newRoundNumber}.</a>`);
+      result.newRoundLogEvents.push(
+        `Начало раунда №${result.newRoundNumber}. Ход игрока <a>${player.getUserName()}</a>`
+      );
 
       this.set({ round: result.newRoundNumber }); // без этого не отработает prepareRoundObject -> calcClientMoney
       const round = this.prepareRoundObject();
 
       result.statusLabel = `Раунд ${result.newRoundNumber}`;
       result.roundStep = 'ROULETTE';
-
-      const player = this.selectNextActivePlayer();
 
       const eventData = { playDisabled: null, controlBtn: { label: 'Крутить рулетку' } };
       if (gameMaster) {
@@ -41,37 +43,39 @@
 
       player.updateIncome(income);
 
+      const { white, black } = this.dicecubes;
       result.newRoundLogEvents.push(
-        `На кубиках выпали значения: <a style="color:white">${this.dicecubes.white.value}</a> и <a style="color:dimgray">${this.dicecubes.black.value}</a>`
+        `На кубиках выпали значения: <a style="color:white">${white.value}</a> и <a style="color:dimgray">${black.value}</a>`
       );
 
-      for (const player of this.players()) {
-        if (player.active) continue;
+      if (white.value === black.value) {
+        for (const player of this.players()) {
+          if (player.active) continue;
 
-        const busters = player.decks.buster.items().filter((b) => b.name === 'activist');
-        if (busters.length > 0) {
-          if (!round.playersWithActiveBusters) round.playersWithActiveBusters = [];
-          round.playersWithActiveBusters.push(player.id());
+          const busters = player.decks.buster.items().filter((b) => b.name === 'activist');
+          if (busters.length > 0) {
+            if (!round.playersWithActiveBusters) round.playersWithActiveBusters = [];
+            round.playersWithActiveBusters.push(player.id());
 
-          player.activate({
-            notifyUser: 'Ты можешь воспользоваться картой <a>ДЕЯТЕЛЬ</a>',
-            setData: {
-              eventData: {
-                playDisabled: true,
-                enableControlBtn: true,
-                controlBtn: { label: 'Завершить действие' },
-                playEnabledObjects: Object.fromEntries(busters.map((b) => [b.id(), true])),
-              },
-            },
-          });
+            const eventData = {
+              playDisabled: true,
+              enableControlBtn: true,
+              controlBtn: { label: 'Завершить действие' },
+              playEnabledObjects: Object.fromEntries(busters.map((b) => [b.id(), true])),
+            };
+            player.activate({
+              notifyUser: 'Ты можешь воспользоваться картой <a>ДЕЯТЕЛЬ</a>',
+              setData: gameMaster ? {} : { eventData },
+            });
+          }
         }
       }
 
       const needRestoreResources = player.needRestoreResources();
       const needRestoreIncome = player.income < player.maxIncome();
-      if (needRestoreResources || needRestoreIncome) {
+      if ((needRestoreResources || needRestoreIncome) && !gameMaster) {
         const staticHelper = {
-          text: `Доступные действия при моментальном завершении хода:`,
+          text: `Доступные действия (<a>завершают ход</a>):`,
           buttons: [
             needRestoreResources ? { text: 'Восстановить ресурсы', code: 'RESTORE_RESOURCES' } : null,
             needRestoreIncome ? { text: 'Восстановить доход', code: 'RESTORE_INCOME' } : null,
@@ -115,7 +119,11 @@
           company.set({ played: null });
         }
         if (round.playersWithActiveBusters?.includes(player.id())) {
-          player.deactivate({ setData: { eventData: { playDisabled: true, playEnabledObjects: null } } });
+          player.deactivate({
+            setData: {
+              eventData: { playDisabled: true, playEnabledObjects: null, controlBtn: null, enableControlBtn: null },
+            },
+          });
         }
       }
 

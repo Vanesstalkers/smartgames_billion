@@ -23,7 +23,7 @@
   handlers: {
     TRIGGER({ selectedChipSubtype }) {
       const { game, player, source: card } = this.eventContext();
-      const cardPlayer = card.findParent({ className: 'Player' }); // в player может быть gameMaster
+      const cardPlayer = card.getPlayer(); // в player может быть gameMaster
       const roulette = game.roulettes.main;
 
       const chip = game.addNewChip(selectedChipSubtype);

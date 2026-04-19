@@ -7,7 +7,7 @@
     case 'DELETE_CHIP': {
       const chipId = eventData.chipId;
       const chip = game.get(chipId);
-      const player = chip.findParent({ className: 'Player' });
+      const player = chip.getPlayer();
 
       if (player?.acquired?.chip?.[chipId]) player.set({ acquired: { chip: { [chipId]: null } } });
 

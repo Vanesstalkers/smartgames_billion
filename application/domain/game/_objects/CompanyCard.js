@@ -45,7 +45,7 @@
   restoreResources() {
     this._ensureCompanyDecks();
 
-    const player = this.findParent({ className: 'Player' });
+    const player = this.getPlayer();
     const currentResourcesCount = this.decks.inner.items().length;
     const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
     for (let i = 0; i < maxResourcesCount - currentResourcesCount; i++) {
@@ -56,7 +56,7 @@
     }
   }
   needRestoreResources() {
-    const player = this.findParent({ className: 'Player' });
+    const player = this.getPlayer();
     const currentResourcesCount = this.decks.inner.items().length;
     const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
     return currentResourcesCount < maxResourcesCount;
