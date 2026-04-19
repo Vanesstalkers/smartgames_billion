@@ -108,7 +108,11 @@
 
     for (const key of Object.keys(source)) {
       // без этого рекурсия не дойдет до нужного keyPath в проверке выше
-      if (reset.includes([...keyPath, key].join('.')) && source[key] === null) source[key] = {};
+      let nullSourceKey;
+      if (reset.includes([...keyPath, key].join('.')) && source[key] === null) {
+        source[key] = {};
+        nullSourceKey = true;
+      }
 
       if (masterObj[key] == null) {
         if (source[key] !== null) {
@@ -121,9 +125,13 @@
               config,
               keyPath: [...keyPath, key],
             });
-            if (removeEmptyObject && Object.keys(target[key]).length === 0) {
-              // изменений во вложенном объекте нет (удаляем, чтобы он не перетерся в БД)
-              delete target[key];
+            if (Object.keys(target[key]).length == 0) {
+              if (removeEmptyObject) {
+                // изменений во вложенном объекте нет (удаляем, чтобы он не перетерся в БД)
+                delete target[key];
+              } else if (nullSourceKey) {
+                target[key] = null;
+              }
             }
           } else target[key] = source[key];
         } else if (!deleteNull) target[key] = source[key];

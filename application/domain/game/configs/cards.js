@@ -47,10 +47,8 @@
     // { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
     // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
     // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
-    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
-    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
-    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
-    { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
+    // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
+    // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
     // { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
     // { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
     // { group: 'buster', name: 'embargo', title: 'ЭМБАРГО' }, // +
@@ -63,8 +61,8 @@
     // { group: 'buster', name: 'achiever', title: 'ДОСТИГАТОР' }, // +
     // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' }, // +
     // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' }, // +
-    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
-    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' },
+    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
+    // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
     // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
     // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
     // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },

@@ -43,6 +43,13 @@
     return `Раунд ${this.round} (${label})`;
   }
 
+  getEvent(eventName) {
+    if (!eventName) eventName = this.name;
+    const event = domain.game.events?.company?.[eventName];
+    if (!event) return null;
+    return event();
+  }
+
   removeTableCards() {
     const tableDecks = this.select({ className: 'Deck', attr: { placement: 'table' } });
     for (const deck of tableDecks) {
