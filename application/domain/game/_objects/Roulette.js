@@ -15,7 +15,7 @@
 
     let skipValues = [];
     const busterDeck = game.roulettes.main.decks.buster;
-    const hasEngineeringCompany = player?.companyCount({ type: 'engineering' }) > 0;
+    const hasEngineeringCompany = player?.getCompaniesBySubtype({ type: 'engineering' }).length > 0;
     if (busterDeck && !hasEngineeringCompany) {
       skipValues = busterDeck
         .items()

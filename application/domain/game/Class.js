@@ -45,7 +45,7 @@
 
   getEvent(eventName) {
     if (!eventName) eventName = this.name;
-    const event = domain.game.events?.company?.[eventName];
+    const event = domain.game.events?.company?.[eventName] || domain.game.events?.[eventName];
     if (!event) return null;
     return event();
   }

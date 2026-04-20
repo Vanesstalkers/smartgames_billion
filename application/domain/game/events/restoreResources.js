@@ -1,4 +1,5 @@
-() => ({
+({ skipRound = false } = {}) => ({
+  data: { skipRound },
   init: function () {
     const { game, player, source: card } = this.eventContext();
 
@@ -36,7 +37,6 @@
     },
     RESET({ success } = {}) {
       const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
-      const skipRound = player.eventData.deal?.skipRound || false;
 
       player.set(
         { eventData: { controlBtn, company: null }, staticHelper: null },
@@ -46,7 +46,7 @@
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
 
-      if (skipRound) {
+      if (this.data.skipRound) {
         game.set({ roundStep: 'ROUND_END' });
 
         const gameMaster = game.gameMaster();
@@ -55,7 +55,6 @@
           {
             staticHelper: { text: `Ход завершен по причине восстановления ресурсов` },
             eventData: {
-              deal: null,
               ...{
                 playDisabled: true,
                 enableControlBtn: gameMaster ? false : true,
@@ -63,7 +62,6 @@
               },
             },
           },
-          { reset: ['eventData.deal'] }
         );
       }
     },

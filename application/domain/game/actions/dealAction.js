@@ -197,14 +197,16 @@
       break;
     }
     case 'RESTORE_RESOURCES': {
-      player.initEvent(domain.game.events.restoreResources(), { game, player });
+      player.set({ eventData: { deal: null } });
+      player.initEvent(domain.game.events.restoreResources({ skipRound: true }), { game, player });
       return;
     }
     case 'RESTORE_INCOME': {
+      player.set({ eventData: { deal: null } });
       player.updateIncome(player.maxIncome());
 
       game.set({ roundStep: 'ROUND_END' });
-      
+
       const gameMaster = game.gameMaster();
       if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
       player.set(

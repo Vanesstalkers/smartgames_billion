@@ -12,7 +12,7 @@
 
   company.moveToTarget(decks.company, { restoreResources: true });
 
-  if (player.companyCount({ type: 'chemistry' }) > 0) {
+  if (player.getCompaniesBySubtype({ type: 'chemistry' }).length > 0) {
     for (const company of decks.company.items()) {
       if (company.decks.inner.items().length === 4) continue;
       company.decks.inner.addItem({

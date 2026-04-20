@@ -146,7 +146,6 @@ export default {
       return this.sessionPlayerIsActive() && this.sessionPlayer().eventData?.player?.[this.playerId]?.selectable;
     },
     showControlBtn() {
-      console.log('showControlBtn', this.sessionPlayer().eventData.playDisabled, this.sessionPlayer().eventData.enableControlBtn);
       return (
         ((this.iam && this.sessionPlayerIsActive()) || this.isGameMaster()) &&
         (!this.sessionPlayer().eventData.playDisabled || this.sessionPlayer().eventData.enableControlBtn) &&

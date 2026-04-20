@@ -34,7 +34,7 @@
       this.rollAllDicecubes();
 
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
-      if (player.companyCount({ type: 'light' }) > 0) incomeChange++;
+      if (player.getCompaniesBySubtype({ type: 'light' }).length > 0) incomeChange++;
 
       let income = player.income + incomeChange;
       if (income < 0) income = 0;
@@ -82,7 +82,7 @@
             { text: 'Закрыть', code: 'DO_NOTHING', exit: true },
           ],
         };
-        const eventData = { deal: { skipRound: true } };
+        const eventData = { deal: { fake: true } };
 
         if (player.income === 0) {
           eventData.bankrupt = true;
@@ -155,10 +155,13 @@
         roulette.set({ eventData: { roundChipId: null } });
       }
 
-      roundActivePlayer.set({
-        eventData: { playDisabled: true, enableControlBtn: null, deal: null },
-        staticHelper: null,
-      });
+      roundActivePlayer.set(
+        {
+          eventData: { playDisabled: true, enableControlBtn: null, deal: null },
+          staticHelper: null,
+        }
+        // , { reset: ['eventData.deal'] }
+      );
 
       return { ...result, forcedEndRound: true };
     }

@@ -6,15 +6,17 @@
   },
   init: function () {
     const { game, player } = this.eventContext();
-    return { resetEvent: true };
+
+    this.emit('RESET', { success: true });
+    
+    player.initEvent(domain.game.events.replaceCompany());
   },
   handlers: {
-    TRIGGER({ target }) {
-      const { game, player } = this.eventContext();
-      this.emit('RESET');
-    },
-    RESET() {
+    RESET({ success } = {}) {
       const { game, player, source: card } = this.eventContext();
+
+      if(success) card.moveToDrop();
+      this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },
   },

@@ -39,14 +39,14 @@
     // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
     // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
     // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
-    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' },
-    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
-    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' },
+    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' }, // +
+    // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' }, // +
+    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' }, // +
+    // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' }, // +
     // { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
     // { group: 'buster', name: 'crisis', title: 'КРИЗИС' },
-    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
-    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' },
+    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' }, // +
+    // { group: 'buster', name: 'sabotage', title: 'САБОТАЖ' }, // +
     // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
     // { group: 'buster', name: 'activist', title: 'ДЕЯТЕЛЬ' }, // +
     // { group: 'buster', name: 'alchemist', title: 'АЛХИМИК' },
@@ -63,9 +63,9 @@
     // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' }, // +
     // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
     // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' },
+    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
     // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
     // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' },
     // { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' },

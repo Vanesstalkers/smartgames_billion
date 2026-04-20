@@ -7,7 +7,7 @@
 
   let skipValues = [];
   const busterDeck = game.roulettes.main.decks.buster;
-  if (busterDeck && !player.companyCount({ type: 'engineering' }) > 0) {
+  if (busterDeck && !player.getCompaniesBySubtype({ type: 'engineering' }).length > 0) {
     skipValues = busterDeck
       .items()
       .filter((b) => b.name === 'embargo')

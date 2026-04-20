@@ -1,15 +1,24 @@
-(function ({ chipId } = {}, initPlayer) {
+(function ({ chipId, targetChipId = null } = {}, initPlayer) {
   const game = this;
   const player = initPlayer || game.roundActivePlayer();
+
+  if (player.triggerEventEnabled()) {
+    return player.handleEventWithTriggerListener('TRIGGER', { target: game.get(chipId) });
+  }
 
   player.initEvent({
     name: 'rouletteChipEvent',
     data: {
       rouletteChipId: chipId,
+      targetChipId,
     },
     init() {
-      const { game, player, data: { rouletteChipId } = {} } = this.eventContext();
+      const { game, player, data: { rouletteChipId, targetChipId } = {} } = this.eventContext();
       const rouletteChip = game.get(rouletteChipId);
+      const targetChip = game.get(targetChipId);
+
+      if (targetChip) return this.emit('TRIGGER', { target: targetChip });
+
       const eventData = { chip: {}, deck: {} };
 
       for (const chip of player.getAvailableChipsByValue(rouletteChip.value)) {
@@ -52,7 +61,7 @@
     },
     handlers: {
       TRIGGER({ target, initPlayer: triggerPlayer }) {
-        const { game, player, data: { rouletteChipId } = {} } = this.eventContext();
+        const { game, player, data: { rouletteChipId, targetChipId } = {} } = this.eventContext();
         const rouletteChip = game.get(rouletteChipId);
         const actionPlayer = triggerPlayer || player;
 
@@ -74,7 +83,11 @@
             throw new Error('Этот ресурс принадлежит другому игроку.');
           }
 
-          if (!player.eventData.chip?.[target.id()]?.selectable) throw new Error('Данный ресурс не может быть выбран.');
+          if (
+            !player.eventData.chip?.[target.id()]?.selectable &&
+            !targetChipId // тут будут события бустеров
+          )
+            throw new Error('Данный ресурс не может быть выбран.');
 
           const targetDeck = target.parent();
           targetDeck.removeItem(target, { forceDelete: true });

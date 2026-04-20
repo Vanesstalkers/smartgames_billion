@@ -67,7 +67,7 @@
       cardsToRemove: [],
       autoFinishAfterRoundsOverdue: 10,
       playerStartMoney: 60,
-      playerStartIncome: 6,
+      playerStartIncome: 1,
       playerTemplates: {
         default: {
           deckList: [

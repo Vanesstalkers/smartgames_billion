@@ -9,8 +9,8 @@
     this.set({ money, income, acquired });
   }
 
-  companyCount({ type }) {
-    return this.decks.company.items().filter((company) => company.subtype === type).length;
+  getCompaniesBySubtype({ type }) {
+    return this.decks.company.items().filter((company) => company.subtype === type);
   }
 
   getAvailableChipsByValue(value) {
@@ -92,7 +92,7 @@
   }
 
   processDistributionIncome() {
-    const count = this.companyCount({ type: 'distribution' });
+    const count = this.getCompaniesBySubtype({ type: 'distribution' }).length;
     if (count === 0) return;
 
     const income = count === 1 ? 3 : count === 2 ? 6 : 12;
@@ -111,7 +111,7 @@
     return false;
   }
   maxIncome() {
-    const hasLightCompany = this.companyCount({ type: 'light' }) > 0;
+    const hasLightCompany = this.getCompaniesBySubtype({ type: 'light' }).length > 0;
     const companyCount = this.decks.company.itemsCount();
     return hasLightCompany ? 10 : companyCount == 1 ? 6 : companyCount == 2 ? 8 : 10;
   }

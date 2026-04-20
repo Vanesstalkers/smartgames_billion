@@ -47,7 +47,7 @@
 
     const player = this.getPlayer();
     const currentResourcesCount = this.decks.inner.items().length;
-    const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
+    const maxResourcesCount = player.getCompaniesBySubtype({ type: 'chemistry' }).length > 0 ? 4 : 3;
     for (let i = 0; i < maxResourcesCount - currentResourcesCount; i++) {
       this.decks.inner.addItem({
         value: this.subtype,
@@ -58,7 +58,7 @@
   needRestoreResources() {
     const player = this.getPlayer();
     const currentResourcesCount = this.decks.inner.items().length;
-    const maxResourcesCount = player.companyCount({ type: 'chemistry' }) > 0 ? 4 : 3;
+    const maxResourcesCount = player.getCompaniesBySubtype({ type: 'chemistry' }).length > 0 ? 4 : 3;
     return currentResourcesCount < maxResourcesCount;
   }
 

@@ -1,6 +1,8 @@
 (function ({ cardId } = {}, player) {
   const game = this;
 
+  if (player.triggerEventEnabled()) throw new Error('Необходимо завершить предыдущее действие');
+
   player.initEvent({
     name: 'useCardEvent',
     data: {

@@ -75,7 +75,7 @@
           if (this.data.changeCompanyEvent) {
             this.emit('RESET');
 
-            return player.initEvent(domain.game.events.company.light(), {
+            return player.initEvent(domain.game.events.replaceCompany(), {
               initData: { sourceDeck: deck, targetPlayerId: targetPlayer.id(), price: 10 },
             });
           }
