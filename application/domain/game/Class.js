@@ -24,7 +24,7 @@
   }
 
   getFreePlayerSlot() {
-    const playerCount = this.players().length;
+    const playerCount = this.players({ readyOnly: false }).length;
     if (this.maxPlayersInGame && playerCount >= this.maxPlayersInGame) return null;
 
     const player = this.run('addPlayer', {

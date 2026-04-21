@@ -35,9 +35,13 @@
       this.emit('RESET', { success: true });
     },
     RESET({ success } = {}) {
-      const { game, player, source } = this.eventContext();
+      const { game, player, source: companyCard } = this.eventContext();
+      const companyId = companyCard.id();
 
       player.set({ staticHelper: null });
+      if (success && player.acquired?.company?.[companyId]) {
+        player.set({ acquired: { company: { [companyId]: null } } });
+      }
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

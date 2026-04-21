@@ -169,7 +169,7 @@ export default {
       this.hovered = false;
     },
     async action(button) {
-      console.log('action', button);
+      console.log('action', { button, eventData: this.player.eventData });
       if (button.gameMasterAction) {
         await this.handleGameApi({ name: 'gm-dealAction', data: { ...button } });
       } else if (button.triggerEvent) {
@@ -282,7 +282,11 @@ export default {
       }
     }
 
-    &.scale-1, &.scale-2, &.scale-3, &.scale-4, &.scale-5 {
+    &.scale-1,
+    &.scale-2,
+    &.scale-3,
+    &.scale-4,
+    &.scale-5 {
       scale: 1;
     }
   }

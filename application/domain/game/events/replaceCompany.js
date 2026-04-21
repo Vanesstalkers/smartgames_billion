@@ -78,13 +78,20 @@
       }
     },
     RESET({ success } = {}) {
-      const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const { game, player, source, beforeEventControlBtn: controlBtn } = this.eventContext();
       const targetPlayer = game.get(this.data.targetPlayerId);
 
       player.set(
         { eventData: { controlBtn, deck: null, company: null, deal: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
+
+      if (source.matches({ className: 'CompanyCard' })) {
+        const companyId = source.id();
+        if (success && player.acquired?.company?.[companyId]) {
+          player.set({ acquired: { company: { [companyId]: null } } });
+        }
+      }
 
       if (success && this.data.price) {
         game.set({ roundStep: 'ROUND_END' });

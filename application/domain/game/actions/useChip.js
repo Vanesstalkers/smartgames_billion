@@ -22,6 +22,7 @@
           continue;
         }
         if (company.played || company.subtype !== chip.value) continue;
+        if(!domain.game.events.company[company.subtype]) continue;
 
         eventData.company[company.id()] = { selectable: true };
       }
@@ -32,6 +33,8 @@
       for (const [companyId, { playerId }] of Object.entries(player.acquired?.company || {})) {
         const company = game.get(companyId);
         if (company.played || company.subtype !== chip.value) continue;
+        if(!domain.game.events.company[company.subtype]) continue;
+        
         eventData.player[playerId] = { selectable: true };
         eventData.company[companyId] = { selectable: true };
       }

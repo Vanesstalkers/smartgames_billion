@@ -1,7 +1,7 @@
 (async function ({ targetId } = {}, player) {
   const event = player.initEvent({
     name: 'deal',
-    data: { contractorId: targetId },
+    data: { contractorId: targetId, beforeEnterStaticHelper: lib.utils.structuredClone(player.staticHelper || {}) },
     init() {
       const { game, player, data: { contractorId } = {} } = this.eventContext();
       const contractor = game.get(contractorId);
@@ -153,9 +153,16 @@
         this.emit('RESET');
       },
       RESET() {
-        const { player, beforeEventControlBtn: controlBtn } = this.eventContext();
+        const {
+          player,
+          beforeEventControlBtn: controlBtn,
+          data: { beforeEnterStaticHelper = null } = {},
+        } = this.eventContext();
 
-        player.set({ eventData: { controlBtn }, staticHelper: null }, { reset: ['eventData.controlBtn'] });
+        player.set(
+          { eventData: { controlBtn }, staticHelper: beforeEnterStaticHelper },
+          { reset: ['eventData.controlBtn'] }
+        );
 
         this.destroy();
       },

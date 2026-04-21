@@ -15,7 +15,7 @@
     }
 
     game.decks.buster.moveRandomItems({ count: 1, target: player.decks.buster });
-    
+
     return { resetEvent: { success: true } };
   },
   handlers: {
@@ -27,9 +27,13 @@
       this.emit('RESET', { success: true });
     },
     RESET({ success } = {}) {
-      const { game, player } = this.eventContext();
+      const { game, player, source: companyCard } = this.eventContext();
+      const companyId = companyCard.id();
 
       player.set({ eventData: { player: null }, staticHelper: null });
+      if (success && player.acquired?.company?.[companyId]) {
+        player.set({ acquired: { company: { [companyId]: null } } });
+      }
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

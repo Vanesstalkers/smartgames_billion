@@ -222,6 +222,22 @@
       );
       return;
     }
+    case 'USE_DIPLOMAT': {
+      const { diplomatEvent: { playerId, eventCode } = {} } = player.eventData.deal;
+      const contractor = game.get(playerId);
+      const event = contractor.findEvent({ code: eventCode });
+      const busterId = player.getBusters({ name: 'diplomat' })[0]?.id();
+      event.emit('TRIGGER', {
+        diplomatAction: eventData.doNothing
+          ? { message: null }
+          : busterId
+          ? { busterId }
+          : { message: 'Действие не возможно, так как в руке нет бустера <a>ДИПЛОМАТ</a>' },
+      });
+      player.deactivate().set({ staticHelper: null, eventData: { deal: null } });
+
+      break;
+    }
     case 'DO_NOTHING':
       player.set({ eventData: { deal: null } });
       break;

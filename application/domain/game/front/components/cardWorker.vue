@@ -39,11 +39,7 @@
         <div class="income-plane" />
         <div class="income-value" :style="incomeValueStyle">{{ displayIncome }}</div>
       </div>
-      <div
-        v-if="!iam && !sessionPlayer().eventData.playDisabled"
-        class="handshake-action"
-        @click.stop="onWorkerHandshakeClick"
-      />
+      <div v-if="!isDisabled" class="handshake-action" @click.stop="onWorkerHandshakeClick" />
     </slot>
     <slot name="control" :controlAction="controlAction">
       <div
@@ -184,6 +180,13 @@ export default {
     },
     showLeaveBtn() {
       return (this.iam && this.controlBtn?.leaveGame) || (this.viewerId && !this.isGameMaster());
+    },
+    isDisabled() {
+      return (
+        this.iam ||
+        (this.sessionPlayer().eventData.playDisabled &&
+          !this.sessionPlayer().eventData.playEnabled?.[this.playerId])
+      );
     },
   },
   methods: {

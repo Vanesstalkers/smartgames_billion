@@ -13,6 +13,12 @@
     return this.decks.company.items().filter((company) => company.subtype === type);
   }
 
+  getBusters({ name } = {}) {
+    let busterCards = this.decks.buster.items();
+    if (name) busterCards = busterCards.filter((buster) => buster.name === name);
+    return busterCards;
+  }
+
   getAvailableChipsByValue(value) {
     const game = this.game();
     const result = [];

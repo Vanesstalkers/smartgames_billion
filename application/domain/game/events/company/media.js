@@ -37,12 +37,16 @@
       return this.emit('RESET', { success: true });
     },
     RESET({ success } = {}) {
-      const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const { game, player, source: companyCard, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const companyId = companyCard.id();
 
       player.set(
         { eventData: { controlBtn, player: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
+      if (success && player.acquired?.company?.[companyId]) {
+        player.set({ acquired: { company: { [companyId]: null } } });
+      }
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();

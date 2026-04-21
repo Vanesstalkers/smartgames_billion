@@ -56,7 +56,9 @@
         Object.keys(modifications).length === 0
           ? ''
           : ` (модификаторы: ${Object.entries(modifications)
-              .map(([key, value]) => `${key}: <a style="color:${value > 0 ? 'white' : 'dimgray'}">${Math.abs(value)}</a>`)
+              .map(
+                ([key, value]) => `${key}: <a style="color:${value > 0 ? 'white' : 'dimgray'}">${Math.abs(value)}</a>`
+              )
               .join(', ')})`;
       const incomeChangeText =
         incomeChange > 0
@@ -114,6 +116,11 @@
         player.set({ eventData, staticHelper });
       }
 
+      for (const player of this.players()) {
+        for (const company of player.decks.company.items() || []) {
+          company.set({ played: null });
+        }
+      }
       for (const player of this.players({ ai: true })) {
         if (!player.active) continue;
 
@@ -135,9 +142,6 @@
 
     case 'ROULETTE': {
       for (const player of this.players()) {
-        for (const company of player.decks.company.items() || []) {
-          company.set({ played: null });
-        }
         if (round.playersWithActiveBusters?.includes(player.id())) {
           player.deactivate({
             setData: {

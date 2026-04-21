@@ -36,12 +36,18 @@
       return this.emit('RESET', { success: true });
     },
     RESET({ success } = {}) {
-      const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
+      const { game, player, source, beforeEventControlBtn: controlBtn } = this.eventContext();
 
       player.set(
         { eventData: { controlBtn, company: null }, staticHelper: null },
         { reset: ['eventData.controlBtn', 'staticHelper'] }
       );
+      if (source.matches({ className: 'CompanyCard' })) {
+        const companyId = source.id();
+        if (success && player.acquired?.company?.[companyId]) {
+          player.set({ acquired: { company: { [companyId]: null } } });
+        }
+      }
 
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
@@ -51,18 +57,16 @@
 
         const gameMaster = game.gameMaster();
         if (gameMaster) gameMaster.set({ eventData: { controlBtn: { label: 'Завершить раунд' } } });
-        player.set(
-          {
-            staticHelper: { text: `Ход завершен по причине восстановления ресурсов` },
-            eventData: {
-              ...{
-                playDisabled: true,
-                enableControlBtn: gameMaster ? false : true,
-                controlBtn: { label: 'Завершить раунд' },
-              },
+        player.set({
+          staticHelper: { text: `Ход завершен по причине восстановления ресурсов` },
+          eventData: {
+            ...{
+              playDisabled: true,
+              enableControlBtn: gameMaster ? false : true,
+              controlBtn: { label: 'Завершить раунд' },
             },
           },
-        );
+        });
       }
     },
   },

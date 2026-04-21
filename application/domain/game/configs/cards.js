@@ -36,9 +36,12 @@
 
     // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' }, // +
     // { group: 'buster', name: 'strategist', title: 'СТРАТЕГ' }, // +
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
-    // { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
+    { group: 'buster', name: 'diplomat', title: 'ДИПЛОМАТ' },
     // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' }, // +
     // { group: 'buster', name: 'winner', title: 'ВЫИГРЫВАТЕЛЬ' }, // +
     // { group: 'buster', name: 'solver', title: 'РЕШАТЕЛЬ' }, // +
@@ -63,9 +66,12 @@
     // { group: 'buster', name: 'aggressor', title: 'АГРЕССОР' }, // +
     // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
     // { group: 'buster', name: 'innovator', title: 'ИННОВАТОР' }, // +
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
-    // { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
+    { group: 'buster', name: 'seeker', title: 'ИСКАТЕЛЬ' }, // +
     // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' }, // +
     // { group: 'buster', name: 'expert', title: 'ЭКСПЕРТ' }, // +
     // { group: 'buster', name: 'trainer', title: 'ТРЕНЕР' }, // +
