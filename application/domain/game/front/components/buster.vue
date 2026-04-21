@@ -31,6 +31,7 @@ export default {
     cardData: Object,
     canPlay: Boolean,
     myCard: Boolean,
+    cardEvent: Function,
     deckEvent: Function,
     deck: Object,
   },
@@ -84,6 +85,11 @@ export default {
   methods: {
     async triggerCardEvent() {
       if (this.isDisabled) return;
+
+      if (this.cardEvent) {
+        await this.cardEvent(this.card);
+        return;
+      }
 
       if (this.deckEvent) {
         await this.deckEvent(this.deck);

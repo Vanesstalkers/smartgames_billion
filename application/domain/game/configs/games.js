@@ -67,11 +67,12 @@
       cardsToRemove: [],
       autoFinishAfterRoundsOverdue: 10,
       playerStartMoney: 60,
-      playerStartIncome: 1,
+      playerStartIncome: 6,
       playerTemplates: {
         default: {
           deckList: [
             { type: 'company', subtype: 'company', access: 'all' },
+            { type: 'card', subtype: 'income', access: 'all' },
             { type: 'card', subtype: 'buster' },
           ],
         },

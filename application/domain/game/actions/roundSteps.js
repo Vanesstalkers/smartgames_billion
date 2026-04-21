@@ -34,8 +34,16 @@
       this.rollAllDicecubes();
 
       let incomeChange = this.dicecubes.white.value - this.dicecubes.black.value;
-      if (player.getCompaniesBySubtype({ type: 'light' }).length > 0) incomeChange++;
+      const modifications = {};
 
+      if (player.getCompaniesBySubtype({ type: 'light' }).length > 0) modifications['Легкая промышленность'] = 1;
+
+      const alchemistCardsCount = player.decks.income.items().filter((c) => c.name === 'alchemist').length;
+      const crisisCardsCount = player.decks.income.items().filter((c) => c.name === 'crisis').length;
+      if (alchemistCardsCount > 0) modifications['Алхимик'] = alchemistCardsCount;
+      if (crisisCardsCount > 0) modifications['Кризис'] = -crisisCardsCount;
+
+      incomeChange += Object.values(modifications).reduce((a, b) => a + b, 0);
       let income = player.income + incomeChange;
       if (income < 0) income = 0;
       const maxIncome = player.maxIncome();
@@ -44,8 +52,20 @@
       player.updateIncome(income);
 
       const { white, black } = this.dicecubes;
+      const modificationsText =
+        Object.keys(modifications).length === 0
+          ? ''
+          : ` (модификаторы: ${Object.entries(modifications)
+              .map(([key, value]) => `${key}: <a style="color:${value > 0 ? 'white' : 'dimgray'}">${Math.abs(value)}</a>`)
+              .join(', ')})`;
+      const incomeChangeText =
+        incomeChange > 0
+          ? `увеличился на <a style="color:green">+${incomeChange}</a>`
+          : incomeChange < 0
+          ? `уменьшился на <a style="color:red">${incomeChange}</a>`
+          : `не изменился`;
       result.newRoundLogEvents.push(
-        `На кубиках выпали значения: <a style="color:white">${white.value}</a> и <a style="color:dimgray">${black.value}</a>`
+        `На кубиках выпали значения: <a style="color:white">${white.value}</a> и <a style="color:dimgray">${black.value}</a>. Уровень дохода ${incomeChangeText}${modificationsText}`
       );
 
       if (white.value === black.value) {

@@ -7,10 +7,10 @@
       const game = this.game();
       this.deckMap = data.deckMap;
 
-      const { Chip } = game.defaultClasses();
+      const { Chip, Card } = game.defaultClasses();
       for (const _id of Object.keys(data.deckMap)) {
         const deckData = game.store.deck[_id];
-        const deck = this.addDeck(deckData, { deckItemClass: Chip });
+        const deck = this.addDeck(deckData, { deckItemClass: deckData.itemType === 'chip' ? Chip : Card });
         deck.access = game.playerMap;
       }
     }
@@ -28,17 +28,21 @@
 
     if (this.decks?.outer) this.deleteDeck(this.decks.outer);
     if (this.decks?.inner) this.deleteDeck(this.decks.inner);
+    if (this.decks?.buster) this.deleteDeck(this.decks.buster);
 
     if (config.restoreResources) this.restoreResources();
   }
 
   _ensureCompanyDecks() {
-    const { Chip } = this.game().defaultClasses();
+    const { Chip, Card } = this.game().defaultClasses();
     if (!this.decks?.inner) {
       this.addDeck({ type: 'inner', itemType: 'chip', subtype: 'inner', itemMap: {} }, { deckItemClass: Chip });
     }
     if (!this.decks?.outer) {
       this.addDeck({ type: 'outer', itemType: 'chip', subtype: 'outer', itemMap: {} }, { deckItemClass: Chip });
+    }
+    if (!this.decks?.buster) {
+      this.addDeck({ type: 'buster', itemType: 'card', subtype: 'buster', itemMap: {} }, { deckItemClass: Card });
     }
   }
 

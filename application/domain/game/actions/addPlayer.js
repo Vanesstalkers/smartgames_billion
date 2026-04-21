@@ -18,6 +18,7 @@
   
   for (const player of game.players({ readyOnly: false })) {
     player.decks.company.set({ access: game.playerMap });
+    player.decks.income.set({ access: game.playerMap });
   }
 
   return player;

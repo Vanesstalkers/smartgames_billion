@@ -6,15 +6,28 @@
   },
   init: function () {
     const { game, player } = this.eventContext();
-    return { resetEvent: true };
+
+    const eventData = { player: {} };
+    for (const p of game.players()) {
+      if(p === player) continue;
+      eventData.player[p.id()] = { selectable: true };
+    }
+    player.set({ eventData, staticHelper: { text: 'Против какого игрока нужно использовать бустер?', buttons: null } });
   },
   handlers: {
     TRIGGER({ target }) {
-      const { game, player } = this.eventContext();
-      this.emit('RESET');
-    },
-    RESET() {
       const { game, player, source: card } = this.eventContext();
+
+      card.moveToTarget(target.decks.income);
+
+      this.emit('RESET', { success: true });
+    },
+    RESET({ success = false } = {}) {
+      const { game, player, source: card } = this.eventContext();
+
+      player.set({ eventData: { player: null }, staticHelper: null });
+
+      this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },
   },

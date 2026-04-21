@@ -24,6 +24,17 @@
     </slot>
     <slot v-if="!viewerId" name="custom">
       <div class="income-block">
+        <div v-if="incomeCards.length > 0" class="income-cards">
+          <buster-card
+            v-for="card in incomeCards"
+            :key="card.id"
+            :cardId="card.id"
+            :cardGroup="'buster'"
+            :myCard="true"
+            :content="card.title"
+            :imgExt="'png'"
+          />
+        </div>
         <div class="income-counter" :style="incomeCounterStyle" />
         <div class="income-plane" />
         <div class="income-value" :style="incomeValueStyle">{{ displayIncome }}</div>
@@ -54,8 +65,12 @@
 
 <script>
 import { inject } from 'vue';
+import busterCard from './buster.vue';
 
 export default {
+  components: {
+    busterCard,
+  },
   props: {
     playerId: String,
     viewerId: String,
@@ -135,6 +150,12 @@ export default {
       if (this.displayIncome < 2) backgroundColor = '#be1a2e';
 
       return { backgroundColor };
+    },
+    incomeCards() {
+      const cardDecks = Object.keys(this.player.deckMap || {}).map((id) => this.store.deck?.[id] || {});
+      const deck = cardDecks.find((deck) => deck.subtype === 'income');
+      const cards = deck ? Object.keys(deck.itemMap).map((id) => ({ id, deck, ...this.store.card?.[id] })) : [];
+      return cards;
     },
     controlBtn() {
       return this.player.eventData?.controlBtn || this.viewer.eventData?.controlBtn;
@@ -323,6 +344,16 @@ export default {
       color: #fff;
       text-shadow: 2px 1px 0 #000;
       padding-right: 2px;
+    }
+
+    .income-cards {
+      z-index: -1;
+      position: absolute;
+      bottom: 100%;
+      left: -108px;
+      .buster-card {
+        margin-top: -80px;
+      }
     }
   }
   .handshake-action {

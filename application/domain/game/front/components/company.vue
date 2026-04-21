@@ -1,5 +1,16 @@
 <template>
   <div class="company-card">
+    <div v-if="busterCards.length > 0" class="buster-cards">
+      <buster-card
+        v-for="card in busterCards"
+        :key="card.id"
+        :cardId="card.id"
+        :cardGroup="'buster'"
+        :myCard="true"
+        :imgExt="'png'"
+        :cardEvent="() => triggerBusterCardEvent(card)"
+      />
+    </div>
     <div
       :class="{ 'company-card-background': true, played: card.played, selected: isSelected }"
       :style="{ backgroundImage: getCustomStyle.backgroundImage }"
@@ -59,6 +70,7 @@ import { inject } from 'vue';
 
 import baseCard from '~/lib/game/front/components/card.vue';
 import chip from './chip.vue';
+import busterCard from './buster.vue';
 
 export default {
   name: 'company-card',
@@ -66,6 +78,7 @@ export default {
   components: {
     baseCard,
     chip,
+    busterCard,
   },
   props: {
     customStyle: {
@@ -124,6 +137,11 @@ export default {
     },
     outedDeck() {
       return this.cardDecks.find((d) => d.subtype === 'outer');
+    },
+    busterCards() {
+      const deck = this.cardDecks.find((deck) => deck.subtype === 'buster');
+      const cards = deck ? Object.keys(deck.itemMap).map((id) => ({ id, deck, ...this.store.card?.[id] })) : [];
+      return cards;
     },
     isSelected() {
       return this.cardId === this.gameCustom.selectedCard;
@@ -201,6 +219,11 @@ export default {
         data: { eventData: { targetId: this.outedDeck._id } },
       });
     },
+    async triggerBusterCardEvent(card) {
+      if (this.isDisabled) return;
+
+      await this.handleGameApi({ name: 'useBuster', data: { busterCardId: card._id } });
+    },
   },
 };
 </script>
@@ -228,7 +251,25 @@ export default {
     }
   }
 
-  .card-event {
+  .buster-cards {
+    z-index: -1;
+    position: absolute;
+    top: -40px;
+    right: 24px;
+    scale: 0.5;
+    transform-origin: top right;
+    width: 0px !important;
+
+    .card-event {
+      filter: none;
+      cursor: pointer;
+      &:hover {
+        margin-top: -8px;
+      }
+    }
+  }
+
+  > .card-event {
     background-image: none !important;
     &.played {
       filter: none !important;

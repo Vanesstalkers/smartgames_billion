@@ -254,6 +254,7 @@ export default {
 }
 
 .player-helper {
+  z-index: 10;
   position: absolute;
   right: 0px;
   bottom: 240px;
