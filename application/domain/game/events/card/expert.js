@@ -61,6 +61,9 @@
       }
 
       card.moveToTarget(target.decks.buster);
+      const deck = game.decks[target.subtype];
+      const experts = deck.eventData.experts || [];
+      deck.set({ eventData: { experts: experts.concat(cardOwner.id()) } });
 
       this.emit('RESET', { success: true });
     },

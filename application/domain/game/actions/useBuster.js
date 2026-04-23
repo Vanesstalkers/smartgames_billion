@@ -33,8 +33,19 @@
     },
     handlers: {
       TRIGGER({ target }) {
+        const { game, player } = this.eventContext();
+
         const busterCard = game.get(busterCardId);
+        const companyCard = busterCard.findParent({ className: 'CompanyCard' });
+
+        const prevDeck = game.decks[companyCard.subtype];
+        const deck = game.decks[target.subtype];
+
+        prevDeck.set({ eventData: { experts: prevDeck.eventData.experts.filter((id) => id !== player.id()) } });
+        deck.set({ eventData: { experts: (deck.eventData.experts || []).concat(player.id()) } });
+
         busterCard.moveToTarget(target.decks.buster);
+
         this.emit('RESET', { success: true });
       },
       RESET({ success = false } = {}) {

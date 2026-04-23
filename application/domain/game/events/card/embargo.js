@@ -27,10 +27,8 @@
       const roulette = game.roulettes.main;
 
       const chip = game.addNewChip(selectedChipSubtype);
-      card.set({ eventData: { chipId: chip.id() } });
+      card.set({ eventData: { ownerId: cardPlayer.id(), chipId: chip.id() } });
       card.moveToTarget(roulette.decks.buster);
-
-      game.decks[chip.value].set({ eventData: { blockedByStrategist: { [cardPlayer.id()]: true } } });
 
       this.emit('RESET', { success: true });
     },
@@ -42,8 +40,6 @@
         const chip = game.addRandomChip();
         card.set({ eventData: { ownerId: player.id(), chipId: chip.id() } });
         card.moveToTarget(roulette.decks.buster);
-
-        game.decks[chip.value].set({ eventData: { blockedByStrategist: { [player.id()]: true } } });
 
         success = true;
       }

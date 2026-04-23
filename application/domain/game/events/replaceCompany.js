@@ -63,12 +63,23 @@
         const oldCompany = target;
         const targetPlayer = oldCompany.getPlayer();
         const outerChip = oldCompany.decks.outer.items()[0];
+        const busterCards = oldCompany.decks.buster.items();
         const newCompany = sourceDeck.getRandomItem();
 
         oldCompany.moveToTarget(game.decks[oldCompany.subtype]);
         newCompany.moveToTarget(targetPlayer.decks.company, { restoreResources: true });
 
         if (outerChip) outerChip.moveToTarget(newCompany.decks.outer);
+        if (busterCards.length > 0) {
+          for (const busterCard of busterCards) {
+            const prevDeck = game.decks[oldCompany.subtype];
+            const deck = game.decks[newCompany.subtype];
+            prevDeck.set({ eventData: { experts: prevDeck.eventData.experts.filter((id) => id !== targetPlayerId) } });
+            deck.set({ eventData: { experts: (deck.eventData.experts || []).concat(targetPlayerId) } });
+
+            busterCard.moveToTarget(newCompany.decks.buster);
+          }
+        }
 
         // замена предприятия из useDeck
         if (!this.data.price) this.data.price = targetPlayer.eventData.deal?.price;

@@ -184,8 +184,7 @@ export default {
     isDisabled() {
       return (
         this.iam ||
-        (this.sessionPlayer().eventData.playDisabled &&
-          !this.sessionPlayer().eventData.playEnabled?.[this.playerId])
+        (this.sessionPlayer().eventData.playDisabled && !this.sessionPlayer().eventData.playEnabled?.[this.playerId])
       );
     },
   },
@@ -243,7 +242,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .card-worker {
   position: relative;
   border: 1px solid;
@@ -308,6 +307,7 @@ export default {
     z-index: -1;
     top: -2px;
     right: 0px;
+
     .income-plane {
       position: absolute;
       right: -62px;
@@ -318,7 +318,6 @@ export default {
       background-repeat: no-repeat;
       width: 242px;
       height: 100px;
-      z-index: -1;
       rotate: -90deg;
     }
     .income-counter {
@@ -331,7 +330,6 @@ export default {
       background-repeat: no-repeat;
       width: 58px;
       height: 202px;
-      z-index: -1;
       rotate: -90deg;
     }
     .income-value {
@@ -350,12 +348,26 @@ export default {
     }
 
     .income-cards {
-      z-index: -1;
       position: absolute;
-      bottom: 100%;
-      left: -108px;
+      top: -200px;
+      left: -106px;
+
       .buster-card {
-        margin-top: -80px;
+        position: relative;
+        margin-bottom: -80px;
+
+        > .card-event {
+          outline: 1px solid #333;
+          border-radius: 8px;
+
+          &.selected {
+            z-index: 2;
+          }
+
+          &.played {
+            filter: none;
+          }
+        }
       }
     }
   }

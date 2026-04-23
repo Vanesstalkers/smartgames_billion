@@ -1,11 +1,11 @@
 <template>
-  <div :class="{ 'buster-card': true, selectable: isSelectable }">
+  <div :class="{ 'buster-card': true }">
     <base-card
       :canPlay="!isDisabled && !card.played"
       v-bind="baseCardBindings"
       v-on="$listeners"
       @click.native.stop="triggerCardEvent"
-      :class="{ disabled: isDisabled }"
+      :class="{ disabled: isDisabled, selectable: isSelectable }"
     >
       <template #additional v-if="chip._id">
         <chip :chip-id="chip._id" :value="chip.value" :size="48" subtype="roulette-stop" />
@@ -84,6 +84,11 @@ export default {
   },
   methods: {
     async triggerCardEvent() {
+      if (this.isSelectable) {
+        this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.cardId } } });
+        return;
+      }
+
       if (this.isDisabled) return;
 
       if (this.cardEvent) {

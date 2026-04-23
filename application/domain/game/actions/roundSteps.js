@@ -152,6 +152,25 @@
       }
 
       roulette.spin({ player: roundActivePlayer });
+      const experts = this.decks[roulette.value.split('-')[0]].eventData.experts || [];
+      if (experts.length > 0) {
+        for (const playerId of experts) {
+          if (playerId === roundActivePlayer.id()) continue;
+
+          const money = roundActivePlayer.money;
+          if (money <= 0) continue;
+
+          const player = this.get(playerId);
+          const amount = money >= 6 ? 6 : money;
+          player.set({ money: player.money + amount });
+          roundActivePlayer.set({ money: roundActivePlayer.money - amount });
+
+          this.logs({
+            msg: `Игрок <a>{{player}}</a> получил <a>${amount}₽</a> от <a>${roundActivePlayer.getUserName()}</a> за бустер <a>ЭКСПЕРТ</a>`,
+            userId: player.userId,
+          });
+        }
+      }
 
       const eventData = {
         controlBtn: { label: 'Завершить раунд' },

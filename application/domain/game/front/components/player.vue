@@ -375,6 +375,7 @@ export default {
     display: flex;
     flex-wrap: nowrap;
     margin-left: 50px;
+    margin-right: 10px;
 
     &[cardcount='0'] {
       margin-left: 0px;
@@ -388,7 +389,7 @@ export default {
   }
   .buster-cards {
     display: flex;
-    padding-bottom: 60px;
+    padding-bottom: 70px;
     height: 120px;
     width: 212px;
     flex-direction: column;
@@ -443,6 +444,12 @@ export default {
     }
     // box-shadow: 0 0 10px 10px #f4e205;
   }
+
+  .player-hands {
+    .buster-cards {
+      align-content: start;
+    }
+  }
 }
 .player:not(.iam):not(.selected):not(.hovered) {
   padding-top: 0px;
@@ -487,6 +494,9 @@ export default {
           }
         }
       }
+    }
+    .buster-cards {
+      display: none;
     }
   }
 }
