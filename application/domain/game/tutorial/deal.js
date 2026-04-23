@@ -33,7 +33,21 @@
     text: borrowMoneyStepBodies[repayType],
     input: [{ placeholder: 'Сумма', name: 'amount' }],
     actions: borrowMoneyStepActions,
-    prepare({ step }) {
+    prepare({ step, user }) {
+      const game = lib.store('game').get(user.gameId);
+      const player = game.get(user.playerId);
+      const playerBusters = player.eventData.deal.playerBusters || {};
+      const entries = Object.entries(playerBusters);
+
+      if (entries.length > 0) {
+        step.input.push({
+          type: 'select',
+          name: 'buster',
+          value: entries[0][0],
+          options: entries.map(([name, { title }]) => ({ value: name, label: title })),
+        });
+      }
+
       step.buttons = [
         { text: 'Назад', step: 'borrowRepayChoice', key: null },
         { text: 'Отправить запрос', action: 'TRIGGER', dealType: 'borrowMoney', repayType },

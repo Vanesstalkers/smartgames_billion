@@ -34,6 +34,11 @@
         playerCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 
+      const playerBusters = {};
+      for (const buster of player.decks.buster.items() || []) {
+        playerBusters[buster.name] = { title: buster.title, busterId: buster.id() };
+      }
+
       player.set({
         eventData: {
           deal: {
@@ -42,6 +47,7 @@
             contractorCompanies,
             playerResources,
             playerCompanies,
+            playerBusters,
           },
           controlBtn: { label: 'Отменить сделку', resetEvent: true },
         },

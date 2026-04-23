@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'buster-card': true }">
     <base-card
-      :canPlay="!isDisabled && !card.played"
+      :canPlay="canPlay"
       v-bind="baseCardBindings"
       v-on="$listeners"
       @click.native.stop="triggerCardEvent"
@@ -29,7 +29,7 @@ export default {
   props: {
     cardId: String,
     cardData: Object,
-    canPlay: Boolean,
+    // canPlay: Boolean,
     myCard: Boolean,
     cardEvent: Function,
     deckEvent: Function,
@@ -80,6 +80,12 @@ export default {
         name: this.card?.name || this.card?.subtype || '',
         subtype: this.card?.subtype || '',
       };
+    },
+    canPlay() {
+      if (this.isGameMaster()) return true;
+
+      const correctRoundStep = this.game.roundStep == (this.card.name === 'trainer' ? 'ROULETTE' : 'ROUND_END');
+      return !this.isDisabled && !this.card.played && correctRoundStep && this.game.gameType !== 'master';
     },
   },
   methods: {

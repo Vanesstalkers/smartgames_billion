@@ -447,12 +447,12 @@ export default {
   line-height: 100px;
   margin: 10px;
   color: #ff5900;
-  text-shadow: 4px 4px 0 #fff;
+  text-shadow: 2px 2px 0 #fff;
 }
 .player:not(.iam) {
   .end-round-timer {
     font-size: 32px;
-    bottom: 10px;
+    bottom: 0px;
     height: auto;
     line-height: 32px;
   }

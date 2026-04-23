@@ -42,6 +42,18 @@
           </div>
         </div>
       </div>
+      <div v-if="busterCards.length > 0" class="buster-cards-counter">
+        <buster-card
+          class="deck-card-layer deck-card--top"
+          :content="busterCards.length"
+          :cardData="{
+            played: false,
+            group: 'buster',
+          }"
+          :imgExt="'png'"
+          :myCard="true"
+        />
+      </div>
       <div class="workers">
         <slot name="worker" :playerId="playerId" :viewerId="viewerId" :iam="iam">
           <card-worker :playerId="playerId" :viewerId="viewerId" :iam="iam" :playerSelected="selected">
@@ -464,7 +476,17 @@ export default {
       left: calc(50% - 20px);
     }
     .income-block {
-      display: none;
+      z-index: 1;
+
+      .income-counter,
+      .income-plane {
+        display: none;
+      }
+
+      .income-value {
+        top: 44px;
+        left: -98px;
+      }
     }
   }
   .player-hands {
@@ -499,5 +521,38 @@ export default {
       display: none;
     }
   }
+  .buster-cards-counter {
+    z-index: 2;
+    display: block;
+    position: absolute;
+    top: 29px;
+    left: 44px;
+
+    .buster-card {
+      width: 29px;
+      height: 29px;
+
+      .card-event {
+        border-radius: 50%;
+        background-position: bottom;
+        filter: none;
+
+        &:before {
+          display: block;
+          font-size: 18px;
+          border-radius: 50%;
+          color: #fff;
+          text-shadow: 2px 1px 0 #000;
+          box-shadow: none;
+          position: absolute;
+          left: 0px;
+          padding: 3px 0px 0px 0px;
+        }
+      }
+    }
+  }
+}
+.buster-cards-counter {
+  display: none;
 }
 </style>
