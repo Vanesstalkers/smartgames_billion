@@ -23,7 +23,6 @@
               break;
             }
             case 'resource': {
-              if (group) repay.group = group;
               if (repayChipId) repay.repayChipId = repayChipId;
               const repayChip = game.get(repayChipId);
 
@@ -48,7 +47,6 @@
               break;
             }
             case 'service': {
-              if (group) repay.group = group;
               if (repayCompanyId) repay.repayCompanyId = repayCompanyId;
               acquired.company = { [repayCompanyId]: { playerId: contractorId } };
               game.get(repayCompanyId).set({ ownerId: playerId });

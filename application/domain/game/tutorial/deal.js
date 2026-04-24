@@ -43,7 +43,7 @@
       const playerBusters = player.eventData.deal.playerBusters || {};
       const entries = Object.entries(playerBusters);
 
-      if (entries.length > 0) {
+      if (repayType === 'buster' && entries.length > 0) {
         step.input.push({
           type: 'select',
           name: 'code',
@@ -72,9 +72,8 @@
         `,
         buttons: [
           { text: 'Взять деньги в долг', step: 'borrowRepayChoice', key: null },
-          { text: 'Купить ресурс', step: 'buyResource' },
-          { text: 'Воспользоваться услугой', step: 'useService' },
-          { text: 'Предложить купить бустер', step: 'saleBuster', key: null },
+          { text: 'Купить у игрока ресурс', step: 'buyResource' },
+          { text: 'Использовать услугу игрока', step: 'useService' },
           { text: 'Отмена', action: 'RESET', exit: true },
         ],
         actions: {
@@ -127,16 +126,19 @@
             return;
           }
 
+          if (entries.length > 0) {
+            step.input.push({
+              type: 'select',
+              name: 'code',
+              value: entries[0][0],
+              options: entries.map(([group, { title }]) => ({ value: group, label: title })),
+            });
+          }
+
           step.buttons = [
-            { text: 'Назад', step: 'borrowRepayChoice', icon: ['fas', 'arrow-left'], key: null },
-            ...entries.map(([group, { title }]) => ({
-              group,
-              text: `Вернуть ресурсом: ${title}`,
-              action: 'TRIGGER',
-              dealType: 'borrowMoney',
-              repayType: 'resource',
-            })),
-            { text: 'Отменить сделку', action: 'RESET', exit: true },
+            { text: 'Назад', step: 'borrowRepayChoice', key: null },
+            { text: 'Отправить запрос', action: 'TRIGGER', dealType: 'borrowMoney', repayType: 'resource' },
+            { text: 'Закрыть', action: 'RESET', exit: true },
           ];
         },
         actions: {
@@ -161,7 +163,8 @@
           const entries = Object.entries(playerCompanies);
 
           if (entries.length === 0) {
-            step.text = `<p>У тебя сейчас нет подходящих карт компаний на поле для такого условия возврата. Выбери другой способ или договорись позже.</p>`;
+            step.input = [];
+            step.text = `У тебя нет подходящих для сделки предприятий`;
             step.buttons = [
               { text: 'Назад', step: 'borrowRepayChoice', icon: ['fas', 'arrow-left'], key: null },
               { text: 'Закрыть', action: 'RESET', exit: true },
@@ -169,16 +172,19 @@
             return;
           }
 
+          if (entries.length > 0) {
+            step.input.push({
+              type: 'select',
+              name: 'code',
+              value: entries[0][0],
+              options: entries.map(([group, { title }]) => ({ value: group, label: title })),
+            });
+          }
+
           step.buttons = [
-            { text: 'Назад', step: 'borrowRepayChoice', icon: ['fas', 'arrow-left'], key: null },
-            ...entries.map(([group, { title }]) => ({
-              group,
-              text: `Вернуть услугой: ${title}`,
-              action: 'TRIGGER',
-              dealType: 'borrowMoney',
-              repayType: 'service',
-            })),
-            { text: 'Отменить сделку', action: 'RESET', exit: true },
+            { text: 'Назад', step: 'borrowRepayChoice', key: null },
+            { text: 'Отправить запрос', action: 'TRIGGER', dealType: 'borrowMoney', repayType: 'service' },
+            { text: 'Закрыть', action: 'RESET', exit: true },
           ];
         },
         actions: {
@@ -191,13 +197,6 @@
         buttons: [],
       },
       borrowMoney_buster: makeBorrowMoneyStep('buster'),
-      saleBuster: {
-        superPos: true,
-        bigControls: true,
-        text: `
-        Предложить купить бустер оппоненту.
-      `,
-      },
       buyResource: {
         superPos: true,
         bigControls: true,

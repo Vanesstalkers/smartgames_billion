@@ -25,12 +25,14 @@
       const contractorCompanies = {};
       for (const company of contractor.decks.company.items() || []) {
         if (company.played) continue;
+        if(!domain.game.events.company[company.subtype]) continue;
         contractorCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 
       const playerCompanies = {};
       for (const company of player.decks.company.items() || []) {
         if (company.played) continue;
+        if(!domain.game.events.company[company.subtype]) continue;
         playerCompanies[company.subtype] = { title: company.getTitle(), companyId: company.id() };
       }
 
@@ -89,17 +91,9 @@
             } else if (repayType === 'buster') {
               repayDescription = `Возврат предполагается бустером <a>${game.busters(code).title}</a>.`;
             } else if (repayType === 'resource') {
-              const br = group && player.eventData.deal.playerResources?.[group];
-              const pledgeChip = br ? game.get(br.chipId) : null;
-              repayDescription = pledgeChip
-                ? `Возврат предполагается ресурсом: <a>${pledgeChip.getTitle()}</a>.`
-                : 'Возврат предполагается ресурсом.';
+              repayDescription = `Возврат предполагается ресурсом: <a>${game.resources(code).title}</a>.`;
             } else if (repayType === 'service') {
-              const pc = group && player.eventData.deal.playerCompanies?.[group];
-              const pledgeCo = pc ? game.get(pc.companyId) : null;
-              repayDescription = pledgeCo
-                ? `Возврат предполагается услугой: <a>${pledgeCo.getTitle()}</a>.`
-                : 'Возврат предполагается услугой.';
+              repayDescription = `Возврат предполагается услугой: <a>${game.resources(code).title}</a>.`;
             }
             text = `Игрок <b>${player.userName}</b> просит одолжить деньги в размере <a>${amount}₽</a>.${
               repayDescription ? ` ${repayDescription}` : ''
@@ -121,13 +115,13 @@
         }
 
         let repayChipId;
-        if (repayType === 'resource' && group && player.eventData.deal.playerResources?.[group]) {
-          repayChipId = player.eventData.deal.playerResources[group].chipId;
+        if (repayType === 'resource' && code && player.eventData.deal.playerResources?.[code]) {
+          repayChipId = player.eventData.deal.playerResources[code].chipId;
         }
 
         let repayCompanyId;
-        if (repayType === 'service' && group && player.eventData.deal.playerCompanies?.[group]) {
-          repayCompanyId = player.eventData.deal.playerCompanies[group].companyId;
+        if (repayType === 'service' && code && player.eventData.deal.playerCompanies?.[code]) {
+          repayCompanyId = player.eventData.deal.playerCompanies[code].companyId;
         }
 
         let repayBusterId;

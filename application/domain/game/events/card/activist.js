@@ -5,9 +5,15 @@
     superPos: true,
   },
   busterAction(cardOwner) {
-    const { game, player } = this.eventContext();
+    const { game, player, source: card } = this.eventContext();
     const roundActivePlayer = game.roundActivePlayer();
     const companyCount = roundActivePlayer.decks.company.itemsCount();
+
+    if(player.eventData.playEnabledObjects?.[card.id()]) {
+      player.notifyUser('Бустер можно использовать только при выпадении дубля');
+      this.emit('FAILED');
+      return { resetEvent: true };
+    }
 
     if (cardOwner === roundActivePlayer || companyCount < 2 || cardOwner.money <= 0) {
       player.notifyUser(

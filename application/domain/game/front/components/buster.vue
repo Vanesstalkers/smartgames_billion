@@ -85,7 +85,7 @@ export default {
       if (this.card.played) return false;
       if (this.isGameMaster()) return true;
 
-      const correctRoundStep = this.game.roundStep == (this.card.name === 'trainer' ? 'ROULETTE' : 'ROUND_END');
+      const correctRoundStep = this.card.name === 'activist' || this.game.roundStep == (this.card.name === 'trainer' ? 'ROULETTE' : 'ROUND_END');
       return !this.isDisabled && correctRoundStep && this.game.gameType !== 'master';
     },
   },
