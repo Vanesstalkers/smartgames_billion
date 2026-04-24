@@ -5,7 +5,7 @@
 
   switch (code) {
     case 'ACCEPT_DEAL': {
-      const { dealType, group, amount, payType, contractorId, repayType, repayChipId, repayCompanyId } =
+      const { dealType, group, amount, payType, contractorId, repayType, repayChipId, repayCompanyId, repayBusterId } =
         player.eventData.deal;
       const contractor = game.get(contractorId);
 
@@ -17,6 +17,11 @@
           const acquired = {};
 
           switch (repayType) {
+            case 'buster': {
+              const buster = game.get(repayBusterId);
+              buster.moveToTarget(player.decks.buster);
+              break;
+            }
             case 'resource': {
               if (group) repay.group = group;
               if (repayChipId) repay.repayChipId = repayChipId;

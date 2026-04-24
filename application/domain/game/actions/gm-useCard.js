@@ -12,7 +12,7 @@
       const { game, player, data: { cardId } = {} } = this.eventContext();
 
       player.set({
-        eventData: { label: 'Отменить действие', resetEvent: true },
+        eventData: { controlBtn: { label: 'Отменить действие', resetEvent: true } },
         staticHelper: {
           text: `Особые действия с предприятием`,
           buttons: [
@@ -22,16 +22,24 @@
               gameMasterAction: true,
               eventData: { cardId },
             },
-            {
-              text: 'Отменить действие',
-              code: 'DO_NOTHING',
-              gameMasterAction: true,
-            },
+            // {
+            //   text: 'Отменить действие',
+            //   code: 'DO_NOTHING',
+            //   gameMasterAction: true,
+            // },
           ],
         },
       });
-
-      return { resetEvent: true };
+    },
+    handlers: {
+      RESET() {
+        const { game, player, beforeEventControlBtn: controlBtn } = this.eventContext();
+        player.set(
+          { eventData: { controlBtn }, staticHelper: null },
+          { reset: ['eventData.controlBtn', 'staticHelper'] }
+        );
+        this.destroy();
+      },
     },
   });
 });

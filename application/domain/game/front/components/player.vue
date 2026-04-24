@@ -47,7 +47,7 @@
           class="deck-card-layer deck-card--top"
           :content="busterCards.length"
           :cardData="{
-            played: false,
+            played: true,
             group: 'buster',
           }"
           :imgExt="'png'"

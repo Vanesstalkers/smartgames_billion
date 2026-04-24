@@ -55,7 +55,7 @@
       contractor.set({ eventData: { deal: { contractorId: player.id() } } });
     },
     handlers: {
-      async TRIGGER({ dealType, amount, payType, group, initPlayer, target, repayType }) {
+      async TRIGGER({ dealType, amount, code, payType, group, initPlayer, target, repayType }) {
         const {
           game,
           player,
@@ -86,8 +86,8 @@
             let repayDescription = '';
             if (repayType === 'money') {
               repayDescription = 'Возврат предполагается деньгами.';
-            } else if (repayType === 'booster') {
-              repayDescription = 'Возврат предполагается бустером.';
+            } else if (repayType === 'buster') {
+              repayDescription = `Возврат предполагается бустером <a>${game.busters(code).title}</a>.`;
             } else if (repayType === 'resource') {
               const br = group && player.eventData.deal.playerResources?.[group];
               const pledgeChip = br ? game.get(br.chipId) : null;
@@ -130,6 +130,11 @@
           repayCompanyId = player.eventData.deal.playerCompanies[group].companyId;
         }
 
+        let repayBusterId;
+        if (repayType === 'buster' && code && player.eventData.deal.playerBusters?.[code]) {
+          repayBusterId = player.eventData.deal.playerBusters[code].busterId;
+        }
+
         contractor.set({
           eventData: {
             deal: {
@@ -141,6 +146,7 @@
               repayType,
               ...(repayChipId && { repayChipId }),
               ...(repayCompanyId && { repayCompanyId }),
+              ...(repayBusterId && { repayBusterId }),
             },
             disableActivePlayerCheck: true,
           },

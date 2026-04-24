@@ -8,11 +8,15 @@
         return { preventApiCall: true };
       }
 
-      const eventData = { ...clickedButton, amount };
+      const eventData = { ...clickedButton, amount, code: inputData.code };
       await api.action
         .call({ path: 'game.api.action', args: [{ name: 'eventTrigger', data: { eventData } }] })
         .catch(prettyAlert);
 
+      return { exit: true };
+    },
+    RESET: async () => {
+      await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
       return { exit: true };
     },
   };
@@ -22,7 +26,7 @@
         Одолжить деньги — отдельные правила займа появятся в партии. Сделку с ресурсом и суммой можно оформить через пункт «Купить ресурс»: сумма и выбор ресурса — в одном окне подсказки.
         <p>Возврат по этому запросу — <b>деньгами</b>.</p>
       `,
-    booster: `
+    buster: `
         Одолжить деньги — отдельные правила займа появятся в партии. Сделку с ресурсом и суммой можно оформить через пункт «Купить ресурс»: сумма и выбор ресурса — в одном окне подсказки.
         <p>Возврат по этому запросу — <b>бустером</b>.</p>
       `,
@@ -42,7 +46,7 @@
       if (entries.length > 0) {
         step.input.push({
           type: 'select',
-          name: 'buster',
+          name: 'code',
           value: entries[0][0],
           options: entries.map(([name, { title }]) => ({ value: name, label: title })),
         });
@@ -51,7 +55,7 @@
       step.buttons = [
         { text: 'Назад', step: 'borrowRepayChoice', key: null },
         { text: 'Отправить запрос', action: 'TRIGGER', dealType: 'borrowMoney', repayType },
-        { text: 'Закрыть', action: 'exit', exit: true },
+        { text: 'Закрыть', action: 'RESET', exit: true },
       ];
     },
     buttons: [],
@@ -70,6 +74,7 @@
           { text: 'Взять деньги в долг', step: 'borrowRepayChoice', key: null },
           { text: 'Купить ресурс', step: 'buyResource' },
           { text: 'Воспользоваться услугой', step: 'useService' },
+          { text: 'Предложить купить бустер', step: 'saleBuster', key: null },
           { text: 'Отмена', action: 'RESET', exit: true },
         ],
         actions: {
@@ -89,10 +94,16 @@
           { text: 'Вернуть деньгами', step: 'borrowMoney_money', key: null },
           { text: 'Вернуть ресурсом', step: 'borrowMoney_resource', key: null },
           { text: 'Вернуть услугой', step: 'borrowMoney_service', key: null },
-          { text: 'Вернуть бустером', step: 'borrowMoney_booster', key: null },
+          { text: 'Вернуть бустером', step: 'borrowMoney_buster', key: null },
           { text: 'Назад', step: 'choose', key: null },
-          { text: 'Отмена', action: 'exit', exit: true },
+          { text: 'Отмена', action: 'RESET', exit: true },
         ],
+        actions: {
+          RESET: async () => {
+            await api.action.call({ path: 'game.api.action', args: [{ name: 'eventReset' }] }).catch(prettyAlert);
+            return { exit: true };
+          },
+        },
       },
       borrowMoney_money: makeBorrowMoneyStep('money'),
       borrowMoney_resource: {
@@ -111,7 +122,7 @@
             step.text = `<p>У тебя сейчас нет свободных ресурсов на поле для такого условия возврата. Выбери другой способ или договорись позже.</p>`;
             step.buttons = [
               { text: 'Назад', step: 'borrowRepayChoice', icon: ['fas', 'arrow-left'], key: null },
-              { text: 'Закрыть', action: 'exit', exit: true },
+              { text: 'Закрыть', action: 'RESET', exit: true },
             ];
             return;
           }
@@ -153,7 +164,7 @@
             step.text = `<p>У тебя сейчас нет подходящих карт компаний на поле для такого условия возврата. Выбери другой способ или договорись позже.</p>`;
             step.buttons = [
               { text: 'Назад', step: 'borrowRepayChoice', icon: ['fas', 'arrow-left'], key: null },
-              { text: 'Закрыть', action: 'exit', exit: true },
+              { text: 'Закрыть', action: 'RESET', exit: true },
             ];
             return;
           }
@@ -179,7 +190,14 @@
         },
         buttons: [],
       },
-      borrowMoney_booster: makeBorrowMoneyStep('booster'),
+      borrowMoney_buster: makeBorrowMoneyStep('buster'),
+      saleBuster: {
+        superPos: true,
+        bigControls: true,
+        text: `
+        Предложить купить бустер оппоненту.
+      `,
+      },
       buyResource: {
         superPos: true,
         bigControls: true,
@@ -294,7 +312,7 @@
         },
         buttons: [
           { text: 'Назад', step: 'choose' },
-          { text: 'Закрыть', action: 'exit', exit: true },
+          { text: 'Закрыть', action: 'RESET', exit: true },
         ],
       },
     },

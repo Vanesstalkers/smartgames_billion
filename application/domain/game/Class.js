@@ -1,5 +1,6 @@
 (class Game extends lib.game.Class() {
   #resources = domain.game.configs.cards({ mapFormat: true });
+  #busters = domain.game.configs.cards({ selectGroup: 'buster', unique: true }).reduce((agg, c)=>({...agg, [c.name]: {title: c.title}}), {});
 
   constructor(...args) {
     super(...args);
@@ -21,6 +22,11 @@
   resources(type) {
     if (!type) return this.#resources;
     return this.#resources[type];
+  }
+
+  busters(name) {
+    if (!name) return this.#busters;
+    return this.#busters[name];
   }
 
   getFreePlayerSlot() {

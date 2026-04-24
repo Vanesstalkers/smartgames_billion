@@ -82,14 +82,22 @@ export default {
       };
     },
     canPlay() {
+      if (this.card.played) return false;
       if (this.isGameMaster()) return true;
 
       const correctRoundStep = this.game.roundStep == (this.card.name === 'trainer' ? 'ROULETTE' : 'ROUND_END');
-      return !this.isDisabled && !this.card.played && correctRoundStep && this.game.gameType !== 'master';
+      return !this.isDisabled && correctRoundStep && this.game.gameType !== 'master';
     },
   },
   methods: {
     async triggerCardEvent() {
+      if (!this.isSelectable) {
+        if (this.isGameMaster()) {
+          await this.handleGameApi({ name: `gm-useBuster`, data: { busterCardId: this.cardId } });
+        }
+        return;
+      }
+
       if (this.isSelectable) {
         this.handleGameApi({ name: 'eventTrigger', data: { eventData: { targetId: this.cardId } } });
         return;

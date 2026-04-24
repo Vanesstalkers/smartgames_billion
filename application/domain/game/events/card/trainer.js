@@ -39,6 +39,7 @@
 
       player.set({ eventData: { player: null }, staticHelper: null });
 
+      if(success) card.moveToDrop();
       this.emit(success ? 'SUCCESS' : 'FAILED');
       this.destroy();
     },

@@ -26,6 +26,7 @@
     }
     case 'RESTORE_CHIPS': {
       game.get(eventData.cardId).restoreResources();
+      game.toggleEventHandlers('RESET', {}, gameMaster);
       break;
     }
     case 'DO_NOTHING':
