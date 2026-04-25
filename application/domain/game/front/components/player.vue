@@ -188,7 +188,7 @@ export default {
         await this.handleGameApi({ name: 'eventTrigger', data: { eventData: { button } } });
       } else if (button.resetEvent) {
         await this.handleGameApi({ name: 'eventReset' });
-      } else if (this.player.eventData?.deal) {
+      } else {
         await this.handleGameApi({ name: 'dealAction', data: { ...button } });
       }
     },

@@ -26,17 +26,17 @@
       init() {
         const { game } = this.eventContext();
 
-        for (const player of game.players()) {
-          const cards = domain.game.configs.cards({ selectGroup: 'buster', unique: true });
-          for (const card of cards) {
-            game.decks.buster.select({ attr: { name: card.name } })[0].moveToTarget(player.decks.buster);
-          }
+        // for (const player of game.players()) {
+        //   const cards = domain.game.configs.cards({ selectGroup: 'buster', unique: true });
+        //   for (const card of cards) {
+        //     game.decks.buster.select({ attr: { name: card.name } })[0].moveToTarget(player.decks.buster);
+        //   }
           // const decks = Object.values(game.decks).filter((d) => d.type === 'company');
           // for (const deck of decks) {
           //   const card = deck.getRandomItem();
           //   card.moveToTarget(player.decks.company, { restoreResources: true });
           // }
-        }
+        // }
 
         // game.run('startGame');
         // return { resetEvent: true };

@@ -5,75 +5,12 @@
 
   switch (code) {
     case 'ACCEPT_DEAL': {
-      const { dealType, group, amount, payType, contractorId, repayType, repayChipId, repayCompanyId, repayBusterId } =
-        player.eventData.deal;
+      const { dealType, code, amount, payType, contractorId, chipId, companyId, busterId } = player.eventData.deal;
       const contractor = game.get(contractorId);
 
       let logMessage = '';
       switch (dealType) {
-        case 'borrowMoney': {
-          const dealId = db.mongo.ObjectID().toString();
-          const repay = repayType ? { repayType } : {};
-          const acquired = {};
-
-          switch (repayType) {
-            case 'buster': {
-              const buster = game.get(repayBusterId);
-              buster.moveToTarget(player.decks.buster);
-              break;
-            }
-            case 'resource': {
-              if (repayChipId) repay.repayChipId = repayChipId;
-              const repayChip = game.get(repayChipId);
-
-              repayChip.set({ ownerId: playerId });
-              acquired.chip = { [repayChipId]: { playerId: contractorId } };
-
-              const acquiredChip = contractor.acquired?.chip?.[repayChipId];
-              if (acquiredChip) {
-                if (acquiredChip.playerId === playerId) {
-                  repayChip.set({ ownerId: null });
-                  acquired.chip = { [repayChipId]: null };
-                } else {
-                  acquired.chip = { [repayChipId]: acquiredChip };
-                }
-                contractor.set({ acquired: { chip: { [repayChipId]: null } } });
-              }
-
-              if (rouletteChip?.value === group) {
-                player.processDistributionIncome();
-                contractor.processDistributionIncome();
-              }
-              break;
-            }
-            case 'service': {
-              if (repayCompanyId) repay.repayCompanyId = repayCompanyId;
-              acquired.company = { [repayCompanyId]: { playerId: contractorId } };
-              game.get(repayCompanyId).set({ ownerId: playerId });
-
-              if (rouletteChip?.value === group) {
-                player.processDistributionIncome();
-                contractor.processDistributionIncome();
-              }
-              break;
-            }
-          }
-          contractor.set({
-            money: contractor.money + amount,
-            dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId, ...repay } },
-          });
-          player.set({
-            money: player.money - amount,
-            dealsMap: { [dealId]: { dealId, amount, contractorId, ...repay } },
-            acquired: { ...acquired },
-          });
-
-          logMessage = `Игрок <a>{{player}}</a> одолжил <a>${amount}₽</a> игроку <a>${contractor.userName}</a>`;
-          break;
-        }
-
         case 'buyResource': {
-          const chipId = contractor.eventData.deal.contractorResources[group].chipId;
           const chip = game.get(chipId);
 
           chip.set({ ownerId: contractorId });
@@ -88,47 +25,147 @@
             player.set({ acquired: { chip: { [chipId]: null } } });
           }
 
-          if (payType === 'deferred') {
-            const dealId = db.mongo.ObjectID().toString();
-            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId } } });
-            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
-          } else {
-            contractor.set({ money: contractor.money - amount });
-            player.set({ money: player.money + amount });
+          switch (payType) {
+            case 'deferred': {
+              const dealId = db.mongo.ObjectID().toString();
+              contractor.set({ dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId: playerId } } });
+              player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
+              break;
+            }
+            case 'immediate': {
+              contractor.set({ money: contractor.money - amount });
+              player.set({ money: player.money + amount });
+              break;
+            }
           }
 
-          logMessage = `Игрок <a>{{player}}</a> продал ресурс <a>${chip.getTitle()}</a> игроку <a>${
-            contractor.userName
-          }</a> за <a>${amount}₽</a>`;
+          logMessage = `Игрок <a>{{player}}</a> продал ресурс <a>${chip.getTitle()}</a> игроку <a>${contractor.getUserName()}</a> за <a>${amount}₽</a>`;
 
-          if (rouletteChip?.value === group) {
+          if (rouletteChip?.value === chip.value) {
             player.processDistributionIncome();
             contractor.processDistributionIncome();
           }
           break;
         }
 
-        case 'useService': {
-          const company = game.get(contractor.eventData.deal.contractorCompanies[group].companyId);
+        case 'borrowMoney': {
+          const dealId = db.mongo.ObjectID().toString();
 
-          contractor.set({ acquired: { company: { [company.id()]: { playerId } } } });
-          if (payType === 'deferred') {
-            const dealId = db.mongo.ObjectID().toString();
-            contractor.set({ dealsMap: { [dealId]: { playerDebt: true, dealId, amount, contractorId: playerId } } });
-            player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
-          } else {
-            contractor.set({ money: contractor.money - amount });
-            player.set({ money: player.money + amount });
+          contractor.set({
+            money: contractor.money + amount,
+            dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId: playerId } },
+          });
+          player.set({
+            money: player.money - amount,
+            dealsMap: { [dealId]: { dealId, amount, contractorId } },
+          });
+
+          logMessage = `Игрок <a>{{player}}</a> дал в долг <a>${amount}₽</a> игроку <a>${contractor.getUserName()}</a>`;
+          break;
+        }
+
+        case 'saleResource': {
+          const acquired = {};
+
+          const chip = game.get(chipId);
+          chip.set({ ownerId: playerId });
+          acquired.chip = { [chipId]: { playerId: contractorId } };
+
+          const acquiredChip = contractor.acquired?.chip?.[chipId];
+          if (acquiredChip) {
+            if (acquiredChip.playerId === playerId) {
+              chip.set({ ownerId: null });
+              acquired.chip = { [chipId]: null };
+            } else {
+              acquired.chip = { [chipId]: acquiredChip };
+            }
+            contractor.set({ acquired: { chip: { [chipId]: null } } });
           }
 
-          logMessage = `Игрок <a>{{player}}</a> дал доступ к услуге <a>${company.getTitle()}</a> игроку <a>${
-            contractor.userName
-          }</a> за <a>${amount}₽</a>`;
-
-          if (rouletteChip?.value === group) {
+          if (rouletteChip?.value === chip.value) {
             player.processDistributionIncome();
             contractor.processDistributionIncome();
           }
+
+          switch (payType) {
+            case 'deferred': {
+              const dealId = db.mongo.ObjectID().toString();
+              contractor.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: playerId } } });
+              player.set({ dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId } } });
+              break;
+            }
+            case 'immediate': {
+              contractor.set({ money: contractor.money + amount });
+              player.set({ money: player.money - amount });
+              break;
+            }
+          }
+
+          logMessage = `Игрок <a>{{player}}</a> купил ресурс <a>${chip.getTitle()}</a> у игрока <a>${contractor.getUserName()}</a> за <a>${amount}₽</a>`;
+          break;
+        }
+        case 'saleService': {
+          const company = game.get(companyId);
+          player.set({ acquired: { company: { [companyId]: { playerId: contractorId } } } });
+
+          switch (payType) {
+            case 'deferred': {
+              const dealId = db.mongo.ObjectID().toString();
+              contractor.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: playerId } } });
+              player.set({ dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId } } });
+              break;
+            }
+            case 'immediate': {
+              contractor.set({ money: contractor.money + amount });
+              player.set({ money: player.money - amount });
+              break;
+            }
+          }
+
+          logMessage = `Игрок <a>{{player}}</a> купил услугу <a>${company.getTitle()}</a> у игрока <a>${contractor.getUserName()}</a> за <a>${amount}₽</a>`;
+          break;
+        }
+        case 'saleBuster': {
+          const buster = game.get(busterId);
+          buster.moveToTarget(player.decks.buster);
+
+          switch (payType) {
+            case 'deferred': {
+              const dealId = db.mongo.ObjectID().toString();
+              contractor.set({ dealsMap: { [dealId]: { dealId, amount, contractorId: playerId } } });
+              player.set({ dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId } } });
+              break;
+            }
+            case 'immediate': {
+              contractor.set({ money: contractor.money + amount });
+              player.set({ money: player.money - amount });
+              break;
+            }
+          }
+
+          logMessage = `Игрок <a>{{player}}</a> купил бустер <a>${buster.getTitle()}</a> у игрока <a>${contractor.getUserName()}</a> за <a>${amount}₽</a>`;
+          break;
+        }
+
+        case 'useService': {
+          const company = game.get(contractor.eventData.deal.contractorCompanies[code].companyId);
+
+          contractor.set({ acquired: { company: { [company.id()]: { playerId } } } });
+          switch (payType) {
+            case 'deferred': {
+              contractor.set({ dealsMap: { [dealId]: { debt: true, dealId, amount, contractorId: playerId } } });
+              player.set({ dealsMap: { [dealId]: { dealId, amount, contractorId } } });
+              break;
+            }
+            case 'immediate': {
+              contractor.set({ money: contractor.money - amount });
+              player.set({ money: player.money + amount });
+              break;
+            }
+          }
+
+          logMessage = `Игрок <a>{{player}}</a> продал услугу <a>${company.getTitle()}</a> игроку <a>${contractor.getUserName()}</a> за <a>${amount}₽</a>`;
+
           break;
         }
       }
@@ -138,6 +175,8 @@
 
       game.logs({ msg: logMessage, userId: player.userId });
       contractor.notifyUser({ message: `Сделка состоялась` });
+
+      game.toggleEventHandlers('RESET', {}, contractor);
       break;
     }
     case 'USE_DECK': {

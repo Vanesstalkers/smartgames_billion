@@ -4,9 +4,8 @@
     showTitle: true,
     superPos: true,
   },
-  busterAction(targetPlayer) {
-    const { game, player, source: card } = this.eventContext();
-    targetPlayer.set({ money: targetPlayer.money + 20 });
+  busterAction(targetPlayer) {   
+    targetPlayer.earnMoney(20);
   },
   init: function () {
     const { game, player } = this.eventContext();
@@ -32,7 +31,7 @@
     RESET({ success } = {}) {
       const { game, player, source: card } = this.eventContext();
 
-      player.set({ eventData: { player: null }, staticHelper: null });
+      player.set({ eventData: { player: null } });
 
       if (success) card.moveToDrop();
       this.emit(success ? 'SUCCESS' : 'FAILED');

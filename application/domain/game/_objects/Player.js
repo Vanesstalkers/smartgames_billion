@@ -5,8 +5,8 @@
     super(data, { parent });
     this.broadcastableFields(['income', 'money']);
 
-    const { money = 0, income = 0, acquired = {} } = data;
-    this.set({ money, income, acquired });
+    const { money = 0, income = 0, acquired = {}, dealsMap = {} } = data;
+    this.set({ money, income, acquired, dealsMap });
   }
 
   getCompaniesBySubtype({ type }) {
@@ -82,11 +82,11 @@
   showDealsHelper() {
     const showList = [];
     for (const deal of this.deals()) {
-      if (!deal.playerDebt) continue;
+      if (!deal.debt) continue;
 
       const contractor = this.game().get(deal.contractorId);
       showList.push({
-        title: `Оплатить долг <a>${deal.amount}₽₽₽</a> игроку <a>${contractor.userName}</a>`,
+        title: `Оплатить долг <a>${deal.amount}₽</a> игроку <a>${contractor.getUserName()}</a>`,
         action: { code: 'CLOSE_DEAL', dealId: deal.dealId },
       });
     }

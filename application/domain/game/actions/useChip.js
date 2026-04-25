@@ -35,7 +35,7 @@
         if (company.played || company.subtype !== chip.value) continue;
         if(!domain.game.events.company[company.subtype]) continue;
         
-        eventData.player[playerId] = { selectable: true };
+        eventData.player[playerId] = { highlight: true };
         eventData.company[companyId] = { selectable: true };
       }
 
