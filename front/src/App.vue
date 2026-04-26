@@ -166,6 +166,7 @@ body {
   z-index: 1000;
   left: 20px;
   top: 10px;
+
   button {
     width: 110px;
     font-size: 10px;
@@ -217,7 +218,24 @@ body {
 }
 #app.game-loaded {
   .fullscreen-btn {
-    left: max(10%, 130px);
+    left: 85px;
+    
+    &.scale-2 {
+      left: 105px;
+      top: 12px;
+    }
+    &.scale-3 {
+      left: 175px;
+      top: 20px;
+    }
+    &.scale-4 {
+      left: 235px;
+      top: 25px;
+    }
+    &.scale-5 {
+      left: 300px;
+      top: 30px;
+    }
   }
 }
 

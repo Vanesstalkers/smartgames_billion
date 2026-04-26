@@ -1,7 +1,7 @@
 <template>
   <game
     :debug="false"
-    :gamePlaneFillWidth="0.2"
+    :gamePlaneFillWidth="[0.2, 0.4, 0.6, 1, 1.5][state.guiScale - 1]"
     :planeScaleMax="[1.5, 2, 3, 4, 6][state.guiScale - 1]"
     :roulette="rouletteTable.value?.split('-')[0] || ''"
   >

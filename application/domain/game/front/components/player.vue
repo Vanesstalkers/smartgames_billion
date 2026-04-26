@@ -78,6 +78,7 @@
           :dialogStyle="{}"
           :customData="staticHelper"
           :action="action"
+          :controlsDisabled="true"
         />
       </div>
     </div>
