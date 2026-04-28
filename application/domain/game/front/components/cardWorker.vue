@@ -473,6 +473,8 @@ export default {
     bottom: 0px;
     height: auto;
     line-height: 32px;
+    width: 100%;
+    margin: 0px 0px 16px 0px;
   }
 }
 
