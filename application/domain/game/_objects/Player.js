@@ -80,21 +80,7 @@
     return Object.values(this.dealsMap);
   }
   showDealsHelper() {
-    const showList = [];
-    for (const deal of this.deals()) {
-      if (!deal.debt) continue;
-
-      const contractor = this.game().get(deal.contractorId);
-      showList.push({
-        title: `Оплатить долг <a>${deal.amount}₽</a> игроку <a>${contractor.getUserName()}</a>`,
-        action: { code: 'CLOSE_DEAL', dealId: deal.dealId },
-      });
-    }
-    if (showList.length === 0) return;
-
-    this.set({
-      staticHelper: { text: `Заключенные сделки:`, showList, buttons: [{ text: 'Отмена' }] },
-    });
+    domain.game.actions.showDealsHelper.call(this);
   }
 
   processDistributionIncome() {

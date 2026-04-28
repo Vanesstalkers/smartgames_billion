@@ -1,4 +1,9 @@
 (async function ({ targetId } = {}, player) {
+  if (targetId === player.id()) {
+    player.showDealsHelper();
+    return;
+  }
+
   const event = player.initEvent({
     name: 'deal',
     data: {
@@ -133,6 +138,11 @@
             deal.companyId = companyId;
             break;
           }
+          // case 'customDeal': {
+          //   text = `Игрок <a>${player.getUserName()}</a> предлагает Вам сделку на условии <a>${payTypeText}</a>. Суть сделки: <a><p>${custom}</p></a>. Согласны заключить такую сделку?`;
+          //   deal.custom = custom;
+          //   break;
+          // }
         }
 
         contractor.set({

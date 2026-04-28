@@ -1,14 +1,34 @@
 /* eslint-disable max-len */
 () => {
   const defaultActions = {
-    TRIGGER: async ({ $helper, inputData, clickedButton }) => {
+    TRIGGER: async ({ $helper, inputData, clickedButton, helperData, state }) => {
+      const userId = state.currentUser;
+      const { playerId, gameId } = state.store.user[userId];
+      const player = state.store.game[gameId].store.player[playerId];
+      const contractor = state.store.game[gameId].store.player[player.eventData.deal.contractorId];
+
       const amount = Number(inputData.amount);
-      if (inputData.amount === '' || !Number.isFinite(amount)) {
-        $helper.dialogError = 'Необходимо указать сумму сделки';
+      let dialogError;
+
+      if (inputData.payType === 'immediate') {
+        if (amount > player.money && !helperData.checkOnlyContractorsMoney)
+          dialogError = 'Вам не хватает денег для сделки';
+        else if (amount > contractor.money) dialogError = 'Игроку не хватает денег для сделки';
+      }
+      if (inputData.amount === '' || !Number.isFinite(amount)) dialogError = 'Необходимо указать сумму сделки';
+
+      if (dialogError) {
+        $helper.dialogError = dialogError;
         return { preventApiCall: true };
       }
 
-      const eventData = { ...clickedButton, amount, code: inputData.code, payType: inputData.payType };
+      const eventData = {
+        ...clickedButton,
+        amount,
+        code: inputData.code,
+        payType: inputData.payType,
+        custom: inputData.custom,
+      };
       await api.action
         .call({ path: 'game.api.action', args: [{ name: 'eventTrigger', data: { eventData } }] })
         .catch(prettyAlert);
@@ -47,6 +67,7 @@
           { text: 'Продать игроку ресурс', step: 'saleResource', key: null },
           { text: 'Продать игроку услугу', step: 'saleService', key: null },
           { text: 'Продать игроку бустер', step: 'saleBuster', key: null },
+          // { text: 'Особая сделка', step: 'customDeal', key: null },
           { text: 'Отмена', action: 'RESET', exit: true },
         ],
         actions: {
@@ -58,6 +79,7 @@
         text: 'Одолжить деньги в размере',
         input: [{ placeholder: 'Сумма', name: 'amount' }],
         actions: defaultActions,
+        checkOnlyContractorsMoney: true,
         buttons: [
           { text: 'Назад', step: 'choose', key: null },
           { text: 'Предложить сделку', action: 'TRIGGER', dealType: 'borrowMoney' },
@@ -99,6 +121,7 @@
           ];
         },
         actions: defaultActions,
+        checkOnlyContractorsMoney: true,
         buttons: [],
       },
       saleService: {
@@ -137,13 +160,13 @@
           ];
         },
         actions: defaultActions,
+        checkOnlyContractorsMoney: true,
         buttons: [],
       },
       saleBuster: {
         superPos: true,
         text: 'Укажите параметры сделки',
         input: [{ placeholder: 'Сумма', name: 'amount' }, payTypeSelect],
-        actions: defaultActions,
         prepare({ step, user }) {
           const game = lib.store('game').get(user.gameId);
           const player = game.get(user.playerId);
@@ -174,6 +197,8 @@
             { text: 'Закрыть', action: 'RESET', exit: true },
           ];
         },
+        actions: defaultActions,
+        checkOnlyContractorsMoney: true,
         buttons: [],
       },
       buyResource: {
@@ -243,6 +268,22 @@
         actions: defaultActions,
         buttons: [
           { text: 'Назад', step: 'choose', icon: ['fas', 'arrow-left'], key: null },
+          { text: 'Закрыть', action: 'RESET', exit: true },
+        ],
+      },
+      customDeal: {
+        superPos: true,
+        bigControls: true,
+        text: `Укажите параметры сделки`,
+        input: [
+          { placeholder: 'Сумма сделки', name: 'amount' },
+          payTypeSelect,
+          { placeholder: 'Особое условие', name: 'custom', type: 'textarea', containerClass: 'w100' },
+        ],
+        actions: defaultActions,
+        buttons: [
+          { text: 'Назад', step: 'choose', icon: ['fas', 'arrow-left'], key: null },
+          { text: 'Предложить сделку', action: 'TRIGGER', dealType: 'customDeal' },
           { text: 'Закрыть', action: 'RESET', exit: true },
         ],
       },

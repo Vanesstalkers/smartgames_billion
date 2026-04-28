@@ -22,8 +22,12 @@
   if (deck.subtype === 'buster') {
     price = 10;
     text = 'Хотите приобрести бустер?';
+
+    const buyDisabled = player.money < price;
+    if (buyDisabled) text += `<p style="color: red;">Для покупки недостаточно денег</p>`;
+    
     buttons = [
-      { text: 'Купить за <b><a>10₽</a></b>', code: 'USE_DECK' },
+      { text: 'Купить за <b><a>10₽</a></b>', code: 'USE_DECK', disabled: buyDisabled },
       { text: 'Отказаться', code: 'DECLINE_DEAL' },
     ];
   } else {
@@ -33,13 +37,25 @@
       player.set({ eventData: { deal: null } });
       return;
     } else {
-      price = 25;
+      const companiesCount = player.decks.company.items().length;
+      price = companiesCount === 1 ? 25 : companiesCount === 2 ? 50 : 100;
       text = `Хотите приобрести или обменять <a>${deck.title}</a>?`;
 
+      const buyDisabled = player.money < price;
+      const exchangeDisabled = player.money < 10;
+
+      if (buyDisabled || exchangeDisabled)
+        text += `<p style="color: red;">Для покупки${exchangeDisabled ? ' или обмена' : ''} недостаточно денег</p>`;
+
       buttons = [
-        { text: 'Купить за <b><a>25₽</a></b>', code: 'USE_DECK' },
-        { text: 'Обменять за <b><a>10₽</a></b>', code: 'USE_DECK', eventData: { changeCompanyEvent: true } },
-        { text: 'Отказаться', code: 'DECLINE_DEAL' },
+        { text: `Купить за <b><a>${price}₽</a></b>`, code: 'USE_DECK', disabled: buyDisabled },
+        {
+          text: 'Обменять за <b><a>10₽</a></b>',
+          code: 'USE_DECK',
+          eventData: { changeCompanyEvent: true },
+          disabled: exchangeDisabled,
+        },
+        { text: 'Отказаться', code: 'DECLINE_DEAL', disabled: false },
       ];
     }
   }

@@ -183,8 +183,7 @@ export default {
     },
     isDisabled() {
       return (
-        this.iam ||
-        (this.sessionPlayer().eventData.playDisabled && !this.sessionPlayer().eventData.playEnabled?.[this.playerId])
+        this.sessionPlayer().eventData.playDisabled && !this.sessionPlayer().eventData.playEnabled?.[this.playerId]
       );
     },
   },
@@ -399,6 +398,25 @@ export default {
 .card-worker.has-action:hover .action-btn:not(.reset-event) {
   cursor: pointer;
   background: green;
+}
+
+.iam {
+  .end-round-timer {
+    bottom: 20px;
+  }
+  .money {
+    width: 80px;
+    font-size: 28px;
+    line-height: 36px;
+  }
+  .handshake-action {
+    display: block;
+    left: 80px;
+    top: 4px;
+    height: 36px;
+    background-size: 36px;
+    width: 36px;
+  }
 }
 
 .card-worker.selectable .end-round-btn:not(.reset-event),

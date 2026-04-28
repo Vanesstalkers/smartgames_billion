@@ -215,8 +215,8 @@
           msg: `Игрок <a>{{player}}</a> отказался от сделки c <a>${contractor.userName}</a>`,
           userId: player.userId,
         });
-        contractor.set({ staticHelper: null });
         contractor.notifyUser({ message: `Сделка отменена` });
+        game.toggleEventHandlers('RESET', {}, contractor);
       }
       player.set({ eventData: { deal: null } });
       game.toggleEventHandlers('RESET', {}, player);
