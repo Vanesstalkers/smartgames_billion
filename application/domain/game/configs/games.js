@@ -66,7 +66,7 @@
       timer: 60,
       cardsToRemove: [],
       autoFinishAfterRoundsOverdue: 10,
-      playerStartMoney: 60,
+      playerStartMoney: 6,
       playerStartIncome: 6,
       playerTemplates: {
         default: {
